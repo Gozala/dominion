@@ -1,0 +1,152 @@
+namespace DOMLog;
+
+table StashNextSibling {
+  address:int;
+}
+
+table DiscardStashed {
+  address:int;
+}
+
+table AssignStringProperty {
+  name:string;
+  value:string;
+}
+
+table AssignBooleanProperty {
+  name:string;
+  value:bool;
+}
+
+table AssignNumberProperty {
+  name:string;
+  value:double;
+}
+
+table AssignNullProperty {
+  name:string;
+}
+
+table DeleteProperty {
+  name:string;
+}
+
+table SetStyleRule {
+  name:string;
+  value:string;
+}
+
+table RemoveStyleRule {
+  name:string;
+}
+
+table SetAttribute {
+  namespaceURI:string;
+  name:string;
+  value:string;
+}
+
+table RemoveAttribute {
+  namespaceURI:string;
+  name:string;
+}
+
+table InsertText {
+  data:string;
+}
+
+table InsertComment {
+  data:string;
+}
+
+table InsertElement {
+  namespaceURI:string;
+  localName:string;
+}
+
+table InsertStashedNode {
+  address:int;
+}
+
+table ReplaceWithText {
+  data:string;
+}
+
+table ReplaceWithComment {
+  data:string;
+}
+
+table ReplaceWithElement {
+  namespaceURI:string;
+  localName:string;
+}
+
+table ReplaceWithStashedNode {
+  address:int;
+}
+
+table SetTextData {
+  data:string;
+}
+
+table EditTextData {
+  start:int;
+  end:int;
+  prefix:string;
+  suffix:string;
+}
+
+table SelectChildren {
+
+}
+
+table SelectSibling {
+  offset:int;
+}
+
+table SelectParent {
+
+}
+
+table RemoveNextSibling {
+
+}
+
+union Op {
+  SelectChildren,
+  SelectSibling,
+  SelectParent,
+
+  InsertComment,
+  InsertText,
+  InsertElement,
+  InsertStashedNode,
+  ReplaceWithComment,
+  ReplaceWithText,
+  ReplaceWithElement,
+  ReplaceWithStashedNode,
+  RemoveNextSibling,
+  SetTextData,
+  EditTextData,
+  SetAttribute,
+  RemoveAttribute,
+  AssignStringProperty,
+  AssignBooleanProperty,
+  AssignNumberProperty,
+  AssignNullProperty,
+  DeleteProperty,
+  SetStyleRule,
+  RemoveStyleRule,
+  StashNextSibling,
+  DiscardStashed
+}
+
+table Change {
+  op:Op;
+}
+
+table ChangeLog {
+  log:[Change];
+}
+
+root_type ChangeLog;
