@@ -240,9 +240,7 @@ export class AssignStringProperty {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -253,9 +251,7 @@ export class AssignStringProperty {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  value(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  value(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -340,9 +336,7 @@ export class AssignBooleanProperty {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -432,9 +426,7 @@ export class AssignNumberProperty {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -524,9 +516,7 @@ export class AssignNullProperty {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -600,9 +590,7 @@ export class DeleteProperty {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -674,9 +662,7 @@ export class SetStyleRule {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -687,9 +673,7 @@ export class SetStyleRule {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  value(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  value(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -772,9 +756,7 @@ export class RemoveStyleRule {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -846,9 +828,7 @@ export class SetAttribute {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  namespaceURI(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  namespaceURI(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -859,9 +839,7 @@ export class SetAttribute {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -872,9 +850,7 @@ export class SetAttribute {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  value(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  value(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 8)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -968,9 +944,7 @@ export class RemoveAttribute {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  namespaceURI(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  namespaceURI(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -981,9 +955,7 @@ export class RemoveAttribute {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  name(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  name(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1066,9 +1038,7 @@ export class InsertText {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  data(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  data(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1140,9 +1110,7 @@ export class InsertComment {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  data(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  data(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1214,9 +1182,7 @@ export class InsertElement {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  namespaceURI(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  namespaceURI(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1227,9 +1193,7 @@ export class InsertElement {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  localName(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  localName(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1386,9 +1350,7 @@ export class ReplaceWithText {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  data(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  data(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1460,9 +1422,7 @@ export class ReplaceWithComment {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  data(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  data(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1536,9 +1496,7 @@ export class ReplaceWithElement {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  namespaceURI(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  namespaceURI(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1549,9 +1507,7 @@ export class ReplaceWithElement {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  localName(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  localName(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1710,9 +1666,7 @@ export class SetTextData {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  data(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  data(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1800,9 +1754,7 @@ export class EditTextData {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  prefix(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  prefix(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 8)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
@@ -1813,9 +1765,7 @@ export class EditTextData {
    * @param {flatbuffers.EncodingValue=} optionalEncoding
    * @returns {string|Uint8Array|null}
    */
-  suffix(
-    optionalEncoding?: flatbuffers.EncodingValue
-  ): string | Uint8Array | null {
+  suffix(optionalEncoding?: flatbuffers.EncodingValue): string | null {
     var offset = this.bb.__offset(this.bb_pos, 10)
     return offset
       ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
