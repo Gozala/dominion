@@ -1,229 +1,114 @@
 /* @flow */
 
 import type { Builder, Offset } from "flatbuffers"
-import type { Op, OpType } from "./Op"
-import { opType } from "./Op"
-import { Change as FBSChange, ChangeLog } from "../../DOM/DOM.fbs.ts.js"
+import type { Log } from "../../Log"
+import type { Op, OpType, OpVariant } from "./Op"
+import * as FBS from "../../DOM/DOM.fbs.ts.js"
 import * as op from "./Op"
 
-export opaque type Change: Offset = number
+import {
+  DecoderError,
+  AssignBooleanProperty,
+  AssignNullProperty,
+  AssignNumberProperty,
+  AssignStringProperty,
+  DeleteProperty,
+  DiscardStashed,
+  EditTextData,
+  InsertComment,
+  InsertElement,
+  InsertStashedNode,
+  InsertText,
+  RemoveAttribute,
+  RemoveNextSibling,
+  RemoveStyleRule,
+  ReplaceWithComment,
+  ReplaceWithElement,
+  ReplaceWithStashedNode,
+  ReplaceWithText,
+  SelectChildren,
+  SelectParent,
+  SelectSibling,
+  SetAttribute,
+  SetStyleRule,
+  SetTextData,
+  StashNextSibling
+} from "./Op"
 
-export const changeLog = (builder: Builder, changes: Change[]): number => {
-  const logOffset = ChangeLog.createLogVector(builder, (changes: Offset[]))
-  ChangeLog.startChangeLog(builder)
-  if (logOffset != null) {
-    ChangeLog.addLog(builder, logOffset)
+export opaque type change: Offset = Offset
+
+class UnknownOpType extends DecoderError {
+  opType: OpType
+  constructor(opType: OpType) {
+    super()
+    this.opType = opType
   }
-  return ChangeLog.endChangeLog(builder)
+  format(context?: string) {
+    const where = context == null ? "" : `at ${context}`
+    return `Encountered unknown opType:${this.opType.toString()} in "Change" table${where}`
+  }
 }
 
-export const change = (
-  builder: Builder,
-  opType: OpType,
-  opOffset: Op
-): Change => {
-  FBSChange.startChange(builder)
-  FBSChange.addOp(builder, opOffset)
-  FBSChange.addOpType(builder, opType)
-  return FBSChange.endChange(builder)
+class OpError extends DecoderError {
+  kind: "OpError" = "OpError"
+  opName: string
+  constructor(opName: string) {
+    super()
+    this.opName = opName
+  }
+  format(context?: string) {
+    const where = context == null ? "" : `at ${context}`
+    return `Failed to decode op as ${this.opName} table${where}`
+  }
 }
 
-export const selectSibling = (builder: Builder, n: number): Change =>
-  change(builder, opType.SelectSibling, op.selectSibling(builder, n))
-
-export const selectChildren = (builder: Builder): Change =>
-  change(builder, opType.SelectChildren, op.selectChildren(builder))
-
-export const selectParent = (builder: Builder): Change =>
-  change(builder, opType.SelectParent, op.selectParent(builder))
-
-export const removeNextSibling = (builder: Builder): Change =>
-  change(builder, opType.RemoveNextSibling, op.removeNextSibling(builder))
-
-export const insertText = (builder: Builder, data: string): Change =>
-  change(builder, opType.InsertText, op.insertText(builder, data))
-
-export const insertComment = (builder: Builder, data: string): Change =>
-  change(builder, opType.InsertComment, op.insertComment(builder, data))
-
-export const insertElement = (builder: Builder, localName: string): Change =>
-  change(builder, opType.InsertElement, op.insertElement(builder, localName))
-
-export const insertElementNS = (
-  builder: Builder,
-  namespaceURI: string,
-  localName: string
-): Change =>
-  change(
-    builder,
-    opType.InsertElement,
-    op.insertElementNS(builder, namespaceURI, localName)
-  )
-
-export const insertStashedNode = (builder: Builder, address: number): Change =>
-  change(
-    builder,
-    opType.InsertStashedNode,
-    op.insertStashedNode(builder, address)
-  )
-
-export const replaceWithText = (builder: Builder, data: string): Change =>
-  change(builder, opType.ReplaceWithText, op.replaceWithText(builder, data))
-
-export const replaceWithComment = (builder: Builder, data: string): Change =>
-  change(
-    builder,
-    opType.ReplaceWithComment,
-    op.replaceWithComment(builder, data)
-  )
-
-export const replaceWithElement = (
-  builder: Builder,
-  localName: string
-): Change =>
-  change(
-    builder,
-    opType.ReplaceWithElement,
-    op.replaceWithElement(builder, localName)
-  )
-
-export const replaceWithElementNS = (
-  builder: Builder,
-  namespaceURI: string,
-  localName: string
-): Change =>
-  change(
-    builder,
-    opType.ReplaceWithElement,
-    op.replaceWithElementNS(builder, namespaceURI, localName)
-  )
-
-export const replaceWithStashedNode = (
-  builder: Builder,
-  address: number
-): Change =>
-  change(
-    builder,
-    opType.ReplaceWithStashedNode,
-    op.replaceWithStashedNode(builder, address)
-  )
-
-export const editTextData = (
-  builder: Builder,
-  start: number,
-  end: number,
-  prefix: string,
-  suffix: string
-): Change =>
-  change(
-    builder,
-    opType.EditTextData,
-    op.editTextData(builder, start, end, prefix, suffix)
-  )
-
-export const setTextData = (builder: Builder, data: string): Change =>
-  change(builder, opType.SetTextData, op.setTextData(builder, data))
-
-export const setAttribute = (
-  builder: Builder,
-  name: string,
-  value: string
-): Change =>
-  change(builder, opType.SetAttribute, op.setAttribute(builder, name, value))
-
-export const removeAttribute = (builder: Builder, name: string): Change =>
-  change(builder, opType.RemoveAttribute, op.removeAttribute(builder, name))
-
-export const setAttributeNS = (
-  builder: Builder,
-  namespaceURI: string,
-  name: string,
-  value: string
-): Change =>
-  change(
-    builder,
-    opType.SetAttribute,
-    op.setAttributeNS(builder, namespaceURI, name, value)
-  )
-
-export const removeAttributeNS = (
-  builder: Builder,
-  namespaceURI: string,
-  name: string
-): Change =>
-  change(
-    builder,
-    opType.RemoveAttribute,
-    op.removeAttributeNS(builder, namespaceURI, name)
-  )
-
-export const assignStringProperty = (
-  builder: Builder,
-  name: string,
-  value: string
-): Change =>
-  change(
-    builder,
-    opType.AssignStringProperty,
-    op.assignStringProperty(builder, name, value)
-  )
-
-export const assignNumberProperty = (
-  builder: Builder,
-  name: string,
-  value: number
-): Change =>
-  change(
-    builder,
-    opType.AssignNumberProperty,
-    op.assignNumberProperty(builder, name, value)
-  )
-
-export const assignBooleanProperty = (
-  builder: Builder,
-  name: string,
-  value: boolean
-): Change =>
-  change(
-    builder,
-    opType.AssignBooleanProperty,
-    op.assignBooleanProperty(builder, name, value)
-  )
-
-export const assignNullProperty = (
-  builder: Builder,
-  name: string,
-  value: null = null
-): Change =>
-  change(
-    builder,
-    opType.AssignNullProperty,
-    op.assignNullProperty(builder, name, value)
-  )
-
-export const deleteProperty = (builder: Builder, name: string): Change =>
-  change(builder, opType.DeleteProperty, op.deleteProperty(builder, name))
-
-export const setStyleRule = (
-  builder: Builder,
-  name: string,
-  value: string
-): Change =>
-  change(builder, opType.SetStyleRule, op.setStyleRule(builder, name, value))
-
-export const removeStyleRule = (builder: Builder, name: string): Change =>
-  change(builder, opType.RemoveStyleRule, op.removeStyleRule(builder, name))
-
-export const stashNextSibling = (builder: Builder, address: number): Change =>
-  change(
-    builder,
-    opType.StashNextSibling,
-    op.stashNextSibling(builder, address)
-  )
-
-export const discardStashedNode = (builder: Builder, address: number): Change =>
-  change(
-    builder,
-    opType.DiscardStashed,
-    op.discardStashedNode(builder, address)
-  )
+export class Change extends FBS.Change {
+  pool: { [OpType]: OpVariant } = {
+    [AssignStringProperty.opType]: new AssignStringProperty(),
+    [RemoveNextSibling.opType]: new RemoveNextSibling(),
+    [InsertText.opType]: new InsertText(),
+    [InsertComment.opType]: new InsertComment(),
+    [InsertElement.opType]: new InsertElement(),
+    [ReplaceWithComment.opType]: new ReplaceWithComment(),
+    [ReplaceWithText.opType]: new ReplaceWithText(),
+    [ReplaceWithElement.opType]: new ReplaceWithElement(),
+    [ReplaceWithStashedNode.opType]: new ReplaceWithStashedNode(),
+    [InsertStashedNode.opType]: new InsertStashedNode(),
+    [RemoveAttribute.opType]: new RemoveAttribute(),
+    [DeleteProperty.opType]: new DeleteProperty(),
+    [AssignBooleanProperty.opType]: new AssignBooleanProperty(),
+    [AssignNullProperty.opType]: new AssignNullProperty(),
+    [AssignNumberProperty.opType]: new AssignNumberProperty(),
+    [SetAttribute.opType]: new SetAttribute(),
+    [SetStyleRule.opType]: new SetStyleRule(),
+    [RemoveStyleRule.opType]: new RemoveStyleRule(),
+    [SelectChildren.opType]: new SelectChildren(),
+    [SelectSibling.opType]: new SelectSibling(),
+    [SelectParent.opType]: new SelectParent(),
+    [EditTextData.opType]: new EditTextData(),
+    [SetTextData.opType]: new SetTextData(),
+    [DiscardStashed.opType]: new DiscardStashed(),
+    [StashNextSibling.opType]: new StashNextSibling()
+  }
+  decode(decoder: Log): Log | DecoderError {
+    const type = this.opType()
+    const variant = this.pool[type]
+    if (variant == null) {
+      return new UnknownOpType(type)
+    } else {
+      console.log(`Decode: Decode op as ${variant.constructor.name}`)
+      const op = this.op(variant)
+      if (op == null) {
+        return new OpError(variant.constructor.name)
+      }
+      console.log(`Decode: op ${op.constructor.name}`)
+      return op.decode(decoder)
+    }
+  }
+  static encode(builder: Builder, opType: OpType, opOffset: Op): change {
+    Change.startChange(builder)
+    Change.addOp(builder, opOffset)
+    Change.addOpType(builder, opType)
+    return Change.endChange(builder)
+  }
+}
