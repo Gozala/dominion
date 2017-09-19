@@ -1,6 +1,6 @@
 /* @flow */
 
-export interface Log {
+export interface ChangeLog<self> {
   selectParent(): self,
   selectChildren(): self,
   selectSibling(offset: number): self,
@@ -13,14 +13,19 @@ export interface Log {
   replaceWithElementNS(namespaceURI: string, localName: string): self,
   replaceWithStashedNode(address: number): self,
 
-  insertText(text: string): self,
-  insertComment(text: string): self,
+  insertText(data: string): self,
+  insertComment(data: string): self,
   insertElement(name: string): self,
   insertElementNS(namespaceURI: string, name: string): self,
   insertStashedNode(address: number): self,
 
-  setTextData(text: string): self,
-  editTextData(from: number, to: number, prefix: string, suffix: string): self,
+  setTextData(data: string): self,
+  editTextData(
+    start: number,
+    end: number,
+    prefix: string,
+    suffix: string
+  ): self,
 
   setAttribute(name: string, value: string): self,
   setAttributeNS(namespaceURI: string, name: string, value: string): self,
@@ -35,12 +40,15 @@ export interface Log {
   discardStashedNode(address: number): self
 }
 
+export interface Log extends ChangeLog<Log> {}
+
 export interface DecoderError {
   isError: true,
   toString(): string
 }
 
-export interface Encoder<buffer> extends Log {
+export interface Encoder<buffer> extends ChangeLog<Encoder<buffer>> {
+  address: number,
   encode(): buffer
 }
 
