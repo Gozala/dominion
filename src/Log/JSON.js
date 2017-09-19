@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Log } from "../Log"
+import type { Encoder, Decoder, Log } from "../Log"
 import unreachable from "unreachable"
 
 type Navigate = SelectChildren | SelectSibling | SelectParent
@@ -25,21 +25,16 @@ type Update =
   | StashNextSibling
   | DiscardStashed
 
-type Op = Version | Navigate | Update
-
-class Version {
-  kind: "Version" = "Version"
-  version: string
-  constructor(version: string) {
-    this.version = version
-  }
-}
+type Op = Navigate | Update
 
 class StashNextSibling {
   kind: "StashNextSibling" = "StashNextSibling"
   address: number
   constructor(address: number) {
     this.address = address
+  }
+  decode(decoder: Log): Log {
+    return decoder.stashNextSibling()
   }
 }
 
@@ -48,6 +43,9 @@ class DiscardStashed {
   address: number
   constructor(address: number) {
     this.address = address
+  }
+  decode(decoder: Log): Log {
+    return decoder.discardStashedNode(this.address)
   }
 }
 
@@ -59,6 +57,9 @@ class AssignProperty {
     this.name = name
     this.value = value
   }
+  decode(decoder: Log): Log {
+    return decoder.assignProperty(this.name, this.value)
+  }
 }
 
 class DeleteProperty {
@@ -66,6 +67,9 @@ class DeleteProperty {
   name: string
   constructor(name: string) {
     this.name = name
+  }
+  decode(decoder: Log): Log {
+    return decoder.deleteProperty(this.name)
   }
 }
 
@@ -77,6 +81,9 @@ class SetStyleRule {
     this.name = name
     this.value = value
   }
+  decode(decoder: Log): Log {
+    return decoder.setStyleRule(this.name, this.value)
+  }
 }
 
 class RemoveStyleRule {
@@ -84,6 +91,9 @@ class RemoveStyleRule {
   name: string
   constructor(name: string) {
     this.name = name
+  }
+  decode(decoder: Log): Log {
+    return decoder.removeStyleRule(this.name)
   }
 }
 
@@ -97,6 +107,9 @@ class SetAttribute {
     this.value = value
     this.namespaceURI = namespaceURI
   }
+  decode(decoder: Log): Log {
+    return decoder.setStyleRule(this.name, this.value)
+  }
 }
 
 class RemoveAttribute {
@@ -107,6 +120,14 @@ class RemoveAttribute {
     this.namespaceURI = namespaceURI
     this.name = name
   }
+  decode(decoder: Log): Log {
+    const { namespaceURI, name } = this
+    if (namespaceURI == null) {
+      return decoder.removeAttribute(name)
+    } else {
+      return decoder.removeAttributeNS(namespaceURI, name)
+    }
+  }
 }
 
 class InsertText {
@@ -115,6 +136,9 @@ class InsertText {
   constructor(data: string) {
     this.data = data
   }
+  decode(decoder: Log): Log {
+    return decoder.insertText(this.data)
+  }
 }
 
 class InsertComment {
@@ -122,6 +146,9 @@ class InsertComment {
   data: string
   constructor(data: string) {
     this.data = data
+  }
+  decode(decoder: Log): Log {
+    return decoder.insertComment(this.data)
   }
 }
 
@@ -133,6 +160,14 @@ class InsertElement {
     this.namespaceURI = namespaceURI
     this.localName = localName
   }
+  decode(decoder: Log): Log {
+    const { namespaceURI, localName } = this
+    if (namespaceURI == null) {
+      return decoder.insertElement(localName)
+    } else {
+      return decoder.insertElementNS(namespaceURI, localName)
+    }
+  }
 }
 
 class InsertStashedNode {
@@ -140,6 +175,9 @@ class InsertStashedNode {
   address: number
   constructor(address: number) {
     this.address = address
+  }
+  decode(decoder: Log): Log {
+    return decoder.insertStashedNode(this.address)
   }
 }
 
@@ -149,6 +187,9 @@ class ReplaceWithText {
   constructor(data: string) {
     this.data = data
   }
+  decode(decoder: Log): Log {
+    return decoder.replaceWithText(this.data)
+  }
 }
 
 class ReplaceWithComment {
@@ -156,6 +197,9 @@ class ReplaceWithComment {
   data: string
   constructor(data: string) {
     this.data = data
+  }
+  decode(decoder: Log): Log {
+    return decoder.replaceWithComment(this.data)
   }
 }
 
@@ -167,6 +211,14 @@ class ReplaceWithElement {
     this.namespaceURI = namespaceURI
     this.name = name
   }
+  decode(decoder: Log): Log {
+    const { namespaceURI, name } = this
+    if (namespaceURI == null) {
+      return decoder.replaceWithElement(name)
+    } else {
+      return decoder.replaceWithElementNS(namespaceURI, name)
+    }
+  }
 }
 
 class ReplaceWithStashedNode {
@@ -175,6 +227,9 @@ class ReplaceWithStashedNode {
   constructor(address: number) {
     this.address = address
   }
+  decode(decoder: Log): Log {
+    return decoder.replaceWithStashedNode(this.address)
+  }
 }
 
 class SetTextData {
@@ -182,6 +237,9 @@ class SetTextData {
   data: string
   constructor(data: string) {
     this.data = data
+  }
+  decode(decoder: Log): Log {
+    return decoder.setTextData(this.data)
   }
 }
 
@@ -197,10 +255,16 @@ class EditTextData {
     this.prefix = prefix
     this.suffix = suffix
   }
+  decode(decoder: Log): Log {
+    return decoder.editTextData(this.start, this.end, this.prefix, this.suffix)
+  }
 }
 
 class SelectChildren {
   kind: "SelectChildren" = "SelectChildren"
+  decode(decoder: Log): Log {
+    return decoder.selectChildren()
+  }
 }
 
 class SelectSibling {
@@ -209,14 +273,23 @@ class SelectSibling {
   constructor(offset: number) {
     this.offset = offset
   }
+  decode(decoder: Log): Log {
+    return decoder.selectSibling(this.offset)
+  }
 }
 
 class SelectParent {
   kind: "SelectParent" = "SelectParent"
+  decode(decoder: Log): Log {
+    return decoder.selectParent()
+  }
 }
 
 class RemoveNextSibling {
   kind: "RemoveNextSibling" = "RemoveNextSibling"
+  decode(decoder: Log): Log {
+    return decoder.removeNextSibling()
+  }
 }
 
 class EmptyList<t> {
@@ -250,7 +323,7 @@ class LinkedList<t> {
 
 export type List<a> = EmptyList<a> | List<a>
 
-class JSONLog implements Log<Op[]> {
+class JSONEncoder implements Encoder<Op[]> {
   address: number
   log: List<Op>
   navigationLog: Array<Navigate>
@@ -409,8 +482,7 @@ class JSONLog implements Log<Op[]> {
   discardStashedNode(address: number): self {
     return this.update(new DiscardStashed(address))
   }
-
-  format(): Op[] {
+  encode(): Op[] {
     let log = this.log
     let instructions = []
     while (log.isEmpty === false) {
@@ -421,4 +493,15 @@ class JSONLog implements Log<Op[]> {
   }
 }
 
-export const init = (): Log<Op[]> => new JSONLog(0, empty, [])
+class JSONDecoder implements Decoder {
+  log: Op[]
+  constructor(log: Op[]) {
+    this.log = log
+  }
+  decode(decoder: Log): Log {
+    return this.log.reduce((decoder, op) => op.decode(decoder), decoder)
+  }
+}
+
+export const encoder = (): Encoder<Op[]> => new JSONEncoder(0, empty, [])
+export const decoder = (log: Op[]): Decoder => new JSONDecoder(log)
