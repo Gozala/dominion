@@ -1,52 +1,49 @@
 /* @flow */
 
-export interface Log<buffer> {
-  address: number,
+export interface Log {
+  selectParent(): self,
+  selectChildren(): self,
+  selectSibling(offset: number): self,
 
-  selectParent(): Log<buffer>,
-  selectChildren(): Log<buffer>,
-  selectSibling(offset: number): Log<buffer>,
+  removeNextSibling(): self,
 
-  removeNextSibling(): Log<buffer>,
+  replaceWithText(data: string): self,
+  replaceWithComment(data: string): self,
+  replaceWithElement(localName: string): self,
+  replaceWithElementNS(namespaceURI: string, localName: string): self,
+  replaceWithStashedNode(address: number): self,
 
-  replaceWithText(data: string): Log<buffer>,
-  replaceWithComment(data: string): Log<buffer>,
-  replaceWithElement(localName: string): Log<buffer>,
-  replaceWithElementNS(namespaceURI: string, localName: string): Log<buffer>,
-  replaceWithStashedNode(address: number): Log<buffer>,
+  insertText(text: string): self,
+  insertComment(text: string): self,
+  insertElement(name: string): self,
+  insertElementNS(namespaceURI: string, name: string): self,
+  insertStashedNode(address: number): self,
 
-  insertText(text: string): Log<buffer>,
-  insertComment(text: string): Log<buffer>,
-  insertElement(name: string): Log<buffer>,
-  insertElementNS(namespaceURI: string, name: string): Log<buffer>,
-  insertStashedNode(address: number): Log<buffer>,
+  setTextData(text: string): self,
+  editTextData(from: number, to: number, prefix: string, suffix: string): self,
 
-  setTextData(text: string): Log<buffer>,
-  editTextData(
-    from: number,
-    to: number,
-    prefix: string,
-    suffix: string
-  ): Log<buffer>,
+  setAttribute(name: string, value: string): self,
+  setAttributeNS(namespaceURI: string, name: string, value: string): self,
+  removeAttribute(name: string): self,
+  removeAttributeNS(namespaceURI: string, name: string): self,
+  assignProperty(name: string, value: string | number | boolean | null): self,
+  deleteProperty(name: string): self,
+  setStyleRule(name: string, value: string): self,
+  removeStyleRule(name: string): self,
 
-  setAttribute(name: string, value: string): Log<buffer>,
-  setAttributeNS(
-    namespaceURI: string,
-    name: string,
-    value: string
-  ): Log<buffer>,
-  removeAttribute(name: string): Log<buffer>,
-  removeAttributeNS(namespaceURI: string, name: string): Log<buffer>,
-  assignProperty(
-    name: string,
-    value: string | number | boolean | null
-  ): Log<buffer>,
-  deleteProperty(name: string): Log<buffer>,
-  setStyleRule(name: string, value: string): Log<buffer>,
-  removeStyleRule(name: string): Log<buffer>,
+  stashNextSibling(): self,
+  discardStashedNode(address: number): self
+}
 
-  stashNextSibling(): Log<buffer>,
-  discardStashedNode(address: number): Log<buffer>,
+export interface DecoderError {
+  isError: true,
+  toString(): string
+}
 
-  format(): buffer
+export interface Encoder<buffer> extends Log {
+  encode(): buffer
+}
+
+export interface Decoder {
+  decode(Log): DecoderError | Log
 }
