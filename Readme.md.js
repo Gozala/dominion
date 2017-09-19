@@ -35,7 +35,7 @@ const tree2 = DOMLog.createElement(
     DOMLog.setAttribute("id", "main"),
     DOMLog.property("autofocus", true),
     DOMLog.style({
-      backgroundColor: "red",
+      backgroundColor: "blue",
       color: "white"
     })
   ],
@@ -50,93 +50,27 @@ const tree2 = DOMLog.createElement(
   ]
 ) //?$.toDebugString()
 
-DOMLog.diff(null, tree1, JSONLog.init()) // ?JSON.stringify($.format())
-DOMLog.diff(tree1, tree1, JSONLog.init()) //?$.format()
-DOMLog.diff(tree1, tree2, JSONLog.init()) //?$.format()
+DOMLog.diff(null, tree1, JSONLog.encoder()) // ?JSON.stringify($.encode())
+DOMLog.diff(tree1, tree1, JSONLog.encoder()) //?$.encode()
+DOMLog.diff(tree1, tree2, JSONLog.encoder()) //?$.encode()
 
-const fb1 = DOMLog.diff(null, tree1, Flat.init()) // ?$.format().length
-const fb2 = DOMLog.diff(tree1, tree1, Flat.init()) //?$.format().length
-const fb3 = DOMLog.diff(tree1, tree2, Flat.init()) //?$.format().length
+const fb1 = DOMLog.diff(null, tree1, Flat.encoder()) //?$.encode().length
 
-const diff1 = [
-  { kind: "InsertElement", namespaceURI: null, name: "div" },
-  { kind: "SelectSibling", offset: 1 },
-  { kind: "AssignProperty", name: "autofocus", value: true },
-  { kind: "SetAttribute", name: "id", value: "main", namespaceURI: null },
-  { kind: "SetStyleRule", name: "backgroundColor", value: "red" },
-  { kind: "SetStyleRule", name: "color", value: "white" },
-  { kind: "SetStyleRule", name: "settingType", value: 3 },
-  { kind: "SelectChildren" },
-  { kind: "InsertText", data: "hi there" },
-  { kind: "SelectSibling", offset: 1 },
-  { kind: "InsertComment", data: "this is some comment" },
-  { kind: "SelectSibling", offset: 1 },
-  {
-    kind: "InsertElement",
-    namespaceURI: "http://www.w3.org/2000/svg",
-    name: "circle"
-  },
-  { kind: "SelectSibling", offset: 1 },
-  { kind: "SetAttribute", name: "cx", value: "40", namespaceURI: null },
-  { kind: "SetAttribute", name: "cy", value: "50", namespaceURI: null },
-  { kind: "SetAttribute", name: "r", value: "26", namespaceURI: null }
-]
+const body = document.createElement("div") //?$.innerHTML
 
-const diff2 = []
+const ch1 = Flat.decoder(fb1.encode()) //?
+DOMLog.patch(body, ch1) //?
+body.innerHTML //?
 
-import { flatbuffers } from "flatbuffers"
-import {
-  OpValue,
-  AssignStringProperty,
-  RemoveNextSibling,
-  InsertText,
-  InsertComment,
-  InsertElement,
-  ReplaceWithComment,
-  ReplaceWithText,
-  ReplaceWithElement,
-  ReplaceWithStashedNode,
-  InsertStashedNode,
-  RemoveAttribute,
-  DeleteProperty,
-  AssignBooleanProperty,
-  AssignNullProperty,
-  AssignNumberProperty,
-  SetAttribute,
-  SetStyleRule,
-  RemoveStyleRule,
-  SelectChildren,
-  SelectSibling,
-  SelectParent,
-  EditTextData,
-  SetTextData,
-  DiscardStashed,
-  StashNextSibling,
-  Change,
-  ChangeLog
-} from "./src/DOM/DOM.fbs.ts.js"
+const fb2 = DOMLog.diff(tree1, tree1, Flat.encoder()) //?$.encode().length
+const ch2 = Flat.decoder(fb2.encode()) //?
+DOMLog.patch(body, ch2) //?
+body.innerHTML //?
 
-import { opType } from "./src/Log/FlatBuffer/Op"
+console.log("-------------------")
 
-const buffer = new flatbuffers.ByteBuffer(fb1.format())
+const fb3 = DOMLog.diff(tree1, tree2, Flat.encoder()) //?$.encode().length
+const ch3 = Flat.decoder(fb3.encode()) //?
+DOMLog.patch(body, ch3) //?
 
-opType //?
-
-const changeLog = ChangeLog.getRootAsChangeLog(buffer) //?
-changeLog.logLength() //?
-let ch = changeLog.log(0) //?
-ch && ch.opType() //?
-let ie = ch && ch.op(new InsertElement()) //?
-ie && ie.localName() //?
-ie && ie.namespaceURI() //?
-
-let ch2 = changeLog.log(1, ch || undefined) //?
-ch2 && ch2.opType() //?
-let ss = ch2 && ch2.op(new SelectSibling()) //?
-ss && ss.offset() //?
-
-let ch3 = changeLog.log(2, ch || undefined) //?
-ch3 && ch3.opType() //?
-let abp = ch3 && ch3.op(new AssignBooleanProperty()) //?
-abp && abp.name() //?
-abp && abp.value() //?
+body.innerHTML //?
