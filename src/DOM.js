@@ -23,6 +23,7 @@ import type {
 import type { Dict } from "dictionary.flow"
 import { nodeType, settingType } from "./DOM/Node"
 import { diff } from "./Diff"
+import { patch } from "./Patch"
 import * as Dictionary from "dictionary.flow"
 import unreachable from "unreachable"
 
@@ -307,4 +308,4 @@ export const createThunk = <message, params: Array<mixed>>(
   ...args: params
 ): Thunk<message> => new ThunkNode(view, args)
 
-export { diff }
+export { diff, patch }
