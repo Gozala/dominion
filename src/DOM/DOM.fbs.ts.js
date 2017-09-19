@@ -2,36 +2,7 @@
 
 import * as flatbuffers from "flatbuffers"
 
-export type Op = $Values<{
-  NONE: 0,
-  SelectChildren: 1,
-  SelectSibling: 2,
-  SelectParent: 3,
-  InsertComment: 4,
-  InsertText: 5,
-  InsertElement: 6,
-  InsertStashedNode: 7,
-  ReplaceWithComment: 8,
-  ReplaceWithText: 9,
-  ReplaceWithElement: 10,
-  ReplaceWithStashedNode: 11,
-  RemoveNextSibling: 12,
-  SetTextData: 13,
-  EditTextData: 14,
-  SetAttribute: 15,
-  RemoveAttribute: 16,
-  AssignStringProperty: 17,
-  AssignBooleanProperty: 18,
-  AssignNumberProperty: 19,
-  AssignNullProperty: 20,
-  DeleteProperty: 21,
-  SetStyleRule: 22,
-  RemoveStyleRule: 23,
-  StashNextSibling: 24,
-  DiscardStashed: 25
-}>
-
-export const OpValue = {
+export type OpType = {
   NONE: 0,
   SelectChildren: 1,
   SelectSibling: 2,
@@ -59,6 +30,37 @@ export const OpValue = {
   StashNextSibling: 24,
   DiscardStashed: 25
 }
+
+export const OpValue: OpType = {
+  NONE: 0,
+  SelectChildren: 1,
+  SelectSibling: 2,
+  SelectParent: 3,
+  InsertComment: 4,
+  InsertText: 5,
+  InsertElement: 6,
+  InsertStashedNode: 7,
+  ReplaceWithComment: 8,
+  ReplaceWithText: 9,
+  ReplaceWithElement: 10,
+  ReplaceWithStashedNode: 11,
+  RemoveNextSibling: 12,
+  SetTextData: 13,
+  EditTextData: 14,
+  SetAttribute: 15,
+  RemoveAttribute: 16,
+  AssignStringProperty: 17,
+  AssignBooleanProperty: 18,
+  AssignNumberProperty: 19,
+  AssignNullProperty: 20,
+  DeleteProperty: 21,
+  SetStyleRule: 22,
+  RemoveStyleRule: 23,
+  StashNextSibling: 24,
+  DiscardStashed: 25
+}
+
+export type Op = $Values<OpType>
 
 /**
  * @constructor
