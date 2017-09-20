@@ -366,15 +366,11 @@ const diffUnindexedChildren = <a, x>(
   const last = lastElement == null ? empty : lastElement.children
   const next = nextElement.children
 
-  const lastCount = last.length
-  const nextCount = next.length
-  const count = lastCount > nextCount ? lastCount : nextCount
   // In nutshell select element.children so that element.selectSibling(1) will
   // select first child.
   log = log.selectChildren()
-
   let index = 0
-  while (index < count) {
+  while (index >= 0) {
     const lastChild = last[index]
     const nextChild = next[index]
 
@@ -393,6 +389,8 @@ const diffUnindexedChildren = <a, x>(
     } else if (lastChild != null) {
       log = log.removeNextSibling()
       index += 1
+    } else {
+      index = -1
     }
   }
 
@@ -407,64 +405,62 @@ const diffIndexedChildren = <a, x>(
   const last = lastElement == null ? empty : lastElement.children
   const next = nextElement.children
   const migrants: { [string]: [number, Node<a>] } = Object.create(null)
-  const lastCount = last.length
-  const nextCount = next.length
   let lastIndex = 0
   let nextIndex = 0
 
   log = log.selectChildren()
-
-  while (lastIndex < lastCount) {
+  while (lastIndex >= 0) {
     const lastIndexed = last[lastIndex]
-    const nextIndexed = next[nextIndex]
-
-    // If child is present in last and next version and has same index select it
-    // and diff.
-    if (
-      lastIndexed != null &&
-      nextIndexed != null &&
-      lastIndexed[0] === nextIndexed[0]
-    ) {
-      const [lastKey, lastNode] = last[lastIndex]
-      const [nextKey, nextNode] = next[nextIndex]
-      log = diffNode(lastNode, nextNode, log.selectSibling(1))
-
-      lastIndex += 1
-      nextIndex += 1
-
-      // Otherwise child in last version (we know it's present since
-      // lastIndex < lastCount) but child in new version isn't or has a different
-      // index. In which case we move child from a tree into a register.
+    // If child in last version does not exist we just break a loop.
+    if (lastIndexed == null) {
+      lastIndex = -1
     } else {
-      const [lastKey, lastNode] = last[lastIndex]
+      const [lastKey, lastNode] = lastIndexed
+      const nextIndexed = next[nextIndex]
 
+      // If child is present in last and next version and has same index select
+      // it and diff.
+      if (nextIndexed && nextIndexed[0] === lastKey) {
+        const [nextKey, nextNode] = next[nextIndex]
+        log = diffNode(lastNode, nextNode, log.selectSibling(1))
+
+        lastIndex += 1
+        nextIndex += 1
+        // Otherwise stash child from last version and continue.
+      } else {
         const { address } = log
         log = log.stashNextSibling(address)
 
         migrants[lastKey] = [address, lastNode]
         lastIndex += 1
+      }
     }
   }
 
   // At this point no more children left in last version, so we will just add
   // children from next version if there are some left.
-  while (nextIndex < nextCount) {
-    const [key, node] = next[nextIndex]
-    const registered = migrants[key]
-    // If child is in migrants dict it means it was reordered, in that case we
-    // insert it back into the tree and diff against next version and move on.
-    if (registered) {
-      const [address, last] = registered
-      log = log.insertStashedNode(address).selectSibling(1)
-      log = diffNode(last, node, log)
-
-      delete migrants[key]
-      nextIndex += 1
-
-      // otherwise we just add nodes from the next version.
+  while (nextIndex >= 0) {
+    const nextIndexed = next[nextIndex]
+    if (nextIndexed == null) {
+      nextIndex = -1
     } else {
-      log = insertNode(node, log).selectSibling(1)
-      nextIndex += 1
+      const [key, node] = nextIndexed
+      const registered = migrants[key]
+      // If child is in migrants dict it means it was reordered, in that case we
+      // insert it back into the tree and diff against next version and move on.
+      if (registered) {
+        const [address, last] = registered
+        log = log.insertStashedNode(address).selectSibling(1)
+        log = diffNode(last, node, log)
+
+        delete migrants[key]
+        nextIndex += 1
+
+        // otherwise we just add nodes from the next version.
+      } else {
+        log = insertNode(node, log).selectSibling(1)
+        nextIndex += 1
+      }
     }
   }
 
