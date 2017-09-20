@@ -8,6 +8,8 @@ export type DOCUMENT_FRAGMENT_NODE = 11
 export type INDEXED_ELEMENT_NODE = 21
 export type TAGGED_ELEMENT_NODE = 22
 export type THUNK_NODE = 23
+export type INDEXED_NODE_LIST = 24
+export type UNINDEXED_NODE_LIST = 25
 
 export type ATTRIBUTE_SETTING = 1
 export type PROPERTY_SETTING = 2
@@ -70,14 +72,32 @@ export interface Element<message> {
 
 export type Indexed<node> = [string, node]
 
-export interface UnindexedElement<message> extends Element<message> {
-  nodeType: ELEMENT_NODE,
+export interface UnindexedChildren<message> {
   children: Array<Node<message>>
 }
 
-export interface IndexedElement<message> extends Element<message> {
-  nodeType: INDEXED_ELEMENT_NODE,
+export interface IndexedChildren<message> {
   children: Array<Indexed<Node<message>>>
+}
+
+export interface UnindexedElement<message>
+  extends Element<message>, UnindexedChildren<message> {
+  nodeType: ELEMENT_NODE
+}
+
+export interface IndexedElement<message>
+  extends Element<message>, IndexedChildren<message> {
+  nodeType: INDEXED_ELEMENT_NODE
+}
+
+export interface UnindexedNodeList<message> extends UnindexedChildren<message> {
+  nodeType: UNINDEXED_NODE_LIST,
+  toDebugString(): string
+}
+
+export interface IndexedNodeList<message> extends IndexedChildren<message> {
+  nodeType: INDEXED_NODE_LIST,
+  toDebugString(): string
 }
 
 export interface Thunk<message, params: Array<mixed> = *> {
@@ -103,7 +123,9 @@ export const nodeType = {
   TAGGED_ELEMENT_NODE: (22: TAGGED_ELEMENT_NODE),
   THUNK_NODE: (23: THUNK_NODE),
   COMMENT_NODE: (8: COMMENT_NODE),
-  DOCUMENT_FRAGMENT_NODE: (11: DOCUMENT_FRAGMENT_NODE)
+  DOCUMENT_FRAGMENT_NODE: (11: DOCUMENT_FRAGMENT_NODE),
+  INDEXED_NODE_LIST: (24:INDEXED_NODE_LIST),
+  UNINDEXED_NODE_LIST: (25:UNINDEXED_NODE_LIST)
 }
 
 export const settingType = {
@@ -120,3 +142,5 @@ export type Node<message> =
   | IndexedElement<message>
   | Thunk<message>
   | Tagged<message>
+  | IndexedNodeList<message>
+  | UnindexedNodeList<message>

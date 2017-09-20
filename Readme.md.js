@@ -67,10 +67,7 @@ const ch2 = Flat.decoder(fb2.encode()) //?
 DOMLog.patch(body, ch2) //?
 body.innerHTML //?
 
-console.log("-------------------")
-
 const fb3 = DOMLog.diff(tree1, tree2, Flat.encoder()) //?$.encode().length
 const ch3 = Flat.decoder(fb3.encode()) //?
 DOMLog.patch(body, ch3) //?
-
 body.innerHTML //?
