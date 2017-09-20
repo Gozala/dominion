@@ -438,10 +438,11 @@ const diffIndexedChildren = <a, x>(
     } else {
       const [lastKey, lastNode] = last[lastIndex]
 
-      log = log.stashNextSibling()
+        const { address } = log
+        log = log.stashNextSibling(address)
 
-      migrants[lastKey] = [log.address, lastNode]
-      lastIndex += 1
+        migrants[lastKey] = [address, lastNode]
+        lastIndex += 1
     }
   }
 

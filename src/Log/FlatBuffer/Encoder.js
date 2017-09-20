@@ -295,11 +295,11 @@ class LogEncoder implements Encoder<Uint8Array> {
     )
   }
 
-  stashNextSibling(): self {
+  stashNextSibling(address): self {
     return this.change(
       StashNextSibling.opType,
-      StashNextSibling.encode(this.builder, this.address),
-      this.address + 1
+      StashNextSibling.encode(this.builder, address),
+      address + 1
     )
   }
   discardStashedNode(address: number): self {
@@ -317,4 +317,4 @@ class LogEncoder implements Encoder<Uint8Array> {
 }
 
 export const encoder = (): Encoder<Uint8Array> =>
-  new LogEncoder(0, new flatbuffers.Builder(1024), [], [])
+  new LogEncoder(1, new flatbuffers.Builder(1024), [], [])

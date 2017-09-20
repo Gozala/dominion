@@ -36,7 +36,7 @@ export interface ChangeLog<self> {
   setStyleRule(name: string, value: string): self,
   removeStyleRule(name: string): self,
 
-  stashNextSibling(): self,
+  stashNextSibling(address: number): self,
   discardStashedNode(address: number): self
 }
 

@@ -116,7 +116,6 @@ class DOMPatcher implements Log {
   target: Node
   childrenSelected: boolean
   stash: { [number]: Node }
-  address: number = 0
 
   constructor(target: Node, childrenSelected: boolean) {
     this.reset(target, childrenSelected)
@@ -345,7 +344,7 @@ class DOMPatcher implements Log {
     return this
   }
 
-  stashNextSibling(): self {
+  stashNextSibling(address: number): self {
     const next = this.childrenSelected
       ? this.target.firstChild
       : this.target.nextSibling
@@ -353,7 +352,7 @@ class DOMPatcher implements Log {
     if (next == null) {
       throw Error("Unable to stash next sibling as there is not one")
     } else {
-      this.stash[this.address++] = next
+      this.stash[address] = next
       removeNode(next)
       return this
     }

@@ -34,7 +34,7 @@ class StashNextSibling {
     this.address = address
   }
   decode(decoder: Log): Log {
-    return decoder.stashNextSibling()
+    return decoder.stashNextSibling(this.address)
   }
 }
 
@@ -472,10 +472,10 @@ class JSONEncoder implements Encoder<Op[]> {
     return this.update(new RemoveStyleRule(name))
   }
 
-  stashNextSibling(): self {
+  stashNextSibling(address: number): self {
     return this.reset(
-      this.address + 1,
-      this.log.push(new StashNextSibling(this.address)),
+      address + 1,
+      this.log.push(new StashNextSibling(address)),
       this.navigationLog
     )
   }
@@ -503,5 +503,5 @@ class JSONDecoder implements Decoder {
   }
 }
 
-export const encoder = (): Encoder<Op[]> => new JSONEncoder(0, empty, [])
+export const encoder = (): Encoder<Op[]> => new JSONEncoder(1, empty, [])
 export const decoder = (log: Op[]): Decoder => new JSONDecoder(log)

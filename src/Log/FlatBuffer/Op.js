@@ -542,7 +542,7 @@ export class StashNextSibling extends FBS.StashNextSibling {
     return StashNextSibling.endStashNextSibling(builder)
   }
   decode(decoder: Log): Log | FieldError {
-    return decoder.stashNextSibling()
+    return decoder.stashNextSibling(this.address())
   }
 }
 
