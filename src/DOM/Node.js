@@ -89,6 +89,10 @@ export type Element<message> =
   | IndexedElement<message>
   | UnindexedElement<message>
 
+export type Fragment<message> =
+  | IndexedFragment<message>
+  | UnindexedFragment<message>
+
 export interface UnindexedFragment<message> {
   nodeType: UNINDEXED_FRAGMENT_NODE,
   children: UnindexedChildren<message>,

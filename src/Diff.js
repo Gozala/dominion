@@ -8,6 +8,7 @@ import type {
   Thunk,
   Tagged,
   Indexed,
+  Fragment,
   UnindexedElement,
   IndexedElement,
   IndexedFragment,
@@ -32,6 +33,24 @@ export const diff = <a, x>(
 ): Encoder<x> => diffNode(last, next, log)
 
 export default diff
+
+const removeFragment = <a, x>(
+  node: Fragment<a>,
+  log: Encoder<x>
+): Encoder<x> => {
+  const { children } = node
+  let index = 0
+  while (index >= 0) {
+    const child = children[index]
+    if (child == null) {
+      index = -1
+    } else {
+      index++
+      log = log.removeNextSibling()
+    }
+  }
+  return log
+}
 
 const insertText = <a, x>(node: Text<a>, log: Encoder<x>): Encoder<x> =>
   log.insertText(node.data)
@@ -277,59 +296,95 @@ const diffNode = <a, x>(
   } else {
     switch (next.nodeType) {
       case nodeType.TEXT_NODE: {
-        if (last.nodeType === next.nodeType) {
-          return diffText(last, next, log)
-        } else {
-          return replaceWithText(next, log)
+        switch (last.nodeType) {
+          case nodeType.TEXT_NODE:
+            return diffText(last, next, log)
+          case nodeType.INDEXED_FRAGMENT_NODE:
+            return insertText(next, removeFragment(last, log))
+          case nodeType.UNINDEXED_FRAGMENT_NODE:
+            return insertText(next, removeFragment(last, log))
+          default:
+            return replaceWithText(next, log)
         }
       }
       case nodeType.COMMENT_NODE: {
-        if (last.nodeType === next.nodeType) {
-          return diffComment(last, next, log)
-        } else {
-          return replaceWithComment(next, log)
+        switch (last.nodeType) {
+          case nodeType.COMMENT_NODE:
+            return diffComment(last, next, log)
+          case nodeType.INDEXED_FRAGMENT_NODE:
+            return insertComment(next, removeFragment(last, log))
+          case nodeType.UNINDEXED_FRAGMENT_NODE:
+            return insertComment(next, removeFragment(last, log))
+          default:
+            return replaceWithComment(next, log)
         }
       }
       case nodeType.ELEMENT_NODE: {
-        if (last.nodeType === nodeType.ELEMENT_NODE) {
-          return diffUnindexedElement(last, next, log)
-        } else {
-          return replaceWithUnindexedElement(next, log)
+        switch (last.nodeType) {
+          case nodeType.ELEMENT_NODE:
+            return diffUnindexedElement(last, next, log)
+          case nodeType.INDEXED_FRAGMENT_NODE:
+            return insertUnindexedElement(next, removeFragment(last, log))
+          case nodeType.UNINDEXED_FRAGMENT_NODE:
+            return insertUnindexedElement(next, removeFragment(last, log))
+          default:
+            return replaceWithUnindexedElement(next, log)
         }
       }
       case nodeType.INDEXED_ELEMENT_NODE: {
-        if (last.nodeType === nodeType.INDEXED_ELEMENT_NODE) {
-          return diffIndexedElement(last, next, log)
-        } else {
-          return replaceWithIndexedElement(next, log)
+        switch (last.nodeType) {
+          case nodeType.INDEXED_ELEMENT_NODE:
+            return diffIndexedElement(last, next, log)
+          case nodeType.INDEXED_FRAGMENT_NODE:
+            return insertIndexedElement(next, removeFragment(last, log))
+          case nodeType.UNINDEXED_FRAGMENT_NODE:
+            return insertIndexedElement(next, removeFragment(last, log))
+          default:
+            return replaceWithIndexedElement(next, log)
         }
       }
       case nodeType.THUNK_NODE: {
-        if (last.nodeType === next.nodeType) {
-          return diffThunk(last, next, log)
-        } else {
-          return replaceWithThunk(next, log)
+        switch (last.nodeType) {
+          case nodeType.THUNK_NODE:
+            return diffThunk(last, next, log)
+          case nodeType.INDEXED_FRAGMENT_NODE:
+            return insertThunk(next, removeFragment(last, log))
+          case nodeType.UNINDEXED_FRAGMENT_NODE:
+            return insertThunk(next, removeFragment(last, log))
+          default:
+            return replaceWithThunk(next, log)
         }
       }
       case nodeType.TAGGED_ELEMENT_NODE: {
-        if (last.nodeType === next.nodeType) {
-          return diffTagged(last, next, log)
-        } else {
-          return replaceWithTagged(next, log)
+        switch (last.nodeType) {
+          case nodeType.TAGGED_ELEMENT_NODE:
+            return diffTagged(last, next, log)
+          case nodeType.INDEXED_FRAGMENT_NODE:
+            return insertTagged(next, removeFragment(last, log))
+          case nodeType.UNINDEXED_FRAGMENT_NODE:
+            return insertTagged(next, removeFragment(last, log))
+          default:
+            return replaceWithTagged(next, log)
         }
       }
       case nodeType.INDEXED_FRAGMENT_NODE: {
-        if (last.nodeType === next.nodeType) {
-          return diffIndexedFragment(last, next, log)
-        } else {
-          return replaceWithIndexedFragment(next, log)
+        switch (last.nodeType) {
+          case nodeType.INDEXED_FRAGMENT_NODE:
+            return diffIndexedFragment(last, next, log)
+          case nodeType.UNINDEXED_FRAGMENT_NODE:
+            return insertIndexedFragment(next, removeFragment(last, log))
+          default:
+            return replaceWithIndexedFragment(next, log)
         }
       }
       case nodeType.UNINDEXED_FRAGMENT_NODE: {
-        if (last.nodeType === next.nodeType) {
-          return diffUnindexedFragment(last, next, log)
-        } else {
-          return replaceWithUnindexedFragment(next, log)
+        switch (last.nodeType) {
+          case nodeType.UNINDEXED_FRAGMENT_NODE:
+            return diffUnindexedFragment(last, next, log)
+          case nodeType.INDEXED_FRAGMENT_NODE:
+            return insertUnindexedFragment(next, removeFragment(last, log))
+          default:
+            return replaceWithUnindexedFragment(next, log)
         }
       }
       default: {
