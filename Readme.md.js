@@ -8,53 +8,59 @@ import * as Flat from "./src/Log/FlatBuffer"
 
 DOMLog //?
 
-const tree1 = DOMLog.createElement(
-  "div",
-  [
-    DOMLog.setAttribute("id", "main"),
-    DOMLog.property("autofocus", true),
-    DOMLog.style({
-      backgroundColor: "red",
-      color: "white"
-    })
-  ],
-  [
-    DOMLog.createTextNode("hi there"),
-    DOMLog.createComment("this is some comment"),
-    DOMLog.createElementNS("http://www.w3.org/2000/svg", "circle", [
-      DOMLog.setAttribute("cx", "40"),
-      DOMLog.setAttribute("cy", "50"),
-      DOMLog.setAttribute("r", "26")
-    ])
-  ]
-) //?$.toDebugString()
+const host = DOMLog.createFragment()
 
-const tree2 = DOMLog.createElement(
-  "div",
-  [
-    DOMLog.setAttribute("id", "main"),
-    DOMLog.property("autofocus", true),
-    DOMLog.style({
-      backgroundColor: "blue",
-      color: "white"
-    })
-  ],
-  [
-    DOMLog.createTextNode("hi there"),
-    DOMLog.createComment("this is"),
-    DOMLog.createElementNS("http://www.w3.org/2000/svg", "circle", [
-      DOMLog.setAttribute("cx", "40"),
-      DOMLog.setAttribute("cy", "50"),
-      DOMLog.setAttribute("r", "26")
-    ])
-  ]
-) //?$.toDebugString()
+const tree1 = DOMLog.createFragment([
+  DOMLog.createElement(
+    "div",
+    [
+      DOMLog.setAttribute("id", "main"),
+      DOMLog.property("autofocus", true),
+      DOMLog.style({
+        backgroundColor: "red",
+        color: "white"
+      })
+    ],
+    [
+      DOMLog.createTextNode("hi there"),
+      DOMLog.createComment("this is some comment"),
+      DOMLog.createElementNS("http://www.w3.org/2000/svg", "circle", [
+        DOMLog.setAttribute("cx", "40"),
+        DOMLog.setAttribute("cy", "50"),
+        DOMLog.setAttribute("r", "26")
+      ])
+    ]
+  )
+]) //?$.toDebugString()
 
-DOMLog.diff(null, tree1, JSONLog.encoder()) // ?JSON.stringify($.encode())
+const tree2 = DOMLog.createFragment([
+  DOMLog.createElement(
+    "div",
+    [
+      DOMLog.setAttribute("id", "main"),
+      DOMLog.property("autofocus", true),
+      DOMLog.style({
+        backgroundColor: "blue",
+        color: "white"
+      })
+    ],
+    [
+      DOMLog.createTextNode("hi there"),
+      DOMLog.createComment("this is"),
+      DOMLog.createElementNS("http://www.w3.org/2000/svg", "circle", [
+        DOMLog.setAttribute("cx", "40"),
+        DOMLog.setAttribute("cy", "50"),
+        DOMLog.setAttribute("r", "26")
+      ])
+    ]
+  )
+]) //?$.toDebugString()
+
+DOMLog.diff(host, tree1, JSONLog.encoder()) // ?JSON.stringify($.encode())
 DOMLog.diff(tree1, tree1, JSONLog.encoder()) //?$.encode()
 DOMLog.diff(tree1, tree2, JSONLog.encoder()) //?$.encode()
 
-const fb1 = DOMLog.diff(null, tree1, Flat.encoder()) //?$.encode().length
+const fb1 = DOMLog.diff(host, tree1, Flat.encoder()) //?$.encode().length
 
 const body = document.createElement("div") //?$.innerHTML
 

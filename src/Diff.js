@@ -26,22 +26,10 @@ const empty = Object.freeze([])
 const blank: Object = Object.freeze(Object.create(null))
 
 export const diff = <a, x>(
-  last: ?Node<a>,
+  last: Node<a>,
   next: Node<a>,
   log: Encoder<x>
-): Encoder<x> => {
-  // Todo: We assume that target element is patched as follows:
-  // patch(target, diff(v1, v2))
-  // And that selection is set to `target.childNodes` there for if last is null
-  // we start insert node right away and otherwise we select first child and
-  // generate a patch. It is awkward because because we diff trees but patch
-  // a container of that tree. Instead diff and patch should be symetric.
-  if (last == null) {
-    return insertNode(next, log)
-  } else {
-    return diffNode(last, next, log.selectSibling(1))
-  }
-}
+): Encoder<x> => diffNode(last, next, log)
 
 export default diff
 
@@ -51,35 +39,47 @@ const insertText = <a, x>(node: Text<a>, log: Encoder<x>): Encoder<x> =>
 const insertComment = <a, x>(node: Comment<a>, log: Encoder<x>): Encoder<x> =>
   log.insertComment(node.data)
 
-const insertElement = <a, x>(node: Element<a>, log: Encoder<x>): Encoder<x> => {
-  const { localName, namespaceURI } = node
-  const v1 =
-    namespaceURI == null
-      ? log.insertElement(localName)
-      : log.insertElementNS(namespaceURI, localName)
-  const v2 = v1.selectSibling(1)
-  const v3 = setSettings(node, v2)
-  const v4 = insertElementChildren(node, v3)
-  const v5 = v4.selectSibling(-1)
-  return v5
-}
-
-const insertElementChildren = <a, x>(
+const insertElementNode = <a, x>(
   node: Element<a>,
   log: Encoder<x>
 ): Encoder<x> => {
-  if (node.nodeType === nodeType.INDEXED_ELEMENT_NODE) {
-    return insertIndexedChildren(
-      node.children,
-      log.selectChildren()
-    ).selectParent()
-  } else {
-    return insertUnindexedChildren(
-      node.children,
-      log.selectChildren()
-    ).selectParent()
-  }
+  const { localName, namespaceURI } = node
+  const out =
+    namespaceURI == null
+      ? log.insertElement(localName)
+      : log.insertElementNS(namespaceURI, localName)
+  return out
 }
+
+const insertIndexedElement = <a, x>(
+  node: IndexedElement<a>,
+  log: Encoder<x>
+): Encoder<x> =>
+  populateIndexedElement(
+    node,
+    setSettings(node, insertElementNode(node, log).selectSibling(1))
+  ).selectSibling(-1)
+
+const insertUnindexedElement = <a, x>(
+  node: UnindexedElement<a>,
+  log: Encoder<x>
+): Encoder<x> =>
+  populateUnindexedElement(
+    node,
+    setSettings(node, insertElementNode(node, log).selectSibling(1))
+  ).selectSibling(-1)
+
+const populateIndexedElement = <a, x>(
+  node: IndexedElement<a>,
+  log: Encoder<x>
+): Encoder<x> =>
+  insertIndexedChildren(node.children, log.selectChildren()).selectParent()
+
+const populateUnindexedElement = <a, x>(
+  node: UnindexedElement<a>,
+  log: Encoder<x>
+): Encoder<x> =>
+  insertUnindexedChildren(node.children, log.selectChildren()).selectParent()
 
 const insertIndexedNodeList = <a, x>(
   nodeList: IndexedNodeList<a>,
@@ -117,18 +117,35 @@ const replaceWithComment = <a, x>(
   log: Encoder<x>
 ): Encoder<x> => log.replaceWithComment(node.data)
 
-const replaceWithElement = <a, x>(
+const replaceWithElementNode = <a, x>(
   node: Element<a>,
   log: Encoder<x>
 ): Encoder<x> => {
   const { localName, namespaceURI } = node
-  const init =
+  const out =
     namespaceURI == null
       ? log.replaceWithElement(localName)
       : log.replaceWithElementNS(namespaceURI, localName)
-
-  return insertElementChildren(node, setSettings(node, init))
+  return out
 }
+
+const replaceWithUnindexedElement = <a, x>(
+  node: UnindexedElement<a>,
+  log: Encoder<x>
+): Encoder<x> =>
+  populateUnindexedElement(
+    node,
+    setSettings(node, replaceWithElementNode(node, log))
+  )
+
+const replaceWithIndexedElement = <a, x>(
+  node: IndexedElement<a>,
+  log: Encoder<x>
+): Encoder<x> =>
+  populateIndexedElement(
+    node,
+    setSettings(node, replaceWithElementNode(node, log))
+  )
 
 const replaceWithThunk = <a, x>(thunk: Thunk<a>, log: Encoder<x>): Encoder<x> =>
   replaceWithNode(thunk.force(), log)
@@ -159,10 +176,10 @@ const replaceWithNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
       return replaceWithComment(node, log)
     }
     case nodeType.ELEMENT_NODE: {
-      return replaceWithElement(node, log)
+      return replaceWithUnindexedElement(node, log)
     }
     case nodeType.INDEXED_ELEMENT_NODE: {
-      return replaceWithElement(node, log)
+      return replaceWithIndexedElement(node, log)
     }
     case nodeType.THUNK_NODE: {
       return replaceWithThunk(node, log)
@@ -191,10 +208,10 @@ const insertNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
       return log.insertComment(node.data)
     }
     case nodeType.ELEMENT_NODE: {
-      return insertElement(node, log)
+      return insertUnindexedElement(node, log)
     }
     case nodeType.INDEXED_ELEMENT_NODE: {
-      return insertElement(node, log)
+      return insertIndexedElement(node, log)
     }
     case nodeType.THUNK_NODE: {
       return insertThunk(node, log)
@@ -277,16 +294,16 @@ const diffNode = <a, x>(
       }
       case nodeType.ELEMENT_NODE: {
         if (last.nodeType === nodeType.ELEMENT_NODE) {
-          return diffElement(last, next, log)
+          return diffUnindexedElement(last, next, log)
         } else {
-          return replaceWithElement(next, log)
+          return replaceWithUnindexedElement(next, log)
         }
       }
       case nodeType.INDEXED_ELEMENT_NODE: {
         if (last.nodeType === nodeType.INDEXED_ELEMENT_NODE) {
-          return diffElement(last, next, log)
+          return diffIndexedElement(last, next, log)
         } else {
-          return replaceWithElement(next, log)
+          return replaceWithIndexedElement(next, log)
         }
       }
       case nodeType.THUNK_NODE: {
@@ -380,33 +397,6 @@ const diffTextData = <x>(
         next.substr(index + last.length)
       )
     }
-  }
-}
-
-const diffElement = <a, x>(
-  last: Element<a>,
-  next: Element<a>,
-  log: Encoder<x>
-): Encoder<x> => {
-  if (
-    last.localName === next.localName &&
-    last.namespaceURI === next.namespaceURI
-  ) {
-    if (
-      next.nodeType === nodeType.INDEXED_ELEMENT_NODE &&
-      last.nodeType === nodeType.INDEXED_ELEMENT_NODE
-    ) {
-      return diffIndexedElement(last, next, diffSettings(last, next, log))
-    } else if (
-      next.nodeType === nodeType.ELEMENT_NODE &&
-      last.nodeType === nodeType.ELEMENT_NODE
-    ) {
-      return diffUnindexedElement(last, next, diffSettings(last, next, log))
-    } else {
-      return replaceWithElement(next, log)
-    }
-  } else {
-    return replaceWithElement(next, log)
   }
 }
 

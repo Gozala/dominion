@@ -366,7 +366,7 @@ class DOMPatcher implements Log {
 export const patch = <buffer>(
   target: Node,
   changeList: Decoder,
-  patcher: Log = new DOMPatcher(target, true)
+  patcher: Log = new DOMPatcher(target, false)
 ): void => {
   console.log("!!! Patch", patcher)
   const result = changeList.decode(patcher)
