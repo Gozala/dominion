@@ -74,7 +74,7 @@ class CommentNode<message> implements Comment<message> {
   }
 }
 
-class ElementNode<message> implements Element<message> {
+class ElementNode<message> {
   localName: string
   namespaceURI: null | string
   attributes: Attributes = blank

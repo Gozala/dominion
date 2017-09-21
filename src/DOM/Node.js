@@ -59,7 +59,7 @@ export interface Comment<message> {
   toDebugString(): string
 }
 
-export interface Element<message> {
+interface ElementNode<message> {
   localName: string,
   namespaceURI: null | string,
   properties: Properties,
@@ -72,31 +72,32 @@ export interface Element<message> {
 
 export type Indexed<node> = [string, node]
 
-export interface UnindexedChildren<message> {
-  children: Array<Node<message>>
+export type UnindexedChildren<message> = Array<Node<message>>
+export type IndexedChildren<message> = Array<Indexed<Node<message>>>
+
+export interface UnindexedElement<message> extends ElementNode<message> {
+  nodeType: ELEMENT_NODE,
+  children: UnindexedChildren<message>
 }
 
-export interface IndexedChildren<message> {
-  children: Array<Indexed<Node<message>>>
+export interface IndexedElement<message> extends ElementNode<message> {
+  nodeType: INDEXED_ELEMENT_NODE,
+  children: IndexedChildren<message>
 }
 
-export interface UnindexedElement<message>
-  extends Element<message>, UnindexedChildren<message> {
-  nodeType: ELEMENT_NODE
-}
+export type Element<message> =
+  | IndexedElement<message>
+  | UnindexedElement<message>
 
-export interface IndexedElement<message>
-  extends Element<message>, IndexedChildren<message> {
-  nodeType: INDEXED_ELEMENT_NODE
-}
-
-export interface UnindexedNodeList<message> extends UnindexedChildren<message> {
+export interface UnindexedNodeList<message> {
   nodeType: UNINDEXED_NODE_LIST,
+  children: UnindexedChildren<message>,
   toDebugString(): string
 }
 
-export interface IndexedNodeList<message> extends IndexedChildren<message> {
+export interface IndexedNodeList<message> {
   nodeType: INDEXED_NODE_LIST,
+  children: IndexedChildren<message>,
   toDebugString(): string
 }
 
@@ -124,8 +125,8 @@ export const nodeType = {
   THUNK_NODE: (23: THUNK_NODE),
   COMMENT_NODE: (8: COMMENT_NODE),
   DOCUMENT_FRAGMENT_NODE: (11: DOCUMENT_FRAGMENT_NODE),
-  INDEXED_NODE_LIST: (24:INDEXED_NODE_LIST),
-  UNINDEXED_NODE_LIST: (25:UNINDEXED_NODE_LIST)
+  INDEXED_NODE_LIST: (24: INDEXED_NODE_LIST),
+  UNINDEXED_NODE_LIST: (25: UNINDEXED_NODE_LIST)
 }
 
 export const settingType = {
