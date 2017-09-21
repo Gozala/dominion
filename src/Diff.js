@@ -10,8 +10,8 @@ import type {
   Indexed,
   UnindexedElement,
   IndexedElement,
-  IndexedNodeList,
-  UnindexedNodeList,
+  IndexedFragment,
+  UnindexedFragment,
   IndexedChildren,
   UnindexedChildren,
   Properties,
@@ -81,15 +81,15 @@ const populateUnindexedElement = <a, x>(
 ): Encoder<x> =>
   insertUnindexedChildren(node.children, log.selectChildren()).selectParent()
 
-const insertIndexedNodeList = <a, x>(
-  nodeList: IndexedNodeList<a>,
+const insertIndexedFragment = <a, x>(
+  node: IndexedFragment<a>,
   log: Encoder<x>
-): Encoder<x> => insertIndexedChildren(nodeList.children, log)
+): Encoder<x> => insertIndexedChildren(node.children, log)
 
-const insertUnindexedNodeList = <a, x>(
-  nodeList: UnindexedNodeList<a>,
+const insertUnindexedFragment = <a, x>(
+  node: UnindexedFragment<a>,
   log: Encoder<x>
-): Encoder<x> => insertUnindexedChildren(nodeList.children, log)
+): Encoder<x> => insertUnindexedChildren(node.children, log)
 
 const insertIndexedChildren = <a, x>(
   children: IndexedChildren<a>,
@@ -155,17 +155,17 @@ const replaceWithTagged = <a, x>(
   log: Encoder<x>
 ): Encoder<x> => replaceWithNode(tagged.node, log)
 
-const replaceWithIndexedNodeList = <a, x>(
-  nodeList: IndexedNodeList<a>,
+const replaceWithIndexedFragment = <a, x>(
+  node: IndexedFragment<a>,
   log: Encoder<x>
 ): Encoder<x> =>
-  insertIndexedNodeList(nodeList, log.selectSibling(-1).removeNextSibling())
+  insertIndexedFragment(node, log.selectSibling(-1).removeNextSibling())
 
-const replaceWithUnindexedNodeList = <a, x>(
-  nodeList: UnindexedNodeList<a>,
+const replaceWithUnindexedFragment = <a, x>(
+  node: UnindexedFragment<a>,
   log: Encoder<x>
 ): Encoder<x> =>
-  insertUnindexedNodeList(nodeList, log.selectSibling(-1).removeNextSibling())
+  insertUnindexedFragment(node, log.selectSibling(-1).removeNextSibling())
 
 const replaceWithNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
   switch (node.nodeType) {
@@ -187,11 +187,11 @@ const replaceWithNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
     case nodeType.TAGGED_ELEMENT_NODE: {
       return replaceWithTagged(node, log)
     }
-    case nodeType.INDEXED_NODE_LIST: {
-      return replaceWithIndexedNodeList(node, log)
+    case nodeType.INDEXED_FRAGMENT_NODE: {
+      return replaceWithIndexedFragment(node, log)
     }
-    case nodeType.UNINDEXED_NODE_LIST: {
-      return replaceWithUnindexedNodeList(node, log)
+    case nodeType.UNINDEXED_FRAGMENT_NODE: {
+      return replaceWithUnindexedFragment(node, log)
     }
     default: {
       return unreachable(node)
@@ -219,11 +219,11 @@ const insertNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
     case nodeType.TAGGED_ELEMENT_NODE: {
       return insertTagged(node, log)
     }
-    case nodeType.INDEXED_NODE_LIST: {
-      return insertIndexedNodeList(node, log)
+    case nodeType.INDEXED_FRAGMENT_NODE: {
+      return insertIndexedFragment(node, log)
     }
-    case nodeType.UNINDEXED_NODE_LIST: {
-      return insertUnindexedNodeList(node, log)
+    case nodeType.UNINDEXED_FRAGMENT_NODE: {
+      return insertUnindexedFragment(node, log)
     }
     default: {
       return unreachable(node)
@@ -272,9 +272,7 @@ const diffNode = <a, x>(
   next: Node<a>,
   log: Encoder<x>
 ): Encoder<x> => {
-  if (last == null) {
-    return insertNode(next, log)
-  } else if (last === next) {
+  if (last === next) {
     return log
   } else {
     switch (next.nodeType) {
@@ -320,18 +318,18 @@ const diffNode = <a, x>(
           return replaceWithTagged(next, log)
         }
       }
-      case nodeType.INDEXED_NODE_LIST: {
+      case nodeType.INDEXED_FRAGMENT_NODE: {
         if (last.nodeType === next.nodeType) {
-          return diffIndexedNodeList(last, next, log)
+          return diffIndexedFragment(last, next, log)
         } else {
-          return replaceWithIndexedNodeList(next, log)
+          return replaceWithIndexedFragment(next, log)
         }
       }
-      case nodeType.UNINDEXED_NODE_LIST: {
+      case nodeType.UNINDEXED_FRAGMENT_NODE: {
         if (last.nodeType === next.nodeType) {
-          return diffUnindexedNodeList(last, next, log)
+          return diffUnindexedFragment(last, next, log)
         } else {
-          return replaceWithUnindexedNodeList(next, log)
+          return replaceWithUnindexedFragment(next, log)
         }
       }
       default: {
@@ -411,9 +409,9 @@ const diffUnindexedElement = <a, x>(
     log.selectChildren()
   ).selectParent()
 
-const diffUnindexedNodeList = <a, x>(
-  last: UnindexedNodeList<a>,
-  next: UnindexedNodeList<a>,
+const diffUnindexedFragment = <a, x>(
+  last: UnindexedFragment<a>,
+  next: UnindexedFragment<a>,
   log: Encoder<x>
 ): Encoder<x> => diffUnindexedChildren(last.children, next.children, log)
 
@@ -461,9 +459,9 @@ const diffIndexedElement = <a, x>(
     log.selectChildren()
   ).selectParent()
 
-const diffIndexedNodeList = <a, x>(
-  last: IndexedNodeList<a>,
-  next: IndexedNodeList<a>,
+const diffIndexedFragment = <a, x>(
+  last: IndexedFragment<a>,
+  next: IndexedFragment<a>,
   log: Encoder<x>
 ): Encoder<x> => diffIndexedChildren(last.children, next.children, log)
 

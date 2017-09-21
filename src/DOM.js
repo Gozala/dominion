@@ -308,8 +308,9 @@ export const createThunk = <message, params: Array<mixed>>(
   ...args: params
 ): Thunk<message> => new ThunkNode(view, args)
 
-export const createFragment = <message>(
+export const createHost = <message>(
+  settings: Iterable<Setting<message>> = empty,
   children: Node<message>[] = empty
-): Element<message> => createElement("main", empty, children)
+): Element<message> => createElement("x-host", settings, children)
 
 export { diff, patch }
