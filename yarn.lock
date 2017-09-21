@@ -1685,9 +1685,9 @@ flatbuffers@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/flatbuffers/-/flatbuffers-1.7.0.tgz#a5a6ed160d2c92a8c3a0de9b1b5726cca46b27c5"
 
-flow-bin@^0.54.1:
-  version "0.54.1"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.54.1.tgz#7101bcccf006dc0652714a8aef0c72078a760510"
+flow-bin@^0.55.0:
+  version "0.55.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.55.0.tgz#9083da9327bd8cab6b4076d63d85f2247a7eae1b"
 
 flow-copy-source@^1.2.1:
   version "1.2.1"
