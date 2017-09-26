@@ -259,8 +259,8 @@ export const createComment = <message>(data: string): Comment<message> =>
 
 export const createElement = <message>(
   localName: string,
-  settings: Iterable<Setting<message>>,
-  children: Node<message>[] = []
+  settings: Iterable<Setting<message>> = empty,
+  children: Node<message>[] = empty
 ): UnindexedElement<message> => {
   const element = new UnindexedElementNode(null, localName)
   setSettings(element, settings)
