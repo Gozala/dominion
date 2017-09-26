@@ -23,7 +23,7 @@ import type { Encoder } from "./Log"
 import { nodeType } from "./DOM/Node"
 import unreachable from "unreachable"
 
-const empty = Object.freeze([])
+const empty: Array<any> = Object.freeze([])
 const blank: Object = Object.freeze(Object.create(null))
 
 export const diff = <a, x>(
@@ -113,12 +113,12 @@ const insertUnindexedFragment = <a, x>(
 const insertIndexedChildren = <a, x>(
   children: IndexedChildren<a>,
   log: Encoder<x>
-): Encoder<x> => diffIndexedChildren([], children, log)
+): Encoder<x> => diffIndexedChildren(empty, children, log)
 
 const insertUnindexedChildren = <a, x>(
   children: UnindexedChildren<a>,
   log: Encoder<x>
-): Encoder<x> => diffUnindexedChildren([], children, log)
+): Encoder<x> => diffUnindexedChildren(empty, children, log)
 
 const insertThunk = <a, x>(thunk: Thunk<a>, log: Encoder<x>): Encoder<x> =>
   insertNode(thunk.force(), log)
