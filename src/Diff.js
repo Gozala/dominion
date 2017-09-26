@@ -635,9 +635,9 @@ const diffSettings = <a, x>(
   log: Encoder<x>
 ): Encoder<x> => {
   const v1 = log
-  const v2 = diffProperties(last && last.properties, next.properties, v1)
-  const v3 = diffAttributes(last && last.attributes, next.attributes, v2)
-  const v4 = diffStyle(last && last.style, next.style, v3)
+  const v2 = diffProperties(last.properties, next.properties, v1)
+  const v3 = diffAttributes(last.attributes, next.attributes, v2)
+  const v4 = diffStyle(last.style, next.style, v3)
   return v4
 }
 
@@ -646,23 +646,19 @@ const diffProperties = <x>(
   next: Properties,
   log: Encoder<x>
 ): Encoder<x> => {
-  if (last != null) {
-    for (let name in last) {
-      if (next == null || !(name in next)) {
-        log = log.deleteProperty(name)
-      }
+  for (let name in last) {
+    if (!(name in next)) {
+      log = log.deleteProperty(name)
     }
   }
 
-  if (next != null) {
-    for (let name in next) {
-      const value = next[name]
-      if (last == null || last[name] !== value) {
-        if (value === undefined) {
-          log = log.deleteProperty(name)
-        } else {
-          log = log.assignProperty(name, value)
-        }
+  for (let name in next) {
+    const value = next[name]
+    if (last[name] !== value) {
+      if (value === undefined) {
+        log = log.deleteProperty(name)
+      } else {
+        log = log.assignProperty(name, value)
       }
     }
   }
@@ -675,41 +671,37 @@ const diffAttributes = <x>(
   next: Attributes,
   log: Encoder<x>
 ): Encoder<x> => {
-  if (last != null) {
-    for (let key in last) {
-      if (next == null || !(key in next)) {
-        const attribute = last[key]
-        if (attribute != null) {
-          const { name, namespaceURI } = attribute
-          if (namespaceURI == null) {
-            log = log.removeAttribute(name)
-          } else {
-            log = log.removeAttributeNS(namespaceURI, name)
-          }
+  for (let key in last) {
+    if (!(key in next)) {
+      const attribute = last[key]
+      if (attribute != null) {
+        const { name, namespaceURI } = attribute
+        if (namespaceURI == null) {
+          log = log.removeAttribute(name)
+        } else {
+          log = log.removeAttributeNS(namespaceURI, name)
         }
       }
     }
   }
 
-  if (next != null) {
-    for (let key in next) {
-      const attribute = next[key]
-      if (attribute != null) {
-        const { namespaceURI, name, value } = attribute
-        const x = last == null ? null : last[key]
-        if (x == null || x.value !== value) {
-          if (namespaceURI == null) {
-            if (value == null) {
-              log = log.removeAttribute(name)
-            } else {
-              log = log.setAttribute(name, value)
-            }
+  for (let key in next) {
+    const attribute = next[key]
+    if (attribute != null) {
+      const { namespaceURI, name, value } = attribute
+      const x = last[key]
+      if (x == null || x.value !== value) {
+        if (namespaceURI == null) {
+          if (value == null) {
+            log = log.removeAttribute(name)
           } else {
-            if (value == null) {
-              log = log.removeAttributeNS(namespaceURI, name)
-            } else {
-              log = log.setAttributeNS(namespaceURI, name, value)
-            }
+            log = log.setAttribute(name, value)
+          }
+        } else {
+          if (value == null) {
+            log = log.removeAttributeNS(namespaceURI, name)
+          } else {
+            log = log.setAttributeNS(namespaceURI, name, value)
           }
         }
       }
@@ -726,26 +718,22 @@ const diffStyle = <x>(
 ): Encoder<x> => {
   let styles = null
 
-  if (last) {
-    for (let name in last) {
-      if (name !== "settingType") {
-        if (next == null || !(name in next)) {
-          log = log.removeStyleRule(name)
-        }
+  for (let name in last) {
+    if (name !== "settingType") {
+      if (!(name in next)) {
+        log = log.removeStyleRule(name)
       }
     }
   }
 
-  if (next != null) {
-    for (let name in next) {
-      if (name != "settingType") {
-        const value = next[name]
-        if (last == null || last[name] !== value) {
-          if (value == null) {
-            log = log.removeStyleRule(name)
-          } else {
-            log = log.setStyleRule(name, value)
-          }
+  for (let name in next) {
+    if (name != "settingType") {
+      const value = next[name]
+      if (last[name] !== value) {
+        if (value == null) {
+          log = log.removeStyleRule(name)
+        } else {
+          log = log.setStyleRule(name, value)
         }
       }
     }
