@@ -648,7 +648,7 @@ const diffProperties = <x>(
 ): Encoder<x> => {
   if (last != null) {
     for (let name in last) {
-      if (next == null || !(name in last)) {
+      if (next == null || !(name in next)) {
         log = log.deleteProperty(name)
       }
     }
