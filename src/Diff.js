@@ -457,12 +457,20 @@ const diffUnindexedElement = <a, x>(
   last: UnindexedElement<a>,
   next: UnindexedElement<a>,
   log: Encoder<x>
-): Encoder<x> =>
-  diffUnindexedChildren(
-    last.children,
-    next.children,
-    log.selectChildren()
-  ).selectParent()
+): Encoder<x> => {
+  if (
+    next.localName === last.localName &&
+    next.namespaceURI === next.namespaceURI
+  ) {
+    return diffUnindexedChildren(
+      last.children,
+      next.children,
+      diffSettings(last, next, log).selectChildren()
+    ).selectParent()
+  } else {
+    return replaceWithUnindexedElement(next, log)
+  }
+}
 
 const diffUnindexedFragment = <a, x>(
   last: UnindexedFragment<a>,
@@ -507,12 +515,20 @@ const diffIndexedElement = <a, x>(
   last: IndexedElement<a>,
   next: IndexedElement<a>,
   log: Encoder<x>
-): Encoder<x> =>
-  diffIndexedChildren(
-    last.children,
-    next.children,
-    log.selectChildren()
-  ).selectParent()
+): Encoder<x> => {
+  if (
+    next.localName === last.localName &&
+    next.namespaceURI === next.namespaceURI
+  ) {
+    return diffIndexedChildren(
+      last.children,
+      next.children,
+      diffSettings(last, next, log).selectChildren()
+    ).selectParent()
+  } else {
+    return replaceWithIndexedElement(next, log)
+  }
+}
 
 const diffIndexedFragment = <a, x>(
   last: IndexedFragment<a>,

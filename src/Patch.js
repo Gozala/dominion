@@ -247,6 +247,7 @@ class DOMPatcher implements Log {
       this.childrenSelected,
       this.target.ownerDocument.createComment(data)
     )
+    return this
   }
   replaceWithElement(localName: string): self {
     replaceNode(
@@ -254,6 +255,7 @@ class DOMPatcher implements Log {
       this.childrenSelected,
       this.target.ownerDocument.createElement(localName)
     )
+    return this
   }
   replaceWithElementNS(namespaceURI: string, localName: string): self {
     replaceNode(
