@@ -314,3 +314,24 @@ export const createHost = <message>(
 ): Element<message> => createElement("x-host", settings, children)
 
 export { diff, patch }
+
+export type {
+  Text,
+  Element,
+  UnindexedElement,
+  IndexedElement,
+  Indexed,
+  Thunk,
+  Comment,
+  Node,
+  Style,
+  StyleRules,
+  Properties,
+  Attributes,
+  ClassList,
+  Setting,
+  Attribute,
+  Property,
+  Listener,
+  Listeners
+}
