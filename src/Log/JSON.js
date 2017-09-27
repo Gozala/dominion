@@ -3,8 +3,10 @@
 import type { Encoder, Decoder, Log } from "../Log"
 import unreachable from "unreachable"
 
-type Navigate = SelectChildren | SelectSibling | SelectParent
 type Update =
+  | SelectChildren
+  | SelectSibling
+  | SelectParent
   | InsertComment
   | InsertText
   | InsertElement
@@ -25,7 +27,7 @@ type Update =
   | StashNextSibling
   | DiscardStashed
 
-type Op = Navigate | Update
+type Op = Update
 
 class StashNextSibling {
   kind: "StashNextSibling" = "StashNextSibling"
@@ -292,113 +294,31 @@ class RemoveNextSibling {
   }
 }
 
-class EmptyList<t> {
-  tail: EmptyList<t>
-  size: number = 0
-  isEmpty: true = true
-  constructor() {
-    this.tail = this
-  }
-  push(head: t): LinkedList<t> {
-    return new LinkedList(head, this)
-  }
-}
-
-const empty: List<any> = new EmptyList()
-
-class LinkedList<t> {
-  head: t
-  tail: EmptyList<t> | LinkedList<t>
-  size: number
-  isEmpty: false = false
-  constructor(head: t, tail: EmptyList<t> | LinkedList<t>) {
-    this.head = head
-    this.tail = tail
-    this.size = tail.size + 1
-  }
-  push(head: t): LinkedList<t> {
-    return new LinkedList(head, this)
-  }
-}
-
-export type List<a> = EmptyList<a> | List<a>
-
 class JSONEncoder implements Encoder<Op[]> {
-  address: number
-  log: List<Op>
-  navigationLog: Array<Navigate>
-  constructor(address: number, log: List<Op>, navigationLog: Array<Navigate>) {
-    this.reset(address, log, navigationLog)
+  address: number = 0
+  log: Op[]
+  constructor(log: Op[]) {
+    this.reset(log)
   }
-  reset(address: number, log: List<Op>, navigationLog: Array<Navigate>): self {
-    this.address = address
+  reset(log: Op[]): self {
     this.log = log
-    this.navigationLog = navigationLog
 
     return this
   }
-
-  fullLog(): List<Op> {
-    let { log, navigationLog } = this
-
-    for (const op of navigationLog) {
-      switch (op.kind) {
-        case "SelectChildren": {
-          log = log.push(op)
-          break
-        }
-        case "SelectSibling": {
-          if (log.isEmpty === false) {
-            const { head, tail } = log
-            if (head instanceof SelectSibling) {
-              log = tail.push(new SelectSibling(head.offset + op.offset))
-            } else {
-              log = log.push(op)
-            }
-          } else {
-            log = log.push(op)
-          }
-          break
-        }
-        case "SelectParent": {
-          if (log.isEmpty === false) {
-            const { head, tail } = log
-            if (head instanceof SelectChildren) {
-              log = tail
-            } else {
-              log = log.push(op)
-            }
-          } else {
-            log = log.push(op)
-          }
-          break
-        }
-        default:
-          return unreachable(op)
-      }
-    }
-
-    return log
-  }
   update(op: Update): self {
-    return this.reset(this.address, this.fullLog().push(op), [])
-  }
-  navigate(op: Navigate): self {
-    return this.reset(
-      this.address,
-      this.log,
-      (this.navigationLog.push(op), this.navigationLog)
-    )
+    const { log } = this
+    log.push(op)
+    return this.reset(log)
   }
 
   selectChildren(): self {
-    return this.navigate(new SelectChildren())
+    return this.update(new SelectChildren())
   }
   selectSibling(offset: number): self {
-    return this.navigate(new SelectSibling(offset))
+    return this.update(new SelectSibling(offset))
   }
   selectParent(): self {
-    return this.navigate(new SelectParent())
+    return this.update(new SelectParent())
   }
   removeNextSibling(): self {
     return this.update(new RemoveNextSibling())
@@ -473,23 +393,13 @@ class JSONEncoder implements Encoder<Op[]> {
   }
 
   stashNextSibling(address: number): self {
-    return this.reset(
-      address + 1,
-      this.log.push(new StashNextSibling(address)),
-      this.navigationLog
-    )
+    return this.update(new StashNextSibling(address))
   }
   discardStashedNode(address: number): self {
     return this.update(new DiscardStashed(address))
   }
   encode(): Op[] {
-    let log = this.log
-    let instructions = []
-    while (log.isEmpty === false) {
-      instructions.unshift(log.head)
-      log = log.tail
-    }
-    return instructions
+    return this.log
   }
 }
 
@@ -503,5 +413,5 @@ class JSONDecoder implements Decoder {
   }
 }
 
-export const encoder = (): Encoder<Op[]> => new JSONEncoder(1, empty, [])
+export const encoder = (): Encoder<Op[]> => new JSONEncoder([])
 export const decoder = (log: Op[]): Decoder => new JSONDecoder(log)

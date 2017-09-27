@@ -1,12 +1,12 @@
 /* @flow */
 
 import type { Encoder, Decoder } from "../../Log"
+import type { Builder, ByteBuffer } from "flatbuffers"
+import type { OpType, Op } from "./Op"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
-import type { Builder, ByteBuffer } from "flatbuffers"
 import { Change, type change } from "./Change"
 import { ChangeLog } from "./ChangeLog"
-import type { OpType, Op } from "./Op"
 
 import {
   DecoderError,
@@ -37,105 +37,44 @@ import {
   StashNextSibling
 } from "./Op"
 
-type Navigate = "SelectParent" | "SelectChildren" | number
-
 const push = <a>(item: a, items: a[]): a[] => (items.push(item), items)
 
-const selectSibling = (builder: Builder, index: number): change =>
-  Change.encode(
-    builder,
-    SelectSibling.opType,
-    SelectSibling.encode(builder, index)
-  )
-
-const selectChildren = (builder: Builder): change =>
-  Change.encode(builder, SelectChildren.opType, SelectChildren.encode(builder))
-
-const selectParent = (builder: Builder): change =>
-  Change.encode(builder, SelectParent.opType, SelectParent.encode(builder))
-
 class LogEncoder implements Encoder<Uint8Array> {
-  address: number
   builder: Builder
   log: Array<change>
-  navigationLog: Array<Navigate>
-  constructor(
-    address: number,
-    builder: Builder,
-    log: Array<change>,
-    navigationLog: Array<Navigate>
-  ) {
-    this.reset(address, builder, log, navigationLog)
+  // TODO: Update interfaces to get rid off this requirement
+  address: number = 0
+  constructor(builder: Builder, log: Array<change>) {
+    this.reset(builder, log)
   }
-  reset(
-    address: number,
-    builder: Builder,
-    log: Array<change>,
-    navigationLog: Array<Navigate>
-  ): self {
-    this.address = address
+  reset(builder: Builder, log: Array<change>): self {
     this.builder = builder
     this.log = log
-    this.navigationLog = navigationLog
 
     return this
   }
 
-  update(change: change, address: number = this.address): self {
-    const { navigationLog, builder } = this
-    let { log } = this
-
-    const count = navigationLog.length
-    let index = 0
-    let position = 0
-    while (index < count) {
-      const op = navigationLog[index++]
-      switch (op) {
-        case "SelectChildren": {
-          if (position > 0) {
-            log = push(selectSibling(builder, position), log)
-            position = 0
-          }
-          log = push(selectChildren(builder), log)
-          break
-        }
-        case "SelectParent": {
-          log = push(selectParent(builder), log)
-          break
-        }
-        default: {
-          position += op
-          break
-        }
-      }
-    }
-
-    if (position > 0) {
-      log = push(selectSibling(builder, position), log)
-    }
-
-    return this.reset(this.address, builder, push(change, log), [])
-  }
-  change(opType: OpType, opOffset: Op, address: number = this.address): self {
-    return this.update(Change.encode(this.builder, opType, opOffset), address)
-  }
-  navigate(op: Navigate): self {
+  change(opType: OpType, opOffset: Op): self {
     return this.reset(
-      this.address,
       this.builder,
-      this.log,
-      push(op, this.navigationLog)
+      push(Change.encode(this.builder, opType, opOffset), this.log)
     )
   }
 
   selectChildren(): self {
-    return this.navigate("SelectChildren")
+    return this.change(
+      SelectChildren.opType,
+      SelectChildren.encode(this.builder)
+    )
   }
   selectSibling(offset: number): self {
-    return this.navigate(offset)
+    return this.change(
+      SelectSibling.opType,
+      SelectSibling.encode(this.builder, offset)
+    )
   }
   selectParent(): self {
-    return this.navigate("SelectParent")
+    return this.change(SelectParent.opType, SelectParent.encode(this.builder))
   }
   removeNextSibling(): self {
     return this.change(
@@ -298,8 +237,7 @@ class LogEncoder implements Encoder<Uint8Array> {
   stashNextSibling(address): self {
     return this.change(
       StashNextSibling.opType,
-      StashNextSibling.encode(this.builder, address),
-      address + 1
+      StashNextSibling.encode(this.builder, address)
     )
   }
   discardStashedNode(address: number): self {
@@ -317,4 +255,4 @@ class LogEncoder implements Encoder<Uint8Array> {
 }
 
 export const encoder = (): Encoder<Uint8Array> =>
-  new LogEncoder(1, new flatbuffers.Builder(1024), [], [])
+  new LogEncoder(new flatbuffers.Builder(1024), [])

@@ -21,6 +21,7 @@ import type {
 } from "./DOM/Node"
 import type { Encoder } from "./Log"
 import { nodeType } from "./DOM/Node"
+import { navigator } from "./Log/Navigator"
 import unreachable from "unreachable"
 
 const empty: Array<any> = Object.freeze([])
@@ -30,7 +31,7 @@ export const diff = <a, x>(
   last: Node<a>,
   next: Node<a>,
   log: Encoder<x>
-): Encoder<x> => diffNode(last, next, log)
+): Encoder<x> => diffNode(last, next, navigator(log))
 
 export default diff
 
