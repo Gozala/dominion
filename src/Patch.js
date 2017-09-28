@@ -1,15 +1,17 @@
 /* @flow */
 
-import type { Decoder, Log } from "./Log"
-import { patcher } from "./Patch/dom"
+import type { Decoder, Encoder, DecoderError } from "./Log"
+import { patcher } from "./Patch/DOM"
 
-export const patch = <buffer>(
+export const patch = (
   target: Node,
   changeList: Decoder,
-  patcher: Log = patcher(target)
-): void => {
-  const result = changeList.decode(patcher)
-  if (result.isError) {
-    throw result
+  encoder: Encoder<Node> = patcher(target)
+): Error | Node => {
+  const result = changeList.decode(encoder)
+  if (result.isError === true) {
+    return new Error(result.toString())
+  } else {
+    return result.encode()
   }
 }

@@ -4,30 +4,34 @@ import type { Encoder, Decoder } from "../Log"
 
 type Nav = [-1 | 0 | 1, number]
 
-class NavigationEncoder<buffer> implements Encoder<buffer> {
+class Diff<buffer> implements Encoder<buffer> {
   encoder: Encoder<buffer>
   navigationLog: Nav[]
   address: number
   constructor(encoder: Encoder<buffer>, address: number, navigationLog: Nav[]) {
     this.reset(encoder, address, navigationLog)
   }
-  reset(encoder: Encoder<buffer>, address: number, navigationLog: Nav[]): self {
+  reset(
+    encoder: Encoder<buffer>,
+    address: number,
+    navigationLog: Nav[]
+  ): Diff<buffer> {
     this.encoder = encoder
     this.address = address
     this.navigationLog = navigationLog
     return this
   }
-  updateAddress(address: number): self {
+  updateAddress(address: number): Diff<buffer> {
     return this.reset(this.encoder, address, this.navigationLog)
   }
-  updateNavigationLog(navigationLog: Nav[]): self {
+  updateNavigationLog(navigationLog: Nav[]): Diff<buffer> {
     return this.reset(this.encoder, this.address, navigationLog)
   }
 
-  update(encoder: Encoder<buffer>): self {
+  update(encoder: Encoder<buffer>): Diff<buffer> {
     return this.reset(encoder, this.address, this.navigationLog)
   }
-  navigate(): self {
+  navigate(): Diff<buffer> {
     const { navigationLog, encoder } = this
 
     while (navigationLog.length > 0) {
@@ -49,7 +53,7 @@ class NavigationEncoder<buffer> implements Encoder<buffer> {
     return this
   }
 
-  selectChildren(): self {
+  selectChildren(): Diff<buffer> {
     const { navigationLog, encoder } = this
     const [level, index] =
       navigationLog.length === 0 ? [0, 0] : navigationLog[0]
@@ -72,7 +76,7 @@ class NavigationEncoder<buffer> implements Encoder<buffer> {
     }
     return this.updateNavigationLog(navigationLog)
   }
-  selectSibling(offset: number): self {
+  selectSibling(offset: number): Diff<buffer> {
     const { navigationLog, encoder } = this
     const [level, index] =
       navigationLog.length === 0 ? [0, 0] : navigationLog.shift()
@@ -80,7 +84,7 @@ class NavigationEncoder<buffer> implements Encoder<buffer> {
 
     return this.updateNavigationLog(navigationLog)
   }
-  selectParent(): self {
+  selectParent(): Diff<buffer> {
     const { navigationLog } = this
     const [level, index] =
       navigationLog.length === 0 ? [0, 0] : navigationLog[0]
@@ -101,43 +105,43 @@ class NavigationEncoder<buffer> implements Encoder<buffer> {
 
     return this.updateNavigationLog(navigationLog)
   }
-  removeNextSibling(): self {
+  removeNextSibling(): Diff<buffer> {
     return this.update(this.navigate().encoder.removeNextSibling())
   }
 
-  insertText(data: string): self {
+  insertText(data: string): Diff<buffer> {
     return this.update(this.navigate().encoder.insertText(data))
   }
-  insertComment(data: string): self {
+  insertComment(data: string): Diff<buffer> {
     return this.update(this.navigate().encoder.insertComment(data))
   }
-  insertElement(localName: string): self {
+  insertElement(localName: string): Diff<buffer> {
     return this.update(this.navigate().encoder.insertElement(localName))
   }
-  insertElementNS(namespaceURI: string, localName: string): self {
+  insertElementNS(namespaceURI: string, localName: string): Diff<buffer> {
     return this.update(
       this.navigate().encoder.insertElementNS(namespaceURI, localName)
     )
   }
-  insertStashedNode(address: number): self {
+  insertStashedNode(address: number): Diff<buffer> {
     return this.update(this.navigate().encoder.insertStashedNode(address))
   }
 
-  replaceWithText(data: string): self {
+  replaceWithText(data: string): Diff<buffer> {
     return this.update(this.navigate().encoder.replaceWithText(data))
   }
-  replaceWithComment(data: string): self {
+  replaceWithComment(data: string): Diff<buffer> {
     return this.update(this.navigate().encoder.replaceWithComment(data))
   }
-  replaceWithElement(localName: string): self {
+  replaceWithElement(localName: string): Diff<buffer> {
     return this.update(this.navigate().encoder.replaceWithElement(localName))
   }
-  replaceWithElementNS(namespaceURI: string, localName: string): self {
+  replaceWithElementNS(namespaceURI: string, localName: string): Diff<buffer> {
     return this.update(
-      this.navigate().encoder.replaceWithElement(namespaceURI, localName)
+      this.navigate().encoder.replaceWithElementNS(namespaceURI, localName)
     )
   }
-  replaceWithStashedNode(address: number): self {
+  replaceWithStashedNode(address: number): Diff<buffer> {
     return this.update(this.navigate().encoder.replaceWithStashedNode(address))
   }
 
@@ -146,49 +150,56 @@ class NavigationEncoder<buffer> implements Encoder<buffer> {
     end: number,
     prefix: string,
     suffix: string
-  ): self {
+  ): Diff<buffer> {
     return this.update(
       this.navigate().encoder.editTextData(start, end, prefix, suffix)
     )
   }
-  setTextData(data: string): self {
+  setTextData(data: string): Diff<buffer> {
     return this.update(this.navigate().encoder.setTextData(data))
   }
-  setAttribute(name: string, value: string): self {
+  setAttribute(name: string, value: string): Diff<buffer> {
     return this.update(this.navigate().encoder.setAttribute(name, value))
   }
-  removeAttribute(name: string): self {
+  removeAttribute(name: string): Diff<buffer> {
     return this.update(this.navigate().encoder.removeAttribute(name))
   }
-  setAttributeNS(namespaceURI: string, name: string, value: string): self {
+  setAttributeNS(
+    namespaceURI: string,
+    name: string,
+    value: string
+  ): Diff<buffer> {
     return this.update(
       this.navigate().encoder.setAttributeNS(namespaceURI, name, value)
     )
   }
-  removeAttributeNS(namespaceURI: string, name: string): self {
+  removeAttributeNS(namespaceURI: string, name: string): Diff<buffer> {
     return this.update(
       this.navigate().encoder.removeAttributeNS(namespaceURI, name)
     )
   }
-  assignProperty(name: string, value: string | number | boolean | null): self {
+  assignProperty(
+    name: string,
+    value: string | number | boolean | null
+  ): Diff<buffer> {
     return this.update(this.navigate().encoder.assignProperty(name, value))
   }
-  deleteProperty(name: string): self {
+  deleteProperty(name: string): Diff<buffer> {
     return this.update(this.navigate().encoder.deleteProperty(name))
   }
-  setStyleRule(name: string, value: string): self {
+  setStyleRule(name: string, value: string): Diff<buffer> {
     return this.update(this.navigate().encoder.setStyleRule(name, value))
   }
-  removeStyleRule(name: string): self {
+  removeStyleRule(name: string): Diff<buffer> {
     return this.update(this.navigate().encoder.removeStyleRule(name))
   }
 
-  stashNextSibling(address): self {
+  stashNextSibling(address: number): Diff<buffer> {
     return this.updateAddress(address + 1).update(
       this.navigate().encoder.stashNextSibling(address)
     )
   }
-  discardStashedNode(address: number): self {
+  discardStashedNode(address: number): Diff<buffer> {
     return this.update(this.navigate().encoder.discardStashedNode(address))
   }
 
@@ -197,5 +208,6 @@ class NavigationEncoder<buffer> implements Encoder<buffer> {
   }
 }
 
-export const navigator = <buffer>(encoder: Encoder<buffer>): Encoder<buffer> =>
-  new NavigationEncoder(encoder, 1, [])
+export type { Diff }
+export const encoder = <buffer>(encoder: Encoder<buffer>): Diff<buffer> =>
+  new Diff(encoder, 1, [])

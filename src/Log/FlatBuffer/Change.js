@@ -1,7 +1,7 @@
 /* @flow */
 
 import type { Builder, Offset } from "flatbuffers"
-import type { Log } from "../../Log"
+import type { Encoder } from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
 import * as FBS from "../../DOM/DOM.fbs.ts.js"
 import * as op from "./Op"
@@ -90,7 +90,7 @@ export class Change extends FBS.Change {
     [DiscardStashed.opType]: new DiscardStashed(),
     [StashNextSibling.opType]: new StashNextSibling()
   }
-  decode(decoder: Log): Log | DecoderError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | DecoderError {
     const type = this.opType()
     const variant = this.pool[type]
     if (variant == null) {
@@ -102,7 +102,7 @@ export class Change extends FBS.Change {
         return new OpError(variant.constructor.name)
       }
       console.log(`Decode: op ${op.constructor.name}`)
-      return op.decode(decoder)
+      return op.decode(encoder)
     }
   }
   static encode(builder: Builder, opType: OpType, opOffset: Op): change {

@@ -2,7 +2,7 @@
 
 import { flatbuffers } from "flatbuffers"
 import type { Builder, Offset } from "flatbuffers"
-import type { Log } from "../../Log"
+import type { Encoder } from "../../Log"
 import * as FBS from "../../DOM/DOM.fbs.ts.js"
 
 export type OpType = FBS.Op
@@ -43,12 +43,12 @@ export class AssignBooleanProperty extends FBS.AssignBooleanProperty {
     AssignBooleanProperty.addValue(builder, value)
     return AssignBooleanProperty.endAssignBooleanProperty(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "AssignBooleanProperty")
     } else {
-      return decoder.assignProperty(name, this.value())
+      return encoder.assignProperty(name, this.value())
     }
   }
 }
@@ -62,12 +62,12 @@ export class AssignNullProperty extends FBS.AssignNullProperty {
     AssignNullProperty.addName(builder, nameOffset)
     return AssignNullProperty.endAssignNullProperty(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "AssignNullProperty")
     } else {
-      return decoder.assignProperty(name, null)
+      return encoder.assignProperty(name, null)
     }
   }
 }
@@ -82,12 +82,12 @@ export class AssignNumberProperty extends FBS.AssignNumberProperty {
     AssignNumberProperty.addValue(builder, value)
     return AssignNumberProperty.endAssignNumberProperty(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "AssignNumberProperty")
     } else {
-      return decoder.assignProperty(name, this.value())
+      return encoder.assignProperty(name, this.value())
     }
   }
 }
@@ -103,12 +103,12 @@ export class AssignStringProperty extends FBS.AssignStringProperty {
     AssignStringProperty.addValue(builder, valueOffset)
     return AssignStringProperty.endAssignStringProperty(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "AssignStringProperty")
     } else {
-      return decoder.assignProperty(name, this.value())
+      return encoder.assignProperty(name, this.value())
     }
   }
 }
@@ -122,12 +122,12 @@ export class DeleteProperty extends FBS.DeleteProperty {
     DeleteProperty.addName(builder, nameOffset)
     return DeleteProperty.endDeleteProperty(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "DeleteProperty")
     } else {
-      return decoder.deleteProperty(name)
+      return encoder.deleteProperty(name)
     }
   }
 }
@@ -140,8 +140,8 @@ export class DiscardStashed extends FBS.DiscardStashed {
     DiscardStashed.addAddress(builder, address)
     return DiscardStashed.endDiscardStashed(builder)
   }
-  decode(decoder: Log): Log {
-    return decoder.discardStashedNode(this.address())
+  decode<x>(encoder: Encoder<x>): Encoder<x> {
+    return encoder.discardStashedNode(this.address())
   }
 }
 
@@ -164,7 +164,7 @@ export class EditTextData extends FBS.EditTextData {
     EditTextData.addSuffix(builder, suffixOffset)
     return EditTextData.endEditTextData(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const prefix = this.prefix()
     if (prefix == null) {
       return new FieldError("prefix", "EditTextData")
@@ -175,7 +175,7 @@ export class EditTextData extends FBS.EditTextData {
       return new FieldError("suffix", "EditTextData")
     }
 
-    return decoder.editTextData(this.start(), this.end(), prefix, suffix)
+    return encoder.editTextData(this.start(), this.end(), prefix, suffix)
   }
 }
 
@@ -188,12 +188,12 @@ export class InsertComment extends FBS.InsertComment {
     InsertComment.addData(builder, dataOffset)
     return InsertComment.endInsertComment(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "InsertComment")
     } else {
-      return decoder.insertComment(data)
+      return encoder.insertComment(data)
     }
   }
 }
@@ -216,7 +216,7 @@ export class InsertElement extends FBS.InsertElement {
     InsertElement.addLocalName(builder, localNameOffset)
     return InsertElement.endInsertElement(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const localName = this.localName()
     if (localName == null) {
       return new FieldError("localName", "InsertElement")
@@ -224,9 +224,9 @@ export class InsertElement extends FBS.InsertElement {
 
     const namespaceURI = this.namespaceURI()
     if (namespaceURI == null) {
-      return decoder.insertElement(localName)
+      return encoder.insertElement(localName)
     } else {
-      return decoder.insertElementNS(namespaceURI, localName)
+      return encoder.insertElementNS(namespaceURI, localName)
     }
   }
 }
@@ -239,8 +239,8 @@ export class InsertStashedNode extends FBS.InsertStashedNode {
     InsertStashedNode.addAddress(builder, address)
     return InsertStashedNode.endInsertStashedNode(builder)
   }
-  decode(decoder: Log): Log {
-    return decoder.insertStashedNode(this.address())
+  decode<x>(encoder: Encoder<x>): Encoder<x> {
+    return encoder.insertStashedNode(this.address())
   }
 }
 
@@ -253,12 +253,12 @@ export class InsertText extends FBS.InsertText {
     InsertText.addData(builder, dataOffset)
     return InsertText.endInsertText(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "InsertText")
     } else {
-      return decoder.insertText(data)
+      return encoder.insertText(data)
     }
   }
 }
@@ -278,16 +278,16 @@ export class RemoveAttribute extends FBS.RemoveAttribute {
 
     return RemoveAttribute.endRemoveAttribute(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "RemoveAttribute")
     }
     const namespaceURI = this.namespaceURI()
     if (namespaceURI == null) {
-      return decoder.removeAttribute(name)
+      return encoder.removeAttribute(name)
     } else {
-      return decoder.removeAttributeNS(namespaceURI, name)
+      return encoder.removeAttributeNS(namespaceURI, name)
     }
   }
 }
@@ -299,8 +299,8 @@ export class RemoveNextSibling extends FBS.RemoveNextSibling {
     RemoveNextSibling.startRemoveNextSibling(builder)
     return RemoveNextSibling.endRemoveNextSibling(builder)
   }
-  decode(decoder: Log): Log {
-    return decoder.removeNextSibling()
+  decode<x>(encoder: Encoder<x>): Encoder<x> {
+    return encoder.removeNextSibling()
   }
 }
 
@@ -313,12 +313,12 @@ export class RemoveStyleRule extends FBS.RemoveStyleRule {
     RemoveStyleRule.addName(builder, nameOffset)
     return RemoveStyleRule.endRemoveStyleRule(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "RemoveStyleRule")
     } else {
-      return decoder.removeStyleRule(name)
+      return encoder.removeStyleRule(name)
     }
   }
 }
@@ -332,12 +332,12 @@ export class ReplaceWithComment extends FBS.ReplaceWithComment {
     ReplaceWithComment.addData(builder, dataOffset)
     return ReplaceWithComment.endReplaceWithComment(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "ReplaceWithComment")
     } else {
-      return decoder.replaceWithComment(data)
+      return encoder.replaceWithComment(data)
     }
   }
 }
@@ -360,7 +360,7 @@ export class ReplaceWithElement extends FBS.ReplaceWithElement {
     ReplaceWithElement.addLocalName(builder, localNameOffset)
     return ReplaceWithElement.endReplaceWithElement(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const localName = this.localName()
     if (localName == null) {
       return new FieldError("localName", "ReplaceWithElement")
@@ -368,9 +368,9 @@ export class ReplaceWithElement extends FBS.ReplaceWithElement {
 
     const namespaceURI = this.namespaceURI()
     if (namespaceURI == null) {
-      return decoder.replaceWithElement(localName)
+      return encoder.replaceWithElement(localName)
     } else {
-      return decoder.replaceWithElementNS(namespaceURI, localName)
+      return encoder.replaceWithElementNS(namespaceURI, localName)
     }
   }
 }
@@ -383,8 +383,8 @@ export class ReplaceWithStashedNode extends FBS.ReplaceWithStashedNode {
     ReplaceWithStashedNode.addAddress(builder, address)
     return ReplaceWithStashedNode.endReplaceWithStashedNode(builder)
   }
-  decode(decoder: Log): Log {
-    return decoder.replaceWithStashedNode(this.address())
+  decode<x>(encoder: Encoder<x>): Encoder<x> {
+    return encoder.replaceWithStashedNode(this.address())
   }
 }
 
@@ -397,12 +397,12 @@ export class ReplaceWithText extends FBS.ReplaceWithText {
     ReplaceWithText.addData(builder, dataOffset)
     return ReplaceWithText.endReplaceWithText(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "ReplaceWithText")
     } else {
-      return decoder.replaceWithText(data)
+      return encoder.replaceWithText(data)
     }
   }
 }
@@ -414,8 +414,8 @@ export class SelectChildren extends FBS.SelectChildren {
     SelectChildren.startSelectChildren(builder)
     return SelectChildren.endSelectChildren(builder)
   }
-  decode(decoder: Log): Log {
-    return decoder.selectChildren()
+  decode<x>(encoder: Encoder<x>): Encoder<x> {
+    return encoder.selectChildren()
   }
 }
 
@@ -426,8 +426,8 @@ export class SelectParent extends FBS.SelectParent {
     SelectParent.startSelectParent(builder)
     return SelectParent.endSelectParent(builder)
   }
-  decode(decoder: Log): Log {
-    return decoder.selectParent()
+  decode<x>(encoder: Encoder<x>): Encoder<x> {
+    return encoder.selectParent()
   }
 }
 
@@ -439,8 +439,8 @@ export class SelectSibling extends FBS.SelectSibling {
     SelectSibling.addOffset(builder, n)
     return SelectSibling.endSelectSibling(builder)
   }
-  decode(decoder: Log): Log {
-    return decoder.selectSibling(this.offset())
+  decode<x>(encoder: Encoder<x>): Encoder<x> {
+    return encoder.selectSibling(this.offset())
   }
 }
 
@@ -466,7 +466,7 @@ export class SetAttribute extends FBS.SetAttribute {
 
     return SetAttribute.endSetAttribute(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "SetAttribute")
@@ -477,9 +477,9 @@ export class SetAttribute extends FBS.SetAttribute {
     }
     const namespaceURI = this.namespaceURI()
     if (namespaceURI == null) {
-      return decoder.setAttribute(name, value)
+      return encoder.setAttribute(name, value)
     } else {
-      return decoder.setAttributeNS(namespaceURI, name, value)
+      return encoder.setAttributeNS(namespaceURI, name, value)
     }
   }
 }
@@ -497,7 +497,7 @@ export class SetStyleRule extends FBS.SetStyleRule {
 
     return SetStyleRule.endSetStyleRule(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     console.log(`Decode: SetStyleRule`)
 
     const name = this.name()
@@ -510,7 +510,7 @@ export class SetStyleRule extends FBS.SetStyleRule {
       return new FieldError("value", "SetStyleRule")
     }
 
-    return decoder.setStyleRule(name, value)
+    return encoder.setStyleRule(name, value)
   }
 }
 
@@ -523,12 +523,12 @@ export class SetTextData extends FBS.SetTextData {
     SetTextData.addData(builder, dataOffset)
     return SetTextData.endSetTextData(builder)
   }
-  decode(decoder: Log): Log | FieldError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "SetTextData")
     } else {
-      return decoder.setTextData(data)
+      return encoder.setTextData(data)
     }
   }
 }
@@ -541,8 +541,8 @@ export class StashNextSibling extends FBS.StashNextSibling {
     StashNextSibling.addAddress(builder, address)
     return StashNextSibling.endStashNextSibling(builder)
   }
-  decode(decoder: Log): Log | FieldError {
-    return decoder.stashNextSibling(this.address())
+  decode<x>(encoder: Encoder<x>): Encoder<x> | FieldError {
+    return encoder.stashNextSibling(this.address())
   }
 }
 

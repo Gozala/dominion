@@ -15,7 +15,7 @@ export const diff = <a>(
   const delta = DOM.diff(left, right, encoder)
   const buffer = encoder.encode()
   const decoder = FlatBuffer.decoder(buffer)
-  const logger = patcher()
+  const logger = patcher(host)
   DOM.patch(host, decoder, logger)
   return logger.log
 }

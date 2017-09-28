@@ -1,57 +1,55 @@
 /* @flow */
 
-export interface ChangeLog<self> {
-  selectParent(): self,
-  selectChildren(): self,
-  selectSibling(offset: number): self,
+export interface Encoder<x> {
+  selectParent(): Encoder<x>,
+  selectChildren(): Encoder<x>,
+  selectSibling(offset: number): Encoder<x>,
 
-  removeNextSibling(): self,
+  removeNextSibling(): Encoder<x>,
 
-  replaceWithText(data: string): self,
-  replaceWithComment(data: string): self,
-  replaceWithElement(localName: string): self,
-  replaceWithElementNS(namespaceURI: string, localName: string): self,
-  replaceWithStashedNode(address: number): self,
+  replaceWithText(data: string): Encoder<x>,
+  replaceWithComment(data: string): Encoder<x>,
+  replaceWithElement(localName: string): Encoder<x>,
+  replaceWithElementNS(namespaceURI: string, localName: string): Encoder<x>,
+  replaceWithStashedNode(address: number): Encoder<x>,
 
-  insertText(data: string): self,
-  insertComment(data: string): self,
-  insertElement(name: string): self,
-  insertElementNS(namespaceURI: string, name: string): self,
-  insertStashedNode(address: number): self,
+  insertText(data: string): Encoder<x>,
+  insertComment(data: string): Encoder<x>,
+  insertElement(name: string): Encoder<x>,
+  insertElementNS(namespaceURI: string, name: string): Encoder<x>,
+  insertStashedNode(address: number): Encoder<x>,
 
-  setTextData(data: string): self,
+  setTextData(data: string): Encoder<x>,
   editTextData(
     start: number,
     end: number,
     prefix: string,
     suffix: string
-  ): self,
+  ): Encoder<x>,
 
-  setAttribute(name: string, value: string): self,
-  setAttributeNS(namespaceURI: string, name: string, value: string): self,
-  removeAttribute(name: string): self,
-  removeAttributeNS(namespaceURI: string, name: string): self,
-  assignProperty(name: string, value: string | number | boolean | null): self,
-  deleteProperty(name: string): self,
-  setStyleRule(name: string, value: string): self,
-  removeStyleRule(name: string): self,
+  setAttribute(name: string, value: string): Encoder<x>,
+  setAttributeNS(namespaceURI: string, name: string, value: string): Encoder<x>,
+  removeAttribute(name: string): Encoder<x>,
+  removeAttributeNS(namespaceURI: string, name: string): Encoder<x>,
+  assignProperty(
+    name: string,
+    value: string | number | boolean | null
+  ): Encoder<x>,
+  deleteProperty(name: string): Encoder<x>,
+  setStyleRule(name: string, value: string): Encoder<x>,
+  removeStyleRule(name: string): Encoder<x>,
 
-  stashNextSibling(address: number): self,
-  discardStashedNode(address: number): self
+  stashNextSibling(address: number): Encoder<x>,
+  discardStashedNode(address: number): Encoder<x>,
+
+  encode(): x
 }
-
-export interface Log extends ChangeLog<Log> {}
 
 export interface DecoderError {
   isError: true,
   toString(): string
 }
 
-export interface Encoder<buffer> extends ChangeLog<Encoder<buffer>> {
-  address: number,
-  encode(): buffer
-}
-
 export interface Decoder {
-  decode(Log): DecoderError | Log
+  decode<buffer>(Encoder<buffer>): DecoderError | Encoder<buffer>
 }

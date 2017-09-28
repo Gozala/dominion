@@ -21,7 +21,7 @@ import type {
 } from "./DOM/Node"
 import type { Encoder } from "./Log"
 import { nodeType } from "./DOM/Node"
-import { navigator } from "./Log/Navigator"
+import { encoder, type Diff } from "./Diff/Encoder"
 import unreachable from "unreachable"
 
 const empty: Array<any> = Object.freeze([])
@@ -31,14 +31,11 @@ export const diff = <a, x>(
   last: Node<a>,
   next: Node<a>,
   log: Encoder<x>
-): Encoder<x> => diffNode(last, next, navigator(log))
+): Encoder<x> => diffNode(last, next, encoder(log))
 
 export default diff
 
-const removeFragment = <a, x>(
-  node: Fragment<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+const removeFragment = <a, x>(node: Fragment<a>, log: Diff<x>): Diff<x> => {
   const { children } = node
   let index = 0
   while (index >= 0) {
@@ -53,16 +50,13 @@ const removeFragment = <a, x>(
   return log
 }
 
-const insertText = <a, x>(node: Text<a>, log: Encoder<x>): Encoder<x> =>
+const insertText = <a, x>(node: Text<a>, log: Diff<x>): Diff<x> =>
   log.insertText(node.data)
 
-const insertComment = <a, x>(node: Comment<a>, log: Encoder<x>): Encoder<x> =>
+const insertComment = <a, x>(node: Comment<a>, log: Diff<x>): Diff<x> =>
   log.insertComment(node.data)
 
-const insertElementNode = <a, x>(
-  node: Element<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+const insertElementNode = <a, x>(node: Element<a>, log: Diff<x>): Diff<x> => {
   const { localName, namespaceURI } = node
   const out =
     namespaceURI == null
@@ -73,8 +67,8 @@ const insertElementNode = <a, x>(
 
 const insertIndexedElement = <a, x>(
   node: IndexedElement<a>,
-  log: Encoder<x>
-): Encoder<x> =>
+  log: Diff<x>
+): Diff<x> =>
   populateIndexedElement(
     node,
     setSettings(node, insertElementNode(node, log).selectSibling(1))
@@ -82,8 +76,8 @@ const insertIndexedElement = <a, x>(
 
 const insertUnindexedElement = <a, x>(
   node: UnindexedElement<a>,
-  log: Encoder<x>
-): Encoder<x> =>
+  log: Diff<x>
+): Diff<x> =>
   populateUnindexedElement(
     node,
     setSettings(node, insertElementNode(node, log).selectSibling(1))
@@ -91,56 +85,54 @@ const insertUnindexedElement = <a, x>(
 
 const populateIndexedElement = <a, x>(
   node: IndexedElement<a>,
-  log: Encoder<x>
-): Encoder<x> =>
+  log: Diff<x>
+): Diff<x> =>
   insertIndexedChildren(node.children, log.selectChildren()).selectParent()
 
 const populateUnindexedElement = <a, x>(
   node: UnindexedElement<a>,
-  log: Encoder<x>
-): Encoder<x> =>
+  log: Diff<x>
+): Diff<x> =>
   insertUnindexedChildren(node.children, log.selectChildren()).selectParent()
 
 const insertIndexedFragment = <a, x>(
   node: IndexedFragment<a>,
-  log: Encoder<x>
-): Encoder<x> => insertIndexedChildren(node.children, log)
+  log: Diff<x>
+): Diff<x> => insertIndexedChildren(node.children, log)
 
 const insertUnindexedFragment = <a, x>(
   node: UnindexedFragment<a>,
-  log: Encoder<x>
-): Encoder<x> => insertUnindexedChildren(node.children, log)
+  log: Diff<x>
+): Diff<x> => insertUnindexedChildren(node.children, log)
 
 const insertIndexedChildren = <a, x>(
   children: IndexedChildren<a>,
-  log: Encoder<x>
-): Encoder<x> => diffIndexedChildren(empty, children, log)
+  log: Diff<x>
+): Diff<x> => diffIndexedChildren(empty, children, log)
 
 const insertUnindexedChildren = <a, x>(
   children: UnindexedChildren<a>,
-  log: Encoder<x>
-): Encoder<x> => diffUnindexedChildren(empty, children, log)
+  log: Diff<x>
+): Diff<x> => diffUnindexedChildren(empty, children, log)
 
-const insertThunk = <a, x>(thunk: Thunk<a>, log: Encoder<x>): Encoder<x> =>
+const insertThunk = <a, x>(thunk: Thunk<a>, log: Diff<x>): Diff<x> =>
   insertNode(thunk.force(), log)
 
 const insertTagged = <inner, outer, x>(
   tagged: Tagged<outer, inner>,
-  log: Encoder<x>
-): Encoder<x> => insertNode(tagged.node, log)
+  log: Diff<x>
+): Diff<x> => insertNode(tagged.node, log)
 
-const replaceWithText = <a, x>(node: Text<a>, log: Encoder<x>): Encoder<x> =>
+const replaceWithText = <a, x>(node: Text<a>, log: Diff<x>): Diff<x> =>
   log.replaceWithText(node.data)
 
-const replaceWithComment = <a, x>(
-  node: Comment<a>,
-  log: Encoder<x>
-): Encoder<x> => log.replaceWithComment(node.data)
+const replaceWithComment = <a, x>(node: Comment<a>, log: Diff<x>): Diff<x> =>
+  log.replaceWithComment(node.data)
 
 const replaceWithElementNode = <a, x>(
   node: Element<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   const { localName, namespaceURI } = node
   const out =
     namespaceURI == null
@@ -151,8 +143,8 @@ const replaceWithElementNode = <a, x>(
 
 const replaceWithUnindexedElement = <a, x>(
   node: UnindexedElement<a>,
-  log: Encoder<x>
-): Encoder<x> =>
+  log: Diff<x>
+): Diff<x> =>
   populateUnindexedElement(
     node,
     setSettings(node, replaceWithElementNode(node, log))
@@ -160,34 +152,32 @@ const replaceWithUnindexedElement = <a, x>(
 
 const replaceWithIndexedElement = <a, x>(
   node: IndexedElement<a>,
-  log: Encoder<x>
-): Encoder<x> =>
+  log: Diff<x>
+): Diff<x> =>
   populateIndexedElement(
     node,
     setSettings(node, replaceWithElementNode(node, log))
   )
 
-const replaceWithThunk = <a, x>(thunk: Thunk<a>, log: Encoder<x>): Encoder<x> =>
+const replaceWithThunk = <a, x>(thunk: Thunk<a>, log: Diff<x>): Diff<x> =>
   replaceWithNode(thunk.force(), log)
 
-const replaceWithTagged = <a, x>(
-  tagged: Tagged<a>,
-  log: Encoder<x>
-): Encoder<x> => replaceWithNode(tagged.node, log)
+const replaceWithTagged = <a, x>(tagged: Tagged<a>, log: Diff<x>): Diff<x> =>
+  replaceWithNode(tagged.node, log)
 
 const replaceWithIndexedFragment = <a, x>(
   node: IndexedFragment<a>,
-  log: Encoder<x>
-): Encoder<x> =>
+  log: Diff<x>
+): Diff<x> =>
   insertIndexedFragment(node, log.selectSibling(-1).removeNextSibling())
 
 const replaceWithUnindexedFragment = <a, x>(
   node: UnindexedFragment<a>,
-  log: Encoder<x>
-): Encoder<x> =>
+  log: Diff<x>
+): Diff<x> =>
   insertUnindexedFragment(node, log.selectSibling(-1).removeNextSibling())
 
-const replaceWithNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
+const replaceWithNode = <a, x>(node: Node<a>, log: Diff<x>): Diff<x> => {
   switch (node.nodeType) {
     case nodeType.TEXT_NODE: {
       return replaceWithText(node, log)
@@ -219,7 +209,7 @@ const replaceWithNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
   }
 }
 
-const insertNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
+const insertNode = <a, x>(node: Node<a>, log: Diff<x>): Diff<x> => {
   switch (node.nodeType) {
     case nodeType.TEXT_NODE: {
       return log.insertText(node.data)
@@ -254,8 +244,8 @@ const insertNode = <a, x>(node: Node<a>, log: Encoder<x>): Encoder<x> => {
 const diffThunk = <a, x>(
   last: Thunk<a>,
   next: Thunk<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   const { args: lastArgs, render: lastRender } = last
   const { args: nextArgs, render: nextRender } = next
   const equal =
@@ -282,16 +272,16 @@ const diffThunk = <a, x>(
 const diffTagged = <message, tagged, x>(
   last: Tagged<message, tagged>,
   next: Tagged<message, tagged>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   return diffNode(last.node, next.node, log)
 }
 
 const diffNode = <a, x>(
   last: Node<a>,
   next: Node<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   if (last === next) {
     return log
   } else {
@@ -398,8 +388,8 @@ const diffNode = <a, x>(
 const diffText = <a, x>(
   last: Text<a>,
   next: Text<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   if (last == null) {
     return insertText(next, log)
   } else if (last.data === next.data) {
@@ -412,8 +402,8 @@ const diffText = <a, x>(
 const diffComment = <a, x>(
   last: Comment<a>,
   next: Comment<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   if (last == null) {
     return insertComment(next, log)
   } else if (last.data === next.data) {
@@ -423,11 +413,7 @@ const diffComment = <a, x>(
   }
 }
 
-const diffTextData = <x>(
-  last: string,
-  next: string,
-  log: Encoder<x>
-): Encoder<x> => {
+const diffTextData = <x>(last: string, next: string, log: Diff<x>): Diff<x> => {
   const nextLength = next.length
   const lastLength = last.length
   if (nextLength <= 6) {
@@ -457,8 +443,8 @@ const diffTextData = <x>(
 const diffUnindexedElement = <a, x>(
   last: UnindexedElement<a>,
   next: UnindexedElement<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   if (
     next.localName === last.localName &&
     next.namespaceURI === next.namespaceURI
@@ -476,14 +462,14 @@ const diffUnindexedElement = <a, x>(
 const diffUnindexedFragment = <a, x>(
   last: UnindexedFragment<a>,
   next: UnindexedFragment<a>,
-  log: Encoder<x>
-): Encoder<x> => diffUnindexedChildren(last.children, next.children, log)
+  log: Diff<x>
+): Diff<x> => diffUnindexedChildren(last.children, next.children, log)
 
 const diffUnindexedChildren = <a, x>(
   last: UnindexedChildren<a>,
   next: UnindexedChildren<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   let index = 0
   while (index >= 0) {
     const lastChild = last[index]
@@ -515,8 +501,8 @@ const diffUnindexedChildren = <a, x>(
 const diffIndexedElement = <a, x>(
   last: IndexedElement<a>,
   next: IndexedElement<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   if (
     next.localName === last.localName &&
     next.namespaceURI === next.namespaceURI
@@ -534,14 +520,14 @@ const diffIndexedElement = <a, x>(
 const diffIndexedFragment = <a, x>(
   last: IndexedFragment<a>,
   next: IndexedFragment<a>,
-  log: Encoder<x>
-): Encoder<x> => diffIndexedChildren(last.children, next.children, log)
+  log: Diff<x>
+): Diff<x> => diffIndexedChildren(last.children, next.children, log)
 
 const diffIndexedChildren = <a, x>(
   last: IndexedChildren<a>,
   next: IndexedChildren<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   const migrants: { [string]: [number, Node<a>] } = (Object.create(
     null
   ): Object)
@@ -622,7 +608,7 @@ const diffIndexedChildren = <a, x>(
   return log
 }
 
-const setSettings = <a, x>(node: Element<a>, log: Encoder<x>): Encoder<x> => {
+const setSettings = <a, x>(node: Element<a>, log: Diff<x>): Diff<x> => {
   const v1 = log
   const v2 = diffProperties(blank, node.properties, v1)
   const v3 = diffAttributes(blank, node.attributes, v2)
@@ -633,8 +619,8 @@ const setSettings = <a, x>(node: Element<a>, log: Encoder<x>): Encoder<x> => {
 const diffSettings = <a, x>(
   last: Element<a>,
   next: Element<a>,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   const v1 = log
   const v2 = diffProperties(last.properties, next.properties, v1)
   const v3 = diffAttributes(last.attributes, next.attributes, v2)
@@ -645,8 +631,8 @@ const diffSettings = <a, x>(
 const diffProperties = <x>(
   last: Properties,
   next: Properties,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   for (let name in last) {
     if (!(name in next)) {
       log = log.deleteProperty(name)
@@ -670,8 +656,8 @@ const diffProperties = <x>(
 const diffAttributes = <x>(
   last: Attributes,
   next: Attributes,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   for (let key in last) {
     if (!(key in next)) {
       const attribute = last[key]
@@ -715,8 +701,8 @@ const diffAttributes = <x>(
 const diffStyle = <x>(
   last: StyleRules,
   next: StyleRules,
-  log: Encoder<x>
-): Encoder<x> => {
+  log: Diff<x>
+): Diff<x> => {
   let styles = null
 
   for (let name in last) {

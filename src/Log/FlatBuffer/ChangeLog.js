@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Log, Decoder, Encoder } from "../../Log"
+import type { Decoder, Encoder } from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
 import type { Builder, Offset } from "flatbuffers"
 import type { change } from "./Change"
@@ -35,9 +35,9 @@ class ChangeError extends DecoderError {
   }
 }
 
-export class ChangeLog extends FBS.ChangeLog {
+export class ChangeLog extends FBS.ChangeLog implements Decoder {
   change = new Change()
-  decode(decoder: Log): Log | DecoderError {
+  decode<x>(encoder: Encoder<x>): Encoder<x> | DecoderError {
     const count = this.logLength()
     console.log(`Decode: ChangeLog contains ${count} changes`)
 
@@ -49,16 +49,16 @@ export class ChangeLog extends FBS.ChangeLog {
         console.error(`Decode: Change is null log[${index}]`)
         return new IndexError(index)
       }
-      const result = this.change.decode(decoder)
+      const result = this.change.decode(encoder)
       if (result instanceof DecoderError) {
         return new ChangeError(index, result)
       } else {
-        decoder = result
+        encoder = result
       }
       index++
     }
 
-    return decoder
+    return encoder
   }
   static encode(builder: Builder, changes: change[]): Offset {
     const logOffset = ChangeLog.createLogVector(builder, (changes: any))

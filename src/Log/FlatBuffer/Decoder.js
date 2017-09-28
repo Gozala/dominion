@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Encoder, Decoder, Log } from "../../Log"
+import type { Encoder, Decoder } from "../../Log"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
 import type { Builder, ByteBuffer } from "flatbuffers"

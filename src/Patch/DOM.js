@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Log } from "../Log"
+import type { Encoder } from "../Log"
 import { nodeType } from "../DOM/Node"
 import unreachable from "unreachable"
 
@@ -112,7 +112,7 @@ const getStashedNode = (stash: { [number]: Node }, address: number): Node => {
   }
 }
 
-class DOMPatcher implements Log {
+class DOMPatcher implements Encoder<Node> {
   target: Node
   childrenSelected: boolean
   stash: { [number]: Node }
@@ -120,12 +120,13 @@ class DOMPatcher implements Log {
   constructor(target: Node, childrenSelected: boolean) {
     this.reset(target, childrenSelected)
   }
-  reset(target: Node, childrenSelected: boolean) {
+  reset(target: Node, childrenSelected: boolean): DOMPatcher {
     this.target = target
     this.childrenSelected = childrenSelected
+    return this
   }
 
-  selectChildren(): self {
+  selectChildren(): DOMPatcher {
     console.log(`Patch: Select children`)
     if (this.childrenSelected) {
       throw Error(
@@ -136,7 +137,7 @@ class DOMPatcher implements Log {
       return this
     }
   }
-  selectSibling(offset: number): self {
+  selectSibling(offset: number): DOMPatcher {
     console.log(`Patch: select sibling ${offset}`)
     const { target, childrenSelected } = this
     let select = null
@@ -160,7 +161,7 @@ class DOMPatcher implements Log {
       return this
     }
   }
-  selectParent(): self {
+  selectParent(): DOMPatcher {
     console.log("select parent")
     if (this.childrenSelected) {
       this.childrenSelected = false
@@ -175,7 +176,7 @@ class DOMPatcher implements Log {
       }
     }
   }
-  removeNextSibling(): self {
+  removeNextSibling(): DOMPatcher {
     console.log("remove next sibling")
     const next = this.childrenSelected
       ? this.target.firstChild
@@ -189,7 +190,7 @@ class DOMPatcher implements Log {
     }
   }
 
-  insertText(data: string): self {
+  insertText(data: string): DOMPatcher {
     console.log("insert text", data)
     insertNode(
       this.target,
@@ -198,7 +199,7 @@ class DOMPatcher implements Log {
     )
     return this
   }
-  insertComment(data: string): self {
+  insertComment(data: string): DOMPatcher {
     console.log("insert comment", data)
     insertNode(
       this.target,
@@ -207,7 +208,7 @@ class DOMPatcher implements Log {
     )
     return this
   }
-  insertElement(localName: string): self {
+  insertElement(localName: string): DOMPatcher {
     console.log(`insert element <${localName}/>`)
     insertNode(
       this.target,
@@ -216,7 +217,7 @@ class DOMPatcher implements Log {
     )
     return this
   }
-  insertElementNS(namespaceURI: string, localName: string): self {
+  insertElementNS(namespaceURI: string, localName: string): DOMPatcher {
     insertNode(
       this.target,
       this.childrenSelected,
@@ -224,7 +225,7 @@ class DOMPatcher implements Log {
     )
     return this
   }
-  insertStashedNode(address: number): self {
+  insertStashedNode(address: number): DOMPatcher {
     insertNode(
       this.target,
       this.childrenSelected,
@@ -233,7 +234,7 @@ class DOMPatcher implements Log {
     return this
   }
 
-  replaceWithText(data: string): self {
+  replaceWithText(data: string): DOMPatcher {
     replaceNode(
       this.target,
       this.childrenSelected,
@@ -241,7 +242,7 @@ class DOMPatcher implements Log {
     )
     return this
   }
-  replaceWithComment(data: string): self {
+  replaceWithComment(data: string): DOMPatcher {
     replaceNode(
       this.target,
       this.childrenSelected,
@@ -249,7 +250,7 @@ class DOMPatcher implements Log {
     )
     return this
   }
-  replaceWithElement(localName: string): self {
+  replaceWithElement(localName: string): DOMPatcher {
     replaceNode(
       this.target,
       this.childrenSelected,
@@ -257,7 +258,7 @@ class DOMPatcher implements Log {
     )
     return this
   }
-  replaceWithElementNS(namespaceURI: string, localName: string): self {
+  replaceWithElementNS(namespaceURI: string, localName: string): DOMPatcher {
     replaceNode(
       this.target,
       this.childrenSelected,
@@ -265,7 +266,7 @@ class DOMPatcher implements Log {
     )
     return this
   }
-  replaceWithStashedNode(address: number): self {
+  replaceWithStashedNode(address: number): DOMPatcher {
     const node = this.stash[address]
     if (node == null) {
       throw Error(`Unable to find stashed node with address #${address}`)
@@ -279,43 +280,50 @@ class DOMPatcher implements Log {
     end: number,
     prefix: string,
     suffix: string
-  ): self {
+  ): DOMPatcher {
     const node = getTextDataUpdateTarget(this.childrenSelected, this.target)
     const { data } = node
     const content = data.substring(start, data.length - end)
     node.data = `${prefix}${content}${suffix}`
     return this
   }
-  setTextData(data: string): self {
+  setTextData(data: string): DOMPatcher {
     const node = getTextDataUpdateTarget(this.childrenSelected, this.target)
     node.data = data
     return this
   }
-  setAttribute(name: string, value: string): self {
+  setAttribute(name: string, value: string): DOMPatcher {
     console.log(`Patch: Set attribute ${name}="${value}"`)
     const node = getUpdateTargetElement(this.childrenSelected, this.target)
     node.setAttribute(name, value)
     return this
   }
-  removeAttribute(name: string): self {
+  removeAttribute(name: string): DOMPatcher {
     console.log(`Patch: Remove attribute ${name}`)
     const node = getUpdateTargetElement(this.childrenSelected, this.target)
     node.removeAttribute(name)
     return this
   }
-  setAttributeNS(namespaceURI: string, name: string, value: string): self {
+  setAttributeNS(
+    namespaceURI: string,
+    name: string,
+    value: string
+  ): DOMPatcher {
     console.log(`Patch: Set attribute NS ${namespaceURI} ${name}="${value}"`)
     const node = getUpdateTargetElement(this.childrenSelected, this.target)
     node.setAttributeNS(namespaceURI, name, value)
     return this
   }
-  removeAttributeNS(namespaceURI: string, name: string): self {
+  removeAttributeNS(namespaceURI: string, name: string): DOMPatcher {
     console.log(`Patch: Remove attribute NS ${namespaceURI} ${name}`)
     const node = getUpdateTargetElement(this.childrenSelected, this.target)
     node.removeAttributeNS(namespaceURI, name)
     return this
   }
-  assignProperty(name: string, value: string | number | boolean | null): self {
+  assignProperty(
+    name: string,
+    value: string | number | boolean | null
+  ): DOMPatcher {
     console.log(`Patch: Assign property ${name}=${JSON.stringify(value)}`)
     const node: Object = getUpdateTargetElement(
       this.childrenSelected,
@@ -324,7 +332,7 @@ class DOMPatcher implements Log {
     node[name] = value
     return this
   }
-  deleteProperty(name: string): self {
+  deleteProperty(name: string): DOMPatcher {
     console.log(`Patch: Delete property ${name}`)
     const node: Object = getUpdateTargetElement(
       this.childrenSelected,
@@ -346,7 +354,7 @@ class DOMPatcher implements Log {
     return this
   }
 
-  stashNextSibling(address: number): self {
+  stashNextSibling(address: number): DOMPatcher {
     const next = this.childrenSelected
       ? this.target.firstChild
       : this.target.nextSibling
@@ -359,10 +367,15 @@ class DOMPatcher implements Log {
       return this
     }
   }
-  discardStashedNode(address: number): self {
+  discardStashedNode(address: number): DOMPatcher {
     delete this.stash[address]
     return this
   }
+
+  encode(): Node {
+    return this.target
+  }
 }
 
-export const patcher = (target: Node): Log => new DOMPatcher(target, false)
+export const patcher = (target: Node): Encoder<Node> =>
+  new DOMPatcher(target, false)
