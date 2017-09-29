@@ -406,19 +406,15 @@ class JSONEncoder implements Encoder<Op[]> {
     return this.update(new DiscardStashed(address))
   }
   encode(): Op[] {
-    return this.log
+    return this.log.splice(0)
   }
 }
 
-class JSONDecoder implements Decoder {
-  log: Op[]
-  constructor(log: Op[]) {
-    this.log = log
-  }
-  decode<x>(encoder: Encoder<x>): Encoder<x> {
-    return this.log.reduce((encoder, op) => op.decode(encoder), encoder)
+class JSONDecoder implements Decoder<Op[]> {
+  decode<x>(log: Op[], encoder: Encoder<x>): Encoder<x> {
+    return log.reduce((encoder, op) => op.decode(encoder), encoder)
   }
 }
 
-export const encoder = (): Encoder<Op[]> => new JSONEncoder([])
-export const decoder = (log: Op[]): Decoder => new JSONDecoder(log)
+export const encoder: Encoder<Op[]> = new JSONEncoder([])
+export const decoder: Decoder<Op[]> = new JSONDecoder()

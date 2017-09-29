@@ -112,17 +112,20 @@ const getStashedNode = (stash: { [number]: Node }, address: number): Node => {
   }
 }
 
+type Stash = { [number]: Node }
+
 class DOMPatcher implements Encoder<Node> {
   target: Node
   childrenSelected: boolean
-  stash: { [number]: Node }
+  stash: Stash
 
-  constructor(target: Node, childrenSelected: boolean) {
-    this.reset(target, childrenSelected)
+  constructor(target: Node, childrenSelected: boolean, stash: Stash) {
+    this.reset(target, childrenSelected, stash)
   }
-  reset(target: Node, childrenSelected: boolean): DOMPatcher {
+  reset(target: Node, childrenSelected: boolean, stash: Stash): DOMPatcher {
     this.target = target
     this.childrenSelected = childrenSelected
+    this.stash = stash
     return this
   }
 
@@ -373,9 +376,10 @@ class DOMPatcher implements Encoder<Node> {
   }
 
   encode(): Node {
+    this.reset(this.target, false, {})
     return this.target
   }
 }
 
-export const patcher = (target: Node): Encoder<Node> =>
-  new DOMPatcher(target, false)
+export default (target: Node): Encoder<Node> =>
+  new DOMPatcher(target, false, {})

@@ -8,7 +8,7 @@ import * as Flat from "./src/Log/FlatBuffer"
 
 DOMLog //?
 
-const host = DOMLog.createHost()
+const tree0 = DOMLog.createHost()
 
 const tree1 = DOMLog.createHost(
   [],
@@ -62,24 +62,22 @@ const tree2 = DOMLog.createHost(
   ]
 ) //?$.toDebugString()
 
-DOMLog.diff(host, tree1, JSONLog.encoder()) // ?JSON.stringify($.encode())
-DOMLog.diff(tree1, tree1, JSONLog.encoder()) //?$.encode()
-DOMLog.diff(tree1, tree2, JSONLog.encoder()) //?$.encode()
+DOMLog.diff(tree0, tree1, JSONLog.encoder) // ?JSON.stringify($.encode())
+DOMLog.diff(tree1, tree1, JSONLog.encoder) //?$.encode()
+DOMLog.diff(tree1, tree2, JSONLog.encoder) //?$.encode()
 
-const fb1 = DOMLog.diff(host, tree1, Flat.encoder()) //?$.encode().length
+const delta1 = DOMLog.diff(tree0, tree1, Flat.encoder) //?$.length
 
 const body = document.createElement("div") //?$.innerHTML
+const host = DOMLog.mount(body)
 
-const ch1 = Flat.decoder(fb1.encode()) //?
-DOMLog.patch(body, ch1) //?
+DOMLog.patch(host, delta1, Flat.decoder) //?
 body.innerHTML //?
 
-const fb2 = DOMLog.diff(tree1, tree1, Flat.encoder()) //?$.encode().length
-const ch2 = Flat.decoder(fb2.encode()) //?
-DOMLog.patch(body, ch2) //?
+const delta2 = DOMLog.diff(tree1, tree1, Flat.encoder) //?$.encode().length
+DOMLog.patch(host, delta2, Flat.decoder) //?
 body.innerHTML //?
 
-const fb3 = DOMLog.diff(tree1, tree2, Flat.encoder()) //?$.encode().length
-const ch3 = Flat.decoder(fb3.encode()) //?
-DOMLog.patch(body, ch3) //?
+const delta3 = DOMLog.diff(tree1, tree2, Flat.encoder) //?$.encode().length
+DOMLog.patch(host, delta3, Flat.decoder) //?
 body.innerHTML //?

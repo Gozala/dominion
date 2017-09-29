@@ -5,8 +5,9 @@ import type { Builder, ByteBuffer } from "flatbuffers"
 import type { OpType, Op } from "./Op"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
-import { Change, type change } from "./Change"
-import { ChangeLog } from "./ChangeLog"
+import { type change } from "./Change"
+import Change from "./Change"
+import ChangeLog from "./ChangeLog"
 
 import {
   DecoderError,
@@ -249,10 +250,14 @@ class LogEncoder implements Encoder<Uint8Array> {
 
   encode(): Uint8Array {
     const { builder, log } = this
-    builder.finish(ChangeLog.encode(builder, log))
-    return builder.asUint8Array()
+    builder.finish(ChangeLog.encode(builder, log.splice(0)))
+    const data = builder.asUint8Array()
+    this.builder = new flatbuffers.Builder(1024)
+    return data
   }
 }
 
-export const encoder = (): Encoder<Uint8Array> =>
-  new LogEncoder(new flatbuffers.Builder(1024), [])
+export const encoder: Encoder<Uint8Array> = new LogEncoder(
+  new flatbuffers.Builder(1024),
+  []
+)

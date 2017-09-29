@@ -50,6 +50,6 @@ export interface DecoderError {
   toString(): string
 }
 
-export interface Decoder {
-  decode<buffer>(Encoder<buffer>): DecoderError | Encoder<buffer>
+export interface Decoder<x> {
+  decode<buffer>(data: x, Encoder<buffer>): DecoderError | Encoder<buffer>
 }

@@ -2,71 +2,66 @@
 
 import type { Encoder } from "../Log"
 
-class LogPatcher<target> implements Encoder<target> {
+class LogPatcher implements Encoder<string[]> {
   log: string[]
-  host: target
-  constructor(host: target) {
-    this.host = host
-    this.log = []
+  constructor(log: string[]) {
+    this.log = log
   }
-  selectChildren(): LogPatcher<target> {
+  selectChildren(): LogPatcher {
     this.log.push("selectChildren()")
     return this
   }
-  selectSibling(offset: number): LogPatcher<target> {
+  selectSibling(offset: number): LogPatcher {
     this.log.push(`selectSibling(${offset})`)
     return this
   }
-  selectParent(): LogPatcher<target> {
+  selectParent(): LogPatcher {
     this.log.push(`selectParent()`)
     return this
   }
-  removeNextSibling(): LogPatcher<target> {
+  removeNextSibling(): LogPatcher {
     this.log.push(`removeNextSibling()`)
     return this
   }
 
-  insertText(data: string): LogPatcher<target> {
+  insertText(data: string): LogPatcher {
     this.log.push(`insertText("${data}")`)
     return this
   }
-  insertComment(data: string): LogPatcher<target> {
+  insertComment(data: string): LogPatcher {
     this.log.push(`insertComment("${data}")`)
     return this
   }
-  insertElement(localName: string): LogPatcher<target> {
+  insertElement(localName: string): LogPatcher {
     this.log.push(`insertElement("${localName}")`)
     return this
   }
-  insertElementNS(namespaceURI: string, localName: string): LogPatcher<target> {
+  insertElementNS(namespaceURI: string, localName: string): LogPatcher {
     this.log.push(`insertElementNS("${namespaceURI}", "${localName}")`)
     return this
   }
-  insertStashedNode(address: number): LogPatcher<target> {
+  insertStashedNode(address: number): LogPatcher {
     this.log.push(`insertStashedNode(${address})`)
     return this
   }
 
-  replaceWithText(data: string): LogPatcher<target> {
+  replaceWithText(data: string): LogPatcher {
     this.log.push(`replaceWithText("${data}")`)
     return this
   }
-  replaceWithComment(data: string): LogPatcher<target> {
+  replaceWithComment(data: string): LogPatcher {
     this.log.push(`replaceWithComment("${data}")`)
     return this
   }
-  replaceWithElement(localName: string): LogPatcher<target> {
+  replaceWithElement(localName: string): LogPatcher {
     this.log.push(`replaceWithElement("${localName}")`)
     return this
   }
-  replaceWithElementNS(
-    namespaceURI: string,
-    localName: string
-  ): LogPatcher<target> {
+  replaceWithElementNS(namespaceURI: string, localName: string): LogPatcher {
     this.log.push(`replaceWithElementNS("${namespaceURI}", "${localName}")`)
     return this
   }
-  replaceWithStashedNode(address: number): LogPatcher<target> {
+  replaceWithStashedNode(address: number): LogPatcher {
     this.log.push(`replaceWithStashedNode(${address})`)
     return this
   }
@@ -76,19 +71,19 @@ class LogPatcher<target> implements Encoder<target> {
     end: number,
     prefix: string,
     suffix: string
-  ): LogPatcher<target> {
+  ): LogPatcher {
     this.log.push(`editTextData(${start}, ${end}, "${prefix}", "${suffix}")`)
     return this
   }
-  setTextData(data: string): LogPatcher<target> {
+  setTextData(data: string): LogPatcher {
     this.log.push(`setTextData("${data}")`)
     return this
   }
-  setAttribute(name: string, value: string): LogPatcher<target> {
+  setAttribute(name: string, value: string): LogPatcher {
     this.log.push(`setAttribute("${name}", "${value}")`)
     return this
   }
-  removeAttribute(name: string): LogPatcher<target> {
+  removeAttribute(name: string): LogPatcher {
     this.log.push(`removeAttribute("${name}")`)
     return this
   }
@@ -96,46 +91,45 @@ class LogPatcher<target> implements Encoder<target> {
     namespaceURI: string,
     name: string,
     value: string
-  ): LogPatcher<target> {
+  ): LogPatcher {
     this.log.push(`setAttributeNS("${namespaceURI}", "${name}", "${value}")`)
     return this
   }
-  removeAttributeNS(namespaceURI: string, name: string): LogPatcher<target> {
+  removeAttributeNS(namespaceURI: string, name: string): LogPatcher {
     this.log.push(`removeAttributeNS("${namespaceURI}", "${name}")`)
     return this
   }
   assignProperty(
     name: string,
     value: string | number | boolean | null
-  ): LogPatcher<target> {
+  ): LogPatcher {
     this.log.push(`assignProperty("${name}", ${JSON.stringify(value)})`)
     return this
   }
-  deleteProperty(name: string): LogPatcher<target> {
+  deleteProperty(name: string): LogPatcher {
     this.log.push(`deleteProperty("${name}")`)
     return this
   }
-  setStyleRule(name: string, value: string): LogPatcher<target> {
+  setStyleRule(name: string, value: string): LogPatcher {
     this.log.push(`setStyleRule("${name}", "${value}")`)
     return this
   }
-  removeStyleRule(name: string): LogPatcher<target> {
+  removeStyleRule(name: string): LogPatcher {
     this.log.push(`removeStyleRule("${name}")`)
     return this
   }
 
-  stashNextSibling(address: number): LogPatcher<target> {
+  stashNextSibling(address: number): LogPatcher {
     this.log.push(`stashNextSibling(${address})`)
     return this
   }
-  discardStashedNode(address: number): LogPatcher<target> {
+  discardStashedNode(address: number): LogPatcher {
     this.log.push(`discardStashedNode(${address})`)
     return this
   }
-  encode(): target {
-    return this.host
+  encode(): string[] {
+    return this.log.splice(0)
   }
 }
 
-export const patcher = <target>(host: target): LogPatcher<target> =>
-  new LogPatcher(host)
+export default new LogPatcher([])

@@ -4,7 +4,7 @@ import type { Encoder, Decoder } from "../Log"
 
 type Nav = [-1 | 0 | 1, number]
 
-class Diff<buffer> implements Encoder<buffer> {
+export default class Diff<buffer> implements Encoder<buffer> {
   encoder: Encoder<buffer>
   navigationLog: Nav[]
   address: number
@@ -204,10 +204,9 @@ class Diff<buffer> implements Encoder<buffer> {
   }
 
   encode(): buffer {
+    this.navigationLog.length = 0
+    this.address = 1
+
     return this.encoder.encode()
   }
 }
-
-export type { Diff }
-export const encoder = <buffer>(encoder: Encoder<buffer>): Diff<buffer> =>
-  new Diff(encoder, 1, [])
