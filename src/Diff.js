@@ -21,7 +21,7 @@ import type {
 } from "./DOM/Node"
 import type { Encoder } from "./Log"
 import { nodeType } from "./DOM/Node"
-import Diff from "./Diff/Encoder"
+import Diff from "./Diff/Diff"
 import unreachable from "unreachable"
 
 const empty: Array<any> = Object.freeze([])
@@ -31,7 +31,10 @@ export const diff = <a, x>(
   last: Node<a>,
   next: Node<a>,
   encoder: Encoder<x>
-): x => diffNode(last, next, new Diff(encoder, 1, [])).encode()
+): x =>
+  encoder(
+    changeLog => diffNode(last, next, new Diff(changeLog, 1, [])).changeLog
+  )
 
 export default diff
 

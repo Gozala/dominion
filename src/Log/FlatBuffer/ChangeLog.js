@@ -1,4 +1,4 @@
-/* @flow */
+/* @noflow */
 
 import type { Decoder, Encoder } from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"

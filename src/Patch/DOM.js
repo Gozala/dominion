@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Encoder } from "../Log"
+import type { Encoder, ChangeLog } from "../Log"
 import { nodeType } from "../DOM/Node"
 import unreachable from "unreachable"
 
@@ -114,14 +114,10 @@ const getStashedNode = (stash: { [number]: Node }, address: number): Node => {
 
 type Stash = { [number]: Node }
 
-class DOMPatcher implements Encoder<Node> {
+class DOMPatcher implements ChangeLog<Node> {
   target: Node
   childrenSelected: boolean
   stash: Stash
-
-  constructor(target: Node, childrenSelected: boolean, stash: Stash) {
-    this.reset(target, childrenSelected, stash)
-  }
   reset(target: Node, childrenSelected: boolean, stash: Stash): DOMPatcher {
     this.target = target
     this.childrenSelected = childrenSelected
@@ -375,11 +371,12 @@ class DOMPatcher implements Encoder<Node> {
     return this
   }
 
-  encode(): Node {
-    this.reset(this.target, false, {})
+  toBuffer(): Node {
     return this.target
   }
 }
 
-export default (target: Node): Encoder<Node> =>
-  new DOMPatcher(target, false, {})
+const patcher = new DOMPatcher()
+
+export default (target: Node): Encoder<Node> => encode =>
+  encode(patcher.reset(target, false, {})).toBuffer()

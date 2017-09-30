@@ -1,4 +1,4 @@
-/* @flow */
+/* @noflow */
 
 import { flatbuffers } from "flatbuffers"
 import type { Builder, Offset } from "flatbuffers"

@@ -1,4 +1,4 @@
-/* @flow */
+/* @noflow */
 
 import type { Builder, Offset } from "flatbuffers"
 import type { Encoder, Decoder } from "../../Log"

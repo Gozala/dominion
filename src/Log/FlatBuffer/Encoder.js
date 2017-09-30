@@ -1,13 +1,13 @@
 /* @flow */
 
-import type { Encoder, Decoder } from "../../Log"
+import type { Encoder, Decoder, ChangeLog } from "../../Log"
 import type { Builder, ByteBuffer } from "flatbuffers"
 import type { OpType, Op } from "./Op"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
 import { type change } from "./Change"
 import Change from "./Change"
-import ChangeLog from "./ChangeLog"
+import Changes from "./ChangeLog"
 
 import {
   DecoderError,
@@ -40,14 +40,10 @@ import {
 
 const push = <a>(item: a, items: a[]): a[] => (items.push(item), items)
 
-class LogEncoder implements Encoder<Uint8Array> {
+class Log implements ChangeLog<Uint8Array> {
   builder: Builder
-  log: Array<change>
-  // TODO: Update interfaces to get rid off this requirement
-  address: number = 0
-  constructor(builder: Builder, log: Array<change>) {
-    this.reset(builder, log)
-  }
+  log: change[]
+  address: number
   reset(builder: Builder, log: Array<change>): self {
     this.builder = builder
     this.log = log
@@ -248,16 +244,14 @@ class LogEncoder implements Encoder<Uint8Array> {
     )
   }
 
-  encode(): Uint8Array {
+  toBuffer(): Uint8Array {
     const { builder, log } = this
-    builder.finish(ChangeLog.encode(builder, log.splice(0)))
-    const data = builder.asUint8Array()
-    this.builder = new flatbuffers.Builder(1024)
-    return data
+    builder.finish(Changes.encode(builder, log.splice(0)))
+    return builder.asUint8Array()
   }
 }
 
-export const encoder: Encoder<Uint8Array> = new LogEncoder(
-  new flatbuffers.Builder(1024),
-  []
-)
+const changeLog = new Log()
+
+export const encode: Encoder<Uint8Array> = encode =>
+  encode(changeLog.reset(new flatbuffers.Builder(1024), [])).toBuffer()

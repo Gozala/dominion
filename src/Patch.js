@@ -6,14 +6,14 @@ import mount from "./Patch/DOM"
 export { mount }
 
 export const patch = <target, buffer>(
-  patcher: Encoder<target>,
+  host: Encoder<target>,
   changeList: buffer,
-  decoder: Decoder<buffer>
+  decode: Decoder<buffer>
 ): Error | target => {
-  const result = decoder.decode(changeList, patcher)
-  if (result.isError === true) {
-    return new Error(result.toString())
+  const result = decode(changeList, host)
+  if (result && result.isError === true) {
+    return new Error(String(result))
   } else {
-    return result.encode()
+    return result
   }
 }

@@ -1,4 +1,4 @@
 /* @flow */
 
-export { encoder } from "./FlatBuffer/Encoder"
-export { decoder } from "./FlatBuffer/Decoder"
+export { encode } from "./FlatBuffer/Encoder"
+export { decode } from "./FlatBuffer/Decoder"

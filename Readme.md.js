@@ -66,18 +66,18 @@ DOMLog.diff(tree0, tree1, JSONLog.encoder) // ?JSON.stringify($.encode())
 DOMLog.diff(tree1, tree1, JSONLog.encoder) //?$.encode()
 DOMLog.diff(tree1, tree2, JSONLog.encoder) //?$.encode()
 
-const delta1 = DOMLog.diff(tree0, tree1, Flat.encoder) //?$.length
+const delta1 = DOMLog.diff(tree0, tree1, Flat.encode) //?$.length
 
 const body = document.createElement("div") //?$.innerHTML
 const host = DOMLog.mount(body)
 
-DOMLog.patch(host, delta1, Flat.decoder) //?
+DOMLog.patch(host, delta1, Flat.decode) //?
 body.innerHTML //?
 
-const delta2 = DOMLog.diff(tree1, tree1, Flat.encoder) //?$.encode().length
-DOMLog.patch(host, delta2, Flat.decoder) //?
+const delta2 = DOMLog.diff(tree1, tree1, Flat.encode) //?$.encode().length
+DOMLog.patch(host, delta2, Flat.decode) //?
 body.innerHTML //?
 
-const delta3 = DOMLog.diff(tree1, tree2, Flat.encoder) //?$.encode().length
-DOMLog.patch(host, delta3, Flat.decoder) //?
+const delta3 = DOMLog.diff(tree1, tree2, Flat.encode) //?$.encode().length
+DOMLog.patch(host, delta3, Flat.decode) //?
 body.innerHTML //?

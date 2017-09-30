@@ -1,4 +1,4 @@
-/* @flow */
+/* @noflow */
 
 import type { Encoder, Decoder } from "../../Log"
 import unreachable from "unreachable"
