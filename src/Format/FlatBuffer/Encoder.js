@@ -59,7 +59,14 @@ export default class FlatBufferEncoder {
       push(Change.encode(this.builder, opType, opOffset), this.log)
     )
   }
+  static toUint8Array({ builder, log }: FlatBufferEncoder): Uint8Array {
+    builder.finish(Changes.encode(builder, log))
+    return builder.asUint8Array()
+  }
 
+  static encoder(size: number = 1024): FlatBufferEncoder {
+    return new FlatBufferEncoder(new flatbuffers.Builder(size), [])
+  }
   static selectChildren(state: FlatBufferEncoder): FlatBufferEncoder {
     return state.change(
       SelectChildren.opType,
@@ -315,15 +322,12 @@ export default class FlatBufferEncoder {
   }
 
   static encode(changeList: ChangeList): Result<Uint8Array> {
-    const builder = new flatbuffers.Builder(1024)
     const result = changeList.encode(
       FlatBufferEncoder,
-      new FlatBufferEncoder(builder, [])
+      FlatBufferEncoder.encoder()
     )
     if (result instanceof FlatBufferEncoder) {
-      const { builder, log } = result
-      builder.finish(Changes.encode(builder, log))
-      return builder.asUint8Array()
+      return FlatBufferEncoder.toUint8Array(result)
     } else {
       return result
     }
