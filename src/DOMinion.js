@@ -37,7 +37,7 @@ class AttributeSetting implements Attribute {
   name: string
   value: string | null
   constructor(namespaceURI: string | null, name: string, value: string | null) {
-    this.namespaceURI
+    this.namespaceURI = namespaceURI
     this.name = name
     this.value = value
   }
@@ -164,7 +164,12 @@ const setSetting = <message>(
 ): Element<message> => {
   switch (setting.settingType) {
     case settingType.attribute: {
-      element.attributes = set(setting.name, setting, element.attributes)
+      const ns = setting.namespaceURI == null ? "" : `@${setting.namespaceURI}`
+      element.attributes = set(
+        `${setting.name}${ns}`,
+        setting,
+        element.attributes
+      )
       return element
     }
     case settingType.property: {

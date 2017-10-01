@@ -682,7 +682,73 @@ test("comment editTextData", async test => {
   )
 })
 
-test("setAttribute", async test => {})
+test("setAttribute", async test => {
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      )
+    ),
+    [],
+    "attribute present in both versions"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div", [])]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'setAttribute("x", "50")'],
+    "attribute was added"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "10")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'setAttribute("x", "50")'],
+    "update attribute value"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'removeAttributeNS("http://www.w3.org/2000/svg", "x")',
+      'setAttribute("x", "50")'
+    ],
+    "namespaced attributes are different"
+  )
+})
 
 test("setAttributeNS", async test => {})
 
