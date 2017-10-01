@@ -4,18 +4,14 @@ import type { ChangeLog } from "../Log"
 
 type Nav = [-1 | 0 | 1, number]
 
-export default class Diff<x> implements ChangeLog<x> {
-  changeLog: ChangeLog<x>
+export default class Diff<x> implements ChangeLog {
+  changeLog: ChangeLog
   navigationLog: Nav[]
   address: number
-  constructor(changeLog: ChangeLog<x>, address: number, navigationLog: Nav[]) {
+  constructor(changeLog: ChangeLog, address: number, navigationLog: Nav[]) {
     this.reset(changeLog, address, navigationLog)
   }
-  reset(
-    changeLog: ChangeLog<x>,
-    address: number,
-    navigationLog: Nav[]
-  ): Diff<x> {
+  reset(changeLog: ChangeLog, address: number, navigationLog: Nav[]): Diff<x> {
     this.changeLog = changeLog
     this.address = address
     this.navigationLog = navigationLog
@@ -28,7 +24,7 @@ export default class Diff<x> implements ChangeLog<x> {
     return this.reset(this.changeLog, this.address, navigationLog)
   }
 
-  update(changeLog: ChangeLog<x>): Diff<x> {
+  update(changeLog: ChangeLog): Diff<x> {
     return this.reset(changeLog, this.address, this.navigationLog)
   }
   navigate(): Diff<x> {
@@ -199,9 +195,5 @@ export default class Diff<x> implements ChangeLog<x> {
   }
   discardStashedNode(address: number): Diff<x> {
     return this.update(this.navigate().changeLog.discardStashedNode(address))
-  }
-
-  toBuffer(): x {
-    return this.changeLog.toBuffer()
   }
 }

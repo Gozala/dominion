@@ -19,7 +19,7 @@ import type {
   Attributes,
   StyleRules
 } from "./DOM/Node"
-import type { Encoder } from "./Log"
+import type { Encoder, ChangeList, ChangeLog } from "./Log"
 import { nodeType } from "./DOM/Node"
 import Diff from "./Diff/Diff"
 import unreachable from "unreachable"
@@ -27,14 +27,9 @@ import unreachable from "unreachable"
 const empty: Array<any> = Object.freeze([])
 const blank: Object = Object.freeze(Object.create(null))
 
-export const diff = <a, x>(
-  last: Node<a>,
-  next: Node<a>,
-  encoder: Encoder<x>
-): x =>
-  encoder(
-    changeLog => diffNode(last, next, new Diff(changeLog, 1, [])).changeLog
-  )
+export const diff = <a>(last: Node<a>, next: Node<a>) => (
+  changeLog: ChangeLog
+): ChangeLog => diffNode(last, next, new Diff(changeLog, 1, [])).changeLog
 
 export default diff
 

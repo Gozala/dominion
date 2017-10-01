@@ -1,6 +1,7 @@
-/* @noflow */
+/* @flow */
 
-import type { Decoder, Encoder } from "../../Log"
+import type { Decoder, Encoder, ChangeList } from "../../Log"
+import * as Log from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
 import type { Builder, Offset } from "flatbuffers"
 import type { change } from "./Change"
@@ -75,33 +76,33 @@ class ChangeError extends DecoderError {
 
 const changePool = new Change.Table()
 
-class Codec implements Decoder<ChangeLog> {
+class Codec {
   Table = ChangeLog
   decode<x>(
-    changeLog: ChangeLog,
-    encoder: Encoder<x>
-  ): Encoder<x> | DecoderError {
-    const count = changeLog.logLength()
+    table: ChangeLog,
+    changeLog: Log.ChangeLog
+  ): Log.ChangeLog | DecoderError {
+    const count = table.logLength()
     console.log(`Decode: ChangeLog contains ${count} changes`)
 
     let index = 0
     while (index < count) {
       console.log(`Decode: log[${index}]`)
-      const change = changeLog.log(index, changePool)
+      const change = table.log(index, changePool)
       if (change == null) {
         console.error(`Decode: Change is null log[${index}]`)
         return new IndexError(index)
       }
-      const result = Change.decode(change, encoder)
+      const result = Change.decode(change, changeLog)
       if (result instanceof DecoderError) {
         return new ChangeError(index, result)
       } else {
-        encoder = result
+        changeLog = result
       }
       index++
     }
 
-    return encoder
+    return changeLog
   }
   encode(builder: Builder, changes: change[]): Offset {
     const logOffset = ChangeLog.createLogVector(builder, (changes: any))

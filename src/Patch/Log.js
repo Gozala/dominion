@@ -1,8 +1,8 @@
-/* @noflow */
+/* @flow */
 
-import type { Encoder } from "../Log"
+import type { Encoder, ChangeList, ChangeLog } from "../Log"
 
-class LogPatcher implements Encoder<string[]> {
+class LogPatcher implements ChangeLog {
   log: string[]
   constructor(log: string[]) {
     this.log = log
@@ -127,9 +127,12 @@ class LogPatcher implements Encoder<string[]> {
     this.log.push(`discardStashedNode(${address})`)
     return this
   }
-  encode(): string[] {
-    return this.log.splice(0)
-  }
 }
 
-export default new LogPatcher([])
+const log = new LogPatcher([])
+const encoder: Encoder<string[]> = (changeList: ChangeList): string[] => {
+  changeList(log)
+  return log.log.splice(0)
+}
+
+export default encoder

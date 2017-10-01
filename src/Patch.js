@@ -1,16 +1,15 @@
 /* @flow */
 
-import type { Decoder, Encoder, DecoderError } from "./Log"
+import type { Decoder, Encoder, DecoderError, ChangeList } from "./Log"
 import mount from "./Patch/DOM"
 
 export { mount }
 
-export const patch = <target, buffer>(
+export const patch = <target>(
   host: Encoder<target>,
-  changeList: buffer,
-  decode: Decoder<buffer>
+  changeList: ChangeList
 ): Error | target => {
-  const result = decode(changeList, host)
+  const result = host(changeList)
   if (result && result.isError === true) {
     return new Error(String(result))
   } else {

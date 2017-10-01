@@ -1,7 +1,7 @@
-/* @noflow */
+/* @flow */
 
 import type { Builder, Offset } from "flatbuffers"
-import type { Encoder, Decoder } from "../../Log"
+import type { Encoder, Decoder, ChangeLog } from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
 import { Change } from "../../DOM/DOM.fbs.ts.js"
 import * as op from "./Op"
@@ -62,7 +62,7 @@ class OpError extends DecoderError {
   }
 }
 
-export class Codec implements Decoder<Change> {
+export class Codec {
   Table = Change
   pool: { [OpType]: OpVariant } = {
     [AssignStringProperty.opType]: new AssignStringProperty(),
@@ -91,7 +91,7 @@ export class Codec implements Decoder<Change> {
     [DiscardStashed.opType]: new DiscardStashed(),
     [StashNextSibling.opType]: new StashNextSibling()
   }
-  decode<x>(change: Change, encoder: Encoder<x>): Encoder<x> | DecoderError {
+  decode<x>(change: Change, changeLog: ChangeLog): ChangeLog | DecoderError {
     const type = change.opType()
     const variant = this.pool[type]
     if (variant == null) {
@@ -103,7 +103,7 @@ export class Codec implements Decoder<Change> {
         return new OpError(variant.constructor.name)
       }
       console.log(`Decode: op ${op.constructor.name}`)
-      return op.decode(encoder)
+      return op.decode(changeLog)
     }
   }
   encode(builder: Builder, opType: OpType, opOffset: Op): change {

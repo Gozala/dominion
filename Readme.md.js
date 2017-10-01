@@ -62,22 +62,22 @@ const tree2 = DOMLog.createHost(
   ]
 ) //?$.toDebugString()
 
-DOMLog.diff(tree0, tree1, JSONLog.encoder) // ?JSON.stringify($.encode())
-DOMLog.diff(tree1, tree1, JSONLog.encoder) //?$.encode()
-DOMLog.diff(tree1, tree2, JSONLog.encoder) //?$.encode()
+DOMLog.diff(tree0, tree1) // ?JSON.stringify($.encode())
+DOMLog.diff(tree1, tree1) //?$.encode()
+DOMLog.diff(tree1, tree2) //?$.encode()
 
-const delta1 = DOMLog.diff(tree0, tree1, Flat.encode) //?$.length
+const delta1 = Flat.encode(DOMLog.diff(tree0, tree1)) //?$.length
 
 const body = document.createElement("div") //?$.innerHTML
 const host = DOMLog.mount(body)
 
-DOMLog.patch(host, delta1, Flat.decode) //?
+DOMLog.patch(host, Flat.decode(delta1)) //?
 body.innerHTML //?
 
-const delta2 = DOMLog.diff(tree1, tree1, Flat.encode) //?$.encode().length
-DOMLog.patch(host, delta2, Flat.decode) //?
+const delta2 = Flat.encode(DOMLog.diff(tree1, tree1)) //?$.encode().length
+DOMLog.patch(host, Flat.decode(delta2)) //?
 body.innerHTML //?
 
-const delta3 = DOMLog.diff(tree1, tree2, Flat.encode) //?$.encode().length
-DOMLog.patch(host, delta3, Flat.decode) //?
+const delta3 = Flat.encode(DOMLog.diff(tree1, tree2)) //?$.encode().length
+DOMLog.patch(host, Flat.decode(delta3)) //?
 body.innerHTML //?
