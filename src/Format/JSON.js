@@ -303,54 +303,56 @@ class RemoveNextSibling {
 
 const push = <a>(x: a, xs: a[]): a[] => (xs.push(x), xs)
 
-class JSONLog implements Encoder<Op[]> {
-  isError = false
-
-  selectChildren(log: Op[]): Op[] {
+export default class JSONEncoder {
+  static selectChildren(log: Op[]): Op[] {
     return push(new SelectChildren(), log)
   }
-  selectSibling(log: Op[], offset: number): Op[] {
+  static selectSibling(log: Op[], offset: number): Op[] {
     return push(new SelectSibling(offset), log)
   }
-  selectParent(log: Op[]): Op[] {
+  static selectParent(log: Op[]): Op[] {
     return push(new SelectParent(), log)
   }
-  removeNextSibling(log: Op[]): Op[] {
+  static removeNextSibling(log: Op[]): Op[] {
     return push(new RemoveNextSibling(), log)
   }
 
-  insertText(log: Op[], text: string): Op[] {
+  static insertText(log: Op[], text: string): Op[] {
     return push(new InsertText(text), log)
   }
-  insertComment(log: Op[], text: string): Op[] {
+  static insertComment(log: Op[], text: string): Op[] {
     return push(new InsertComment(text), log)
   }
-  insertElement(log: Op[], name: string): Op[] {
+  static insertElement(log: Op[], name: string): Op[] {
     return push(new InsertElement(null, name), log)
   }
-  insertElementNS(log: Op[], namespaceURI: string, name: string): Op[] {
+  static insertElementNS(log: Op[], namespaceURI: string, name: string): Op[] {
     return push(new InsertElement(namespaceURI, name), log)
   }
-  insertStashedNode(log: Op[], address: number): Op[] {
+  static insertStashedNode(log: Op[], address: number): Op[] {
     return push(new InsertStashedNode(address), log)
   }
 
-  replaceWithText(log: Op[], text: string): Op[] {
+  static replaceWithText(log: Op[], text: string): Op[] {
     return push(new ReplaceWithText(text), log)
   }
-  replaceWithComment(log: Op[], text: string): Op[] {
+  static replaceWithComment(log: Op[], text: string): Op[] {
     return push(new ReplaceWithComment(text), log)
   }
-  replaceWithElement(log: Op[], name: string): Op[] {
+  static replaceWithElement(log: Op[], name: string): Op[] {
     return push(new ReplaceWithElement(null, name), log)
   }
-  replaceWithElementNS(log: Op[], namespaceURI: string, name: string): Op[] {
+  static replaceWithElementNS(
+    log: Op[],
+    namespaceURI: string,
+    name: string
+  ): Op[] {
     return push(new ReplaceWithElement(namespaceURI, name), log)
   }
-  replaceWithStashedNode(log: Op[], address: number): Op[] {
+  static replaceWithStashedNode(log: Op[], address: number): Op[] {
     return push(new ReplaceWithStashedNode(address), log)
   }
-  editTextData(
+  static editTextData(
     log: Op[],
     start: number,
     end: number,
@@ -359,16 +361,16 @@ class JSONLog implements Encoder<Op[]> {
   ): Op[] {
     return push(new EditTextData(start, end, prefix, suffix), log)
   }
-  setTextData(log: Op[], text: string): Op[] {
+  static setTextData(log: Op[], text: string): Op[] {
     return push(new SetTextData(text), log)
   }
-  setAttribute(log: Op[], name: string, value: string): Op[] {
+  static setAttribute(log: Op[], name: string, value: string): Op[] {
     return push(new SetAttribute(null, name, value), log)
   }
-  removeAttribute(log: Op[], name: string): Op[] {
+  static removeAttribute(log: Op[], name: string): Op[] {
     return push(new RemoveAttribute(null, name), log)
   }
-  setAttributeNS(
+  static setAttributeNS(
     log: Op[],
     namespaceURI: string,
     name: string,
@@ -376,35 +378,45 @@ class JSONLog implements Encoder<Op[]> {
   ): Op[] {
     return push(new SetAttribute(namespaceURI, name, value), log)
   }
-  removeAttributeNS(log: Op[], namespaceURI: string, name: string): Op[] {
+  static removeAttributeNS(
+    log: Op[],
+    namespaceURI: string,
+    name: string
+  ): Op[] {
     return push(new RemoveAttribute(namespaceURI, name), log)
   }
-  assignProperty(
+  static assignProperty(
     log: Op[],
     name: string,
     value: string | number | boolean | null
   ): Op[] {
     return push(new AssignProperty(name, value), log)
   }
-  deleteProperty(log: Op[], name: string): Op[] {
+  static deleteProperty(log: Op[], name: string): Op[] {
     return push(new DeleteProperty(name), log)
   }
-  setStyleRule(log: Op[], name: string, value: string): Op[] {
+  static setStyleRule(log: Op[], name: string, value: string): Op[] {
     return push(new SetStyleRule(name, value), log)
   }
-  removeStyleRule(log: Op[], name: string): Op[] {
+  static removeStyleRule(log: Op[], name: string): Op[] {
     return push(new RemoveStyleRule(name), log)
   }
 
-  stashNextSibling(log: Op[], address: number): Op[] {
+  static stashNextSibling(log: Op[], address: number): Op[] {
     return push(new StashNextSibling(address), log)
   }
-  discardStashedNode(log: Op[], address: number): Op[] {
+  static discardStashedNode(log: Op[], address: number): Op[] {
     return push(new DiscardStashed(address), log)
   }
-}
 
-const changeLog = new JSONLog()
+  static encode(changeList: ChangeList): Result<Op[]> {
+    return changeList.encode(JSONEncoder, [])
+  }
+
+  static decode(log: Op[]): ChangeList {
+    return new JSONDecoder(log)
+  }
+}
 
 class JSONDecoder {
   log: Op[]
@@ -418,8 +430,3 @@ class JSONDecoder {
     return buffer
   }
 }
-
-export const decode: Decode<Op[]> = (log: Op[]) => new JSONDecoder(log)
-
-export const encode: Encode<Op[]> = (changeList: ChangeList): Result<Op[]> =>
-  changeList.encode(changeLog, [])

@@ -23,7 +23,8 @@ import type {
 import type { Dict } from "dictionary.flow"
 import { nodeType, settingType } from "./DOM/Node"
 import { diff } from "./Diff"
-import { patch, mount } from "./Patch"
+import { patch } from "./Patch"
+import DOMPatch from "./Patch/DOM"
 import * as Dictionary from "dictionary.flow"
 import unreachable from "unreachable"
 
@@ -313,7 +314,8 @@ export const createHost = <message>(
   children: Node<message>[] = empty
 ): Element<message> => createElement("x-host", settings, children)
 
-export { diff, patch, mount }
+export const mount = DOMPatch.encoder
+export { diff, patch }
 
 export type {
   Text,

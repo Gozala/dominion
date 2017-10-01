@@ -41,111 +41,135 @@ import {
 
 const push = <a>(item: a, items: a[]): a[] => (items.push(item), items)
 
-class Log {
+export default class FlatBufferEncoder {
   builder: Builder
   log: change[]
   constructor(builder: Builder, log: change[]) {
     this.reset(builder, log)
   }
-  reset(builder: Builder, log: change[]): Log {
+  reset(builder: Builder, log: change[]): FlatBufferEncoder {
     this.builder = builder
     this.log = log
 
     return this
   }
-  change(opType: OpType, opOffset: Op): Log {
+  change(opType: OpType, opOffset: Op): FlatBufferEncoder {
     return this.reset(
       this.builder,
       push(Change.encode(this.builder, opType, opOffset), this.log)
     )
   }
 
-  static selectChildren(state: Log): Log {
+  static selectChildren(state: FlatBufferEncoder): FlatBufferEncoder {
     return state.change(
       SelectChildren.opType,
       SelectChildren.encode(state.builder)
     )
   }
-  static selectSibling(state: Log, offset: number): Log {
+  static selectSibling(
+    state: FlatBufferEncoder,
+    offset: number
+  ): FlatBufferEncoder {
     return state.change(
       SelectSibling.opType,
       SelectSibling.encode(state.builder, offset)
     )
   }
-  static selectParent(state: Log): Log {
+  static selectParent(state: FlatBufferEncoder): FlatBufferEncoder {
     return state.change(SelectParent.opType, SelectParent.encode(state.builder))
   }
-  static removeNextSibling(state: Log): Log {
+  static removeNextSibling(state: FlatBufferEncoder): FlatBufferEncoder {
     return state.change(
       RemoveNextSibling.opType,
       RemoveNextSibling.encode(state.builder)
     )
   }
 
-  static insertText(state: Log, data: string): Log {
+  static insertText(state: FlatBufferEncoder, data: string): FlatBufferEncoder {
     return state.change(
       InsertText.opType,
       InsertText.encode(state.builder, data)
     )
   }
-  static insertComment(state: Log, data: string): Log {
+  static insertComment(
+    state: FlatBufferEncoder,
+    data: string
+  ): FlatBufferEncoder {
     return state.change(
       InsertComment.opType,
       InsertComment.encode(state.builder, data)
     )
   }
-  static insertElement(state: Log, localName: string): Log {
+  static insertElement(
+    state: FlatBufferEncoder,
+    localName: string
+  ): FlatBufferEncoder {
     return state.change(
       InsertElement.opType,
       InsertElement.encode(state.builder, null, localName)
     )
   }
   static insertElementNS(
-    state: Log,
+    state: FlatBufferEncoder,
     namespaceURI: string,
     localName: string
-  ): Log {
+  ): FlatBufferEncoder {
     return state.change(
       InsertElement.opType,
       InsertElement.encode(state.builder, namespaceURI, localName)
     )
   }
-  static insertStashedNode(state: Log, address: number): Log {
+  static insertStashedNode(
+    state: FlatBufferEncoder,
+    address: number
+  ): FlatBufferEncoder {
     return state.change(
       InsertStashedNode.opType,
       InsertStashedNode.encode(state.builder, address)
     )
   }
 
-  static replaceWithText(state: Log, data: string): Log {
+  static replaceWithText(
+    state: FlatBufferEncoder,
+    data: string
+  ): FlatBufferEncoder {
     return state.change(
       ReplaceWithText.opType,
       ReplaceWithText.encode(state.builder, data)
     )
   }
-  static replaceWithComment(state: Log, data: string): Log {
+  static replaceWithComment(
+    state: FlatBufferEncoder,
+    data: string
+  ): FlatBufferEncoder {
     return state.change(
       ReplaceWithComment.opType,
       ReplaceWithComment.encode(state.builder, data)
     )
   }
-  static replaceWithElement(state: Log, localName: string): Log {
+  static replaceWithElement(
+    state: FlatBufferEncoder,
+    localName: string
+  ): FlatBufferEncoder {
     return state.change(
       ReplaceWithElement.opType,
       ReplaceWithElement.encode(state.builder, null, localName)
     )
   }
   static replaceWithElementNS(
-    state: Log,
+    state: FlatBufferEncoder,
     namespaceURI: string,
     localName: string
-  ): Log {
+  ): FlatBufferEncoder {
     return state.change(
       ReplaceWithElement.opType,
       ReplaceWithElement.encode(state.builder, namespaceURI, localName)
     )
   }
-  static replaceWithStashedNode(state: Log, address: number): Log {
+  static replaceWithStashedNode(
+    state: FlatBufferEncoder,
+    address: number
+  ): FlatBufferEncoder {
     return state.change(
       ReplaceWithStashedNode.opType,
       ReplaceWithStashedNode.encode(state.builder, address)
@@ -153,61 +177,71 @@ class Log {
   }
 
   static editTextData(
-    state: Log,
+    state: FlatBufferEncoder,
     start: number,
     end: number,
     prefix: string,
     suffix: string
-  ): Log {
+  ): FlatBufferEncoder {
     return state.change(
       EditTextData.opType,
       EditTextData.encode(state.builder, start, end, prefix, suffix)
     )
   }
-  static setTextData(state: Log, data: string): Log {
+  static setTextData(
+    state: FlatBufferEncoder,
+    data: string
+  ): FlatBufferEncoder {
     return state.change(
       SetTextData.opType,
       SetTextData.encode(state.builder, data)
     )
   }
-  static setAttribute(state: Log, name: string, value: string): Log {
+  static setAttribute(
+    state: FlatBufferEncoder,
+    name: string,
+    value: string
+  ): FlatBufferEncoder {
     return state.change(
       SetAttribute.opType,
       SetAttribute.encode(state.builder, null, name, value)
     )
   }
-  static removeAttribute(state: Log, name: string): Log {
+  static removeAttribute(
+    state: FlatBufferEncoder,
+    name: string
+  ): FlatBufferEncoder {
     return state.change(
       RemoveAttribute.opType,
       RemoveAttribute.encode(state.builder, null, name)
     )
   }
   static setAttributeNS(
-    state: Log,
+    state: FlatBufferEncoder,
     namespaceURI: string,
     name: string,
     value: string
-  ): Log {
+  ): FlatBufferEncoder {
     return state.change(
       SetAttribute.opType,
       SetAttribute.encode(state.builder, namespaceURI, name, value)
     )
   }
   static removeAttributeNS(
-    state: Log,
+    state: FlatBufferEncoder,
     namespaceURI: string,
     name: string
-  ): Log {
+  ): FlatBufferEncoder {
     return state.change(
       RemoveAttribute.opType,
       RemoveAttribute.encode(state.builder, namespaceURI, name)
     )
   }
   static assignProperty(
-    state: Log,
+    state: FlatBufferEncoder,
     name: string,
     value: string | number | boolean | null
-  ): Log {
+  ): FlatBufferEncoder {
     switch (typeof value) {
       case "string": {
         return state.change(
@@ -239,49 +273,59 @@ class Log {
       }
     }
   }
-  static deleteProperty(state: Log, name: string): Log {
+  static deleteProperty(
+    state: FlatBufferEncoder,
+    name: string
+  ): FlatBufferEncoder {
     return state.change(
       DeleteProperty.opType,
       DeleteProperty.encode(state.builder, name)
     )
   }
-  static setStyleRule(state: Log, name: string, value: string) {
+  static setStyleRule(state: FlatBufferEncoder, name: string, value: string) {
     return state.change(
       SetStyleRule.opType,
       SetStyleRule.encode(state.builder, name, value)
     )
   }
-  static removeStyleRule(state: Log, name: string) {
+  static removeStyleRule(state: FlatBufferEncoder, name: string) {
     return state.change(
       RemoveStyleRule.opType,
       RemoveStyleRule.encode(state.builder, name)
     )
   }
 
-  static stashNextSibling(state: Log, address): Log {
+  static stashNextSibling(
+    state: FlatBufferEncoder,
+    address
+  ): FlatBufferEncoder {
     return state.change(
       StashNextSibling.opType,
       StashNextSibling.encode(state.builder, address)
     )
   }
-  static discardStashedNode(state: Log, address: number): Log {
+  static discardStashedNode(
+    state: FlatBufferEncoder,
+    address: number
+  ): FlatBufferEncoder {
     return state.change(
       DiscardStashed.opType,
       DiscardStashed.encode(state.builder, address)
     )
   }
-}
 
-export const encode: Encode<Uint8Array> = (
-  changeList: ChangeList
-): Result<Uint8Array> => {
-  const builder = new flatbuffers.Builder(1024)
-  const result = changeList.encode(Log, new Log(builder, []))
-  if (result instanceof Log) {
-    const { builder, log } = result
-    builder.finish(Changes.encode(builder, log))
-    return builder.asUint8Array()
-  } else {
-    return result
+  static encode(changeList: ChangeList): Result<Uint8Array> {
+    const builder = new flatbuffers.Builder(1024)
+    const result = changeList.encode(
+      FlatBufferEncoder,
+      new FlatBufferEncoder(builder, [])
+    )
+    if (result instanceof FlatBufferEncoder) {
+      const { builder, log } = result
+      builder.finish(Changes.encode(builder, log))
+      return builder.asUint8Array()
+    } else {
+      return result
+    }
   }
 }

@@ -115,7 +115,7 @@ const getStashedNode = (stash: { [number]: Node }, address: number): Node => {
 
 type Stash = { [number]: Node }
 
-class State {
+export default class DOMPatch {
   target: Node
   childrenSelected: boolean
   stash: Stash
@@ -124,10 +124,8 @@ class State {
     this.childrenSelected = childrenSelected
     this.stash = stash
   }
-}
 
-class DOMPatcher implements Encoder<State> {
-  selectChildren(state: State): State {
+  static selectChildren(state: DOMPatch): DOMPatch {
     console.log(`Patch: Select children`)
     if (state.childrenSelected) {
       throw Error(
@@ -138,7 +136,7 @@ class DOMPatcher implements Encoder<State> {
       return state
     }
   }
-  selectSibling(state: State, offset: number): State {
+  static selectSibling(state: DOMPatch, offset: number): DOMPatch {
     console.log(`Patch: select sibling ${offset}`)
     const { target, childrenSelected } = state
     let select = null
@@ -162,7 +160,7 @@ class DOMPatcher implements Encoder<State> {
       return state
     }
   }
-  selectParent(state: State): State {
+  static selectParent(state: DOMPatch): DOMPatch {
     console.log("select parent")
     if (state.childrenSelected) {
       state.childrenSelected = false
@@ -177,7 +175,7 @@ class DOMPatcher implements Encoder<State> {
       }
     }
   }
-  removeNextSibling(state: State): State {
+  static removeNextSibling(state: DOMPatch): DOMPatch {
     console.log("remove next sibling")
     const next = state.childrenSelected
       ? state.target.firstChild
@@ -191,7 +189,7 @@ class DOMPatcher implements Encoder<State> {
     }
   }
 
-  insertText(state: State, data: string): State {
+  static insertText(state: DOMPatch, data: string): DOMPatch {
     console.log("insert text", data)
     insertNode(
       state.target,
@@ -200,7 +198,7 @@ class DOMPatcher implements Encoder<State> {
     )
     return state
   }
-  insertComment(state: State, data: string): State {
+  static insertComment(state: DOMPatch, data: string): DOMPatch {
     console.log("insert comment", data)
     insertNode(
       state.target,
@@ -209,7 +207,7 @@ class DOMPatcher implements Encoder<State> {
     )
     return state
   }
-  insertElement(state: State, localName: string): State {
+  static insertElement(state: DOMPatch, localName: string): DOMPatch {
     console.log(`insert element <${localName}/>`)
     insertNode(
       state.target,
@@ -218,11 +216,11 @@ class DOMPatcher implements Encoder<State> {
     )
     return state
   }
-  insertElementNS(
-    state: State,
+  static insertElementNS(
+    state: DOMPatch,
     namespaceURI: string,
     localName: string
-  ): State {
+  ): DOMPatch {
     insertNode(
       state.target,
       state.childrenSelected,
@@ -230,7 +228,7 @@ class DOMPatcher implements Encoder<State> {
     )
     return state
   }
-  insertStashedNode(state: State, address: number): State {
+  static insertStashedNode(state: DOMPatch, address: number): DOMPatch {
     insertNode(
       state.target,
       state.childrenSelected,
@@ -239,7 +237,7 @@ class DOMPatcher implements Encoder<State> {
     return state
   }
 
-  replaceWithText(state: State, data: string): State {
+  static replaceWithText(state: DOMPatch, data: string): DOMPatch {
     replaceNode(
       state.target,
       state.childrenSelected,
@@ -247,7 +245,7 @@ class DOMPatcher implements Encoder<State> {
     )
     return state
   }
-  replaceWithComment(state: State, data: string): State {
+  static replaceWithComment(state: DOMPatch, data: string): DOMPatch {
     replaceNode(
       state.target,
       state.childrenSelected,
@@ -255,7 +253,7 @@ class DOMPatcher implements Encoder<State> {
     )
     return state
   }
-  replaceWithElement(state: State, localName: string): State {
+  static replaceWithElement(state: DOMPatch, localName: string): DOMPatch {
     replaceNode(
       state.target,
       state.childrenSelected,
@@ -263,11 +261,11 @@ class DOMPatcher implements Encoder<State> {
     )
     return state
   }
-  replaceWithElementNS(
-    state: State,
+  static replaceWithElementNS(
+    state: DOMPatch,
     namespaceURI: string,
     localName: string
-  ): State {
+  ): DOMPatch {
     replaceNode(
       state.target,
       state.childrenSelected,
@@ -275,7 +273,7 @@ class DOMPatcher implements Encoder<State> {
     )
     return state
   }
-  replaceWithStashedNode(state: State, address: number): State {
+  static replaceWithStashedNode(state: DOMPatch, address: number): DOMPatch {
     const node = state.stash[address]
     if (node == null) {
       throw Error(`Unable to find stashed node with address #${address}`)
@@ -284,58 +282,62 @@ class DOMPatcher implements Encoder<State> {
     return state
   }
 
-  editTextData(
-    state: State,
+  static editTextData(
+    state: DOMPatch,
     start: number,
     end: number,
     prefix: string,
     suffix: string
-  ): State {
+  ): DOMPatch {
     const node = getTextDataUpdateTarget(state.childrenSelected, state.target)
     const { data } = node
     const content = data.substring(start, data.length - end)
     node.data = `${prefix}${content}${suffix}`
     return state
   }
-  setTextData(state: State, data: string): State {
+  static setTextData(state: DOMPatch, data: string): DOMPatch {
     const node = getTextDataUpdateTarget(state.childrenSelected, state.target)
     node.data = data
     return state
   }
-  setAttribute(state: State, name: string, value: string): State {
+  static setAttribute(state: DOMPatch, name: string, value: string): DOMPatch {
     console.log(`Patch: Set attribute ${name}="${value}"`)
     const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.setAttribute(name, value)
     return state
   }
-  removeAttribute(state: State, name: string): State {
+  static removeAttribute(state: DOMPatch, name: string): DOMPatch {
     console.log(`Patch: Remove attribute ${name}`)
     const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.removeAttribute(name)
     return state
   }
-  setAttributeNS(
-    state: State,
+  static setAttributeNS(
+    state: DOMPatch,
     namespaceURI: string,
     name: string,
     value: string
-  ): State {
+  ): DOMPatch {
     console.log(`Patch: Set attribute NS ${namespaceURI} ${name}="${value}"`)
     const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.setAttributeNS(namespaceURI, name, value)
     return state
   }
-  removeAttributeNS(state: State, namespaceURI: string, name: string): State {
+  static removeAttributeNS(
+    state: DOMPatch,
+    namespaceURI: string,
+    name: string
+  ): DOMPatch {
     console.log(`Patch: Remove attribute NS ${namespaceURI} ${name}`)
     const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.removeAttributeNS(namespaceURI, name)
     return state
   }
-  assignProperty(
-    state: State,
+  static assignProperty(
+    state: DOMPatch,
     name: string,
     value: string | number | boolean | null
-  ): State {
+  ): DOMPatch {
     console.log(`Patch: Assign property ${name}=${JSON.stringify(value)}`)
     const node: Object = getUpdateTargetElement(
       state.childrenSelected,
@@ -344,7 +346,7 @@ class DOMPatcher implements Encoder<State> {
     node[name] = value
     return state
   }
-  deleteProperty(state: State, name: string): State {
+  static deleteProperty(state: DOMPatch, name: string): DOMPatch {
     console.log(`Patch: Delete property ${name}`)
     const node: Object = getUpdateTargetElement(
       state.childrenSelected,
@@ -353,20 +355,20 @@ class DOMPatcher implements Encoder<State> {
     delete node[name]
     return state
   }
-  setStyleRule(state: State, name: string, value: string) {
+  static setStyleRule(state: DOMPatch, name: string, value: string) {
     console.log(`Patch: Style style.${name}="${value}"`)
     const style = getTargetStyle(state.childrenSelected, state.target)
     style[(name: any)] = value
     return state
   }
-  removeStyleRule(state: State, name: string) {
+  static removeStyleRule(state: DOMPatch, name: string) {
     console.log(`Patch: Remove style rule ${name}`)
     const style = getTargetStyle(state.childrenSelected, state.target)
     delete style[(name: any)]
     return state
   }
 
-  stashNextSibling(state: State, address: number): State {
+  static stashNextSibling(state: DOMPatch, address: number): DOMPatch {
     const next = state.childrenSelected
       ? state.target.firstChild
       : state.target.nextSibling
@@ -379,21 +381,22 @@ class DOMPatcher implements Encoder<State> {
       return state
     }
   }
-  discardStashedNode(state: State, address: number): State {
+  static discardStashedNode(state: DOMPatch, address: number): DOMPatch {
     delete state.stash[address]
     return state
   }
-}
 
-const patcher = new DOMPatcher()
+  static encode(target: Node, changeList: ChangeList): Result<Node> {
+    const result = changeList.encode(DOMPatch, new DOMPatch(target, false, {}))
+    if (result instanceof DOMPatch) {
+      return result.target
+    } else {
+      return result
+    }
+  }
 
-export default (target: Node): Encode<Node> => (
-  changeList: ChangeList
-): Result<Node> => {
-  const result = changeList.encode(patcher, new State(target, false, {}))
-  if (result instanceof State) {
-    return result.target
-  } else {
-    return result
+  static encoder(target: Node): Encode<Node> {
+    return (changeList: ChangeList): Result<Node> =>
+      DOMPatch.encode(target, changeList)
   }
 }

@@ -1,10 +1,9 @@
 /* @flow */
 
 import * as DOM from "../"
-import * as FlatBuffer from "../lib/Log/FlatBuffer"
+import FlatBuffer from "../lib/Format/FlatBuffer"
 import Log from "../lib/Patch/Log"
 import { JSDOM } from "jsdom"
-import type { DecoderError } from "../lib/Log"
 
 export const diff = <a>(
   left: DOM.Node<a>,
@@ -14,7 +13,7 @@ export const diff = <a>(
   if (delta.isError === true) {
     return delta
   } else {
-    return DOM.patch(Log, FlatBuffer.decode(delta))
+    return DOM.patch(Log.encode, FlatBuffer.decode(delta))
   }
 }
 

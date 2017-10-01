@@ -8,9 +8,6 @@ import type {
   ChangeList,
   Result
 } from "./Log"
-import mount from "./Patch/DOM"
-
-export { mount }
 
 export const patch = <target>(
   host: Encode<target>,

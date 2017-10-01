@@ -3,8 +3,8 @@
 import * as Dictionary from "dictionary.flow"
 import type { Dict } from "dictionary.flow"
 import * as DOMLog from "dom-log"
-import * as JSONLog from "./src/Log/JSON"
-import * as Flat from "./src/Log/FlatBuffer"
+import JSON from "./src/Format/JSON"
+import FlatBuffer from "./src/Format/FlatBuffer"
 
 DOMLog //?
 
@@ -66,25 +66,29 @@ DOMLog.diff(tree0, tree1) // ?JSON.stringify($.encode())
 DOMLog.diff(tree1, tree1) //?$.encode()
 DOMLog.diff(tree1, tree2) //?$.encode()
 
-const delta1 = Flat.encode(DOMLog.diff(tree0, tree1)) //?$.length
+const json1 = JSON.encode(DOMLog.diff(tree0, tree1)) //?
+const json2 = JSON.encode(DOMLog.diff(tree1, tree1)) //?
+const json3 = JSON.encode(DOMLog.diff(tree1, tree2)) //?
+
+const delta1 = FlatBuffer.encode(DOMLog.diff(tree0, tree1)) //?$.length
 
 const body = document.createElement("div") //?$.innerHTML
 const host = DOMLog.mount(body)
 
 if (delta1.isError !== true) {
-  DOMLog.patch(host, Flat.decode(delta1)) //?
+  DOMLog.patch(host, FlatBuffer.decode(delta1)) //?
   body.innerHTML //?
 }
 
-const delta2 = Flat.encode(DOMLog.diff(tree1, tree1)) //?$.encode().length
+const delta2 = FlatBuffer.encode(DOMLog.diff(tree1, tree1)) //?$.encode().length
 
 if (delta2.isError !== true) {
-  DOMLog.patch(host, Flat.decode(delta2)) //?
+  DOMLog.patch(host, FlatBuffer.decode(delta2)) //?
   body.innerHTML //?
 }
 
-const delta3 = Flat.encode(DOMLog.diff(tree1, tree2)) //?$.encode().length
+const delta3 = FlatBuffer.encode(DOMLog.diff(tree1, tree2)) //?$.encode().length
 if (delta3.isError !== true) {
-  DOMLog.patch(host, Flat.decode(delta3)) //?
+  DOMLog.patch(host, FlatBuffer.decode(delta3)) //?
 }
 body.innerHTML //?

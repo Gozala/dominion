@@ -38,7 +38,7 @@ import {
   StashNextSibling
 } from "./Op"
 
-class Decoder implements ChangeList {
+export default class FlatBufferDecoder implements ChangeList {
   data: Uint8Array
   constructor(data: Uint8Array) {
     this.data = data
@@ -49,7 +49,8 @@ class Decoder implements ChangeList {
     Changes.Table.getRootAsChangeLog(byteBuffer, table)
     return Changes.decode(table, encoder, init)
   }
-}
 
-export const decode: Decode<Uint8Array> = (data: Uint8Array) =>
-  new Decoder(data)
+  static decode(data: Uint8Array): ChangeList {
+    return new FlatBufferDecoder(data)
+  }
+}
