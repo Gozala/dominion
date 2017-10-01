@@ -1,6 +1,13 @@
 /* @flow */
 
-import type { Encoder, ChangeLog, ChangeList } from "../Log"
+import type {
+  Encoder,
+  ChangeLog,
+  ChangeList,
+  DecoderError,
+  Result
+} from "../Log"
+import { ok, error } from "result.flow"
 import { nodeType } from "../DOM/Node"
 import unreachable from "unreachable"
 
@@ -114,7 +121,8 @@ const getStashedNode = (stash: { [number]: Node }, address: number): Node => {
 
 type Stash = { [number]: Node }
 
-class DOMPatcher implements ChangeLog {
+class DOMPatcher implements ChangeLog<Node> {
+  isError = false
   target: Node
   childrenSelected: boolean
   stash: Stash
@@ -378,8 +386,13 @@ class DOMPatcher implements ChangeLog {
 
 const patcher = new DOMPatcher()
 
-export default (target: Node): Encoder<void> => (
+export default (target: Node): Encoder<Node> => (
   changeList: ChangeList
-): void => {
-  changeList(patcher.reset(target, false, {}))
+): Result<Node> => {
+  const result = changeList(patcher.reset(target, false, {}))
+  if (result.isError === true) {
+    throw error(result)
+  } else {
+    return ok(result.toBuffer())
+  }
 }

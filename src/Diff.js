@@ -27,9 +27,10 @@ import unreachable from "unreachable"
 const empty: Array<any> = Object.freeze([])
 const blank: Object = Object.freeze(Object.create(null))
 
-export const diff = <a>(last: Node<a>, next: Node<a>) => (
-  changeLog: ChangeLog
-): ChangeLog => diffNode(last, next, new Diff(changeLog, 1, [])).changeLog
+export const diff = <a>(last: Node<a>, next: Node<a>) => <buffer>(
+  changeLog: ChangeLog<buffer>
+): ChangeLog<buffer> =>
+  diffNode(last, next, new Diff(changeLog, 1, [])).changeLog
 
 export default diff
 

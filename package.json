@@ -65,6 +65,7 @@
   },
   "dependencies": {
     "dictionary.flow": "^0.1.0",
+    "result.flow": "^0.2.0",
     "unreachable": "^0.2.0"
   }
 }

@@ -38,9 +38,9 @@ import {
   StashNextSibling
 } from "./Op"
 
-export const decode: Decoder<Uint8Array> = (data: Uint8Array) => (
-  changeLog: Log.ChangeLog
-): Log.ChangeLog | Log.DecoderError => {
+export const decode: Decoder<Uint8Array> = (data: Uint8Array) => <x>(
+  changeLog: Log.ChangeLog<x>
+): Log.ChangeLog<x> | Log.DecoderError => {
   const buffer = new flatbuffers.ByteBuffer(data)
   const table = new ChangeLog.Table()
   ChangeLog.Table.getRootAsChangeLog(buffer, table)

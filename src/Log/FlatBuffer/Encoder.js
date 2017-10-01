@@ -1,11 +1,12 @@
 /* @flow */
 
-import type { Encoder, Decoder, ChangeLog, ChangeList } from "../../Log"
+import type { Encoder, Decoder, ChangeLog, ChangeList, Result } from "../../Log"
 import type { Builder, ByteBuffer } from "flatbuffers"
 import type { OpType, Op } from "./Op"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
 import { type change } from "./Change"
+import { ok, error } from "result.flow"
 import Change from "./Change"
 import Changes from "./ChangeLog"
 
@@ -40,7 +41,8 @@ import {
 
 const push = <a>(item: a, items: a[]): a[] => (items.push(item), items)
 
-class Log implements ChangeLog {
+class Log implements ChangeLog<Uint8Array> {
+  isError: false
   builder: Builder
   log: change[]
   address: number
@@ -255,7 +257,11 @@ const changeLog = new Log()
 
 export const encode: Encoder<Uint8Array> = (
   changeList: ChangeList
-): Uint8Array => {
-  changeList(changeLog.reset(new flatbuffers.Builder(1024), []))
-  return changeLog.toBuffer()
+): Result<Uint8Array> => {
+  const result = changeList(changeLog.reset(new flatbuffers.Builder(1024), []))
+  if (result && result.isError === true) {
+    return error(result)
+  } else {
+    return ok(result.toBuffer())
+  }
 }

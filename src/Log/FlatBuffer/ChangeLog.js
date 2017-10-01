@@ -80,8 +80,8 @@ class Codec {
   Table = ChangeLog
   decode<x>(
     table: ChangeLog,
-    changeLog: Log.ChangeLog
-  ): Log.ChangeLog | DecoderError {
+    changeLog: Log.ChangeLog<x>
+  ): Log.ChangeLog<x> | DecoderError {
     const count = table.logLength()
     console.log(`Decode: ChangeLog contains ${count} changes`)
 

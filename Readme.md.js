@@ -71,13 +71,20 @@ const delta1 = Flat.encode(DOMLog.diff(tree0, tree1)) //?$.length
 const body = document.createElement("div") //?$.innerHTML
 const host = DOMLog.mount(body)
 
-DOMLog.patch(host, Flat.decode(delta1)) //?
-body.innerHTML //?
+if (delta1.isOk) {
+  DOMLog.patch(host, Flat.decode(delta1.value)) //?
+  body.innerHTML //?
+}
 
 const delta2 = Flat.encode(DOMLog.diff(tree1, tree1)) //?$.encode().length
-DOMLog.patch(host, Flat.decode(delta2)) //?
-body.innerHTML //?
+
+if (delta2.isOk) {
+  DOMLog.patch(host, Flat.decode(delta2.value)) //?
+  body.innerHTML //?
+}
 
 const delta3 = Flat.encode(DOMLog.diff(tree1, tree2)) //?$.encode().length
-DOMLog.patch(host, Flat.decode(delta3)) //?
+if (delta3.isOk) {
+  DOMLog.patch(host, Flat.decode(delta3.value)) //?
+}
 body.innerHTML //?

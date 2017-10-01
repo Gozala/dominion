@@ -43,7 +43,7 @@ export class AssignBooleanProperty extends FBS.AssignBooleanProperty {
     AssignBooleanProperty.addValue(builder, value)
     return AssignBooleanProperty.endAssignBooleanProperty(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "AssignBooleanProperty")
@@ -62,7 +62,7 @@ export class AssignNullProperty extends FBS.AssignNullProperty {
     AssignNullProperty.addName(builder, nameOffset)
     return AssignNullProperty.endAssignNullProperty(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "AssignNullProperty")
@@ -82,7 +82,7 @@ export class AssignNumberProperty extends FBS.AssignNumberProperty {
     AssignNumberProperty.addValue(builder, value)
     return AssignNumberProperty.endAssignNumberProperty(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "AssignNumberProperty")
@@ -103,7 +103,7 @@ export class AssignStringProperty extends FBS.AssignStringProperty {
     AssignStringProperty.addValue(builder, valueOffset)
     return AssignStringProperty.endAssignStringProperty(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "AssignStringProperty")
@@ -122,7 +122,7 @@ export class DeleteProperty extends FBS.DeleteProperty {
     DeleteProperty.addName(builder, nameOffset)
     return DeleteProperty.endDeleteProperty(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "DeleteProperty")
@@ -140,7 +140,7 @@ export class DiscardStashed extends FBS.DiscardStashed {
     DiscardStashed.addAddress(builder, address)
     return DiscardStashed.endDiscardStashed(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> {
     return changeLog.discardStashedNode(this.address())
   }
 }
@@ -164,7 +164,7 @@ export class EditTextData extends FBS.EditTextData {
     EditTextData.addSuffix(builder, suffixOffset)
     return EditTextData.endEditTextData(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const prefix = this.prefix()
     if (prefix == null) {
       return new FieldError("prefix", "EditTextData")
@@ -188,7 +188,7 @@ export class InsertComment extends FBS.InsertComment {
     InsertComment.addData(builder, dataOffset)
     return InsertComment.endInsertComment(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "InsertComment")
@@ -216,7 +216,7 @@ export class InsertElement extends FBS.InsertElement {
     InsertElement.addLocalName(builder, localNameOffset)
     return InsertElement.endInsertElement(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const localName = this.localName()
     if (localName == null) {
       return new FieldError("localName", "InsertElement")
@@ -239,7 +239,7 @@ export class InsertStashedNode extends FBS.InsertStashedNode {
     InsertStashedNode.addAddress(builder, address)
     return InsertStashedNode.endInsertStashedNode(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> {
     return changeLog.insertStashedNode(this.address())
   }
 }
@@ -253,7 +253,7 @@ export class InsertText extends FBS.InsertText {
     InsertText.addData(builder, dataOffset)
     return InsertText.endInsertText(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "InsertText")
@@ -278,7 +278,7 @@ export class RemoveAttribute extends FBS.RemoveAttribute {
 
     return RemoveAttribute.endRemoveAttribute(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "RemoveAttribute")
@@ -299,7 +299,7 @@ export class RemoveNextSibling extends FBS.RemoveNextSibling {
     RemoveNextSibling.startRemoveNextSibling(builder)
     return RemoveNextSibling.endRemoveNextSibling(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> {
     return changeLog.removeNextSibling()
   }
 }
@@ -313,7 +313,7 @@ export class RemoveStyleRule extends FBS.RemoveStyleRule {
     RemoveStyleRule.addName(builder, nameOffset)
     return RemoveStyleRule.endRemoveStyleRule(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "RemoveStyleRule")
@@ -332,7 +332,7 @@ export class ReplaceWithComment extends FBS.ReplaceWithComment {
     ReplaceWithComment.addData(builder, dataOffset)
     return ReplaceWithComment.endReplaceWithComment(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "ReplaceWithComment")
@@ -360,7 +360,7 @@ export class ReplaceWithElement extends FBS.ReplaceWithElement {
     ReplaceWithElement.addLocalName(builder, localNameOffset)
     return ReplaceWithElement.endReplaceWithElement(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const localName = this.localName()
     if (localName == null) {
       return new FieldError("localName", "ReplaceWithElement")
@@ -383,7 +383,7 @@ export class ReplaceWithStashedNode extends FBS.ReplaceWithStashedNode {
     ReplaceWithStashedNode.addAddress(builder, address)
     return ReplaceWithStashedNode.endReplaceWithStashedNode(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> {
     return changeLog.replaceWithStashedNode(this.address())
   }
 }
@@ -397,7 +397,7 @@ export class ReplaceWithText extends FBS.ReplaceWithText {
     ReplaceWithText.addData(builder, dataOffset)
     return ReplaceWithText.endReplaceWithText(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "ReplaceWithText")
@@ -414,7 +414,7 @@ export class SelectChildren extends FBS.SelectChildren {
     SelectChildren.startSelectChildren(builder)
     return SelectChildren.endSelectChildren(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> {
     return changeLog.selectChildren()
   }
 }
@@ -426,7 +426,7 @@ export class SelectParent extends FBS.SelectParent {
     SelectParent.startSelectParent(builder)
     return SelectParent.endSelectParent(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> {
     return changeLog.selectParent()
   }
 }
@@ -439,7 +439,7 @@ export class SelectSibling extends FBS.SelectSibling {
     SelectSibling.addOffset(builder, n)
     return SelectSibling.endSelectSibling(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> {
     return changeLog.selectSibling(this.offset())
   }
 }
@@ -466,7 +466,7 @@ export class SetAttribute extends FBS.SetAttribute {
 
     return SetAttribute.endSetAttribute(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "SetAttribute")
@@ -497,7 +497,7 @@ export class SetStyleRule extends FBS.SetStyleRule {
 
     return SetStyleRule.endSetStyleRule(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     console.log(`Decode: SetStyleRule`)
 
     const name = this.name()
@@ -523,7 +523,7 @@ export class SetTextData extends FBS.SetTextData {
     SetTextData.addData(builder, dataOffset)
     return SetTextData.endSetTextData(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     const data = this.data()
     if (data == null) {
       return new FieldError("data", "SetTextData")
@@ -541,7 +541,7 @@ export class StashNextSibling extends FBS.StashNextSibling {
     StashNextSibling.addAddress(builder, address)
     return StashNextSibling.endStashNextSibling(builder)
   }
-  decode(changeLog: ChangeLog): ChangeLog | FieldError {
+  decode<x>(changeLog: ChangeLog<x>): ChangeLog<x> | FieldError {
     return changeLog.stashNextSibling(this.address())
   }
 }

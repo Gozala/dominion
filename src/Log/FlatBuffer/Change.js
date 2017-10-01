@@ -91,7 +91,10 @@ export class Codec {
     [DiscardStashed.opType]: new DiscardStashed(),
     [StashNextSibling.opType]: new StashNextSibling()
   }
-  decode<x>(change: Change, changeLog: ChangeLog): ChangeLog | DecoderError {
+  decode<x>(
+    change: Change,
+    changeLog: ChangeLog<x>
+  ): ChangeLog<x> | DecoderError {
     const type = change.opType()
     const variant = this.pool[type]
     if (variant == null) {

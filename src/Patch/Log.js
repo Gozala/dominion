@@ -1,8 +1,10 @@
 /* @flow */
 
-import type { Encoder, ChangeList, ChangeLog } from "../Log"
+import { error, ok } from "result.flow"
+import type { Encoder, ChangeList, ChangeLog, Result } from "../Log"
 
-class LogPatcher implements ChangeLog {
+class LogPatcher implements ChangeLog<string[]> {
+  isError = false
   log: string[]
   constructor(log: string[]) {
     this.log = log
@@ -127,12 +129,21 @@ class LogPatcher implements ChangeLog {
     this.log.push(`discardStashedNode(${address})`)
     return this
   }
+  toBuffer(): string[] {
+    return this.log.splice(0)
+  }
 }
 
 const log = new LogPatcher([])
-const encoder: Encoder<string[]> = (changeList: ChangeList): string[] => {
-  changeList(log)
-  return log.log.splice(0)
+const encoder: Encoder<string[]> = (
+  changeList: ChangeList
+): Result<string[]> => {
+  const result = changeList(log)
+  if (result.isError === true) {
+    return error(result)
+  } else {
+    return ok(result.toBuffer())
+  }
 }
 
 export default encoder
