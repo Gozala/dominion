@@ -19,7 +19,7 @@ import type {
   Attributes,
   StyleRules
 } from "./DOM/Node"
-import type { Encoder, ChangeList, ChangeLog } from "./Log"
+import type { Encoder, ChangeList, ChangeLog, Result } from "./Log"
 import { nodeType } from "./DOM/Node"
 import Diff from "./Diff/Diff"
 import unreachable from "unreachable"
@@ -27,10 +27,21 @@ import unreachable from "unreachable"
 const empty: Array<any> = Object.freeze([])
 const blank: Object = Object.freeze(Object.create(null))
 
-export const diff = <a>(last: Node<a>, next: Node<a>) => <buffer>(
-  changeLog: ChangeLog<buffer>
-): ChangeLog<buffer> =>
-  diffNode(last, next, new Diff(changeLog, 1, [])).changeLog
+class Changes<a> implements ChangeList {
+  last: Node<a>
+  next: Node<a>
+  constructor(last: Node<a>, next: Node<a>) {
+    this.last = last
+    this.next = next
+  }
+  reduce<buffer>(changeLog: ChangeLog<buffer>, init: buffer): Result<buffer> {
+    return diffNode(this.last, this.next, new Diff(init, changeLog, 1, []))
+      .buffer
+  }
+}
+
+export const diff = <a>(last: Node<a>, next: Node<a>): ChangeList =>
+  new Changes(last, next)
 
 export default diff
 
@@ -43,24 +54,24 @@ const removeFragment = <a, x>(node: Fragment<a>, log: Diff<x>): Diff<x> => {
       index = -1
     } else {
       index++
-      log = log.removeNextSibling()
+      log = Diff.removeNextSibling(log)
     }
   }
   return log
 }
 
 const insertText = <a, x>(node: Text<a>, log: Diff<x>): Diff<x> =>
-  log.insertText(node.data)
+  Diff.insertText(log, node.data)
 
 const insertComment = <a, x>(node: Comment<a>, log: Diff<x>): Diff<x> =>
-  log.insertComment(node.data)
+  Diff.insertComment(log, node.data)
 
 const insertElementNode = <a, x>(node: Element<a>, log: Diff<x>): Diff<x> => {
   const { localName, namespaceURI } = node
   const out =
     namespaceURI == null
-      ? log.insertElement(localName)
-      : log.insertElementNS(namespaceURI, localName)
+      ? Diff.insertElement(log, localName)
+      : Diff.insertElementNS(log, namespaceURI, localName)
   return out
 }
 
@@ -68,31 +79,41 @@ const insertIndexedElement = <a, x>(
   node: IndexedElement<a>,
   log: Diff<x>
 ): Diff<x> =>
-  populateIndexedElement(
-    node,
-    setSettings(node, insertElementNode(node, log).selectSibling(1))
-  ).selectSibling(-1)
+  Diff.selectSibling(
+    populateIndexedElement(
+      node,
+      setSettings(node, Diff.selectSibling(insertElementNode(node, log), 1))
+    ),
+    -1
+  )
 
 const insertUnindexedElement = <a, x>(
   node: UnindexedElement<a>,
   log: Diff<x>
 ): Diff<x> =>
-  populateUnindexedElement(
-    node,
-    setSettings(node, insertElementNode(node, log).selectSibling(1))
-  ).selectSibling(-1)
+  Diff.selectSibling(
+    populateUnindexedElement(
+      node,
+      setSettings(node, Diff.selectSibling(insertElementNode(node, log), 1))
+    ),
+    -1
+  )
 
 const populateIndexedElement = <a, x>(
   node: IndexedElement<a>,
   log: Diff<x>
 ): Diff<x> =>
-  insertIndexedChildren(node.children, log.selectChildren()).selectParent()
+  Diff.selectParent(
+    insertIndexedChildren(node.children, Diff.selectChildren(log))
+  )
 
 const populateUnindexedElement = <a, x>(
   node: UnindexedElement<a>,
   log: Diff<x>
 ): Diff<x> =>
-  insertUnindexedChildren(node.children, log.selectChildren()).selectParent()
+  Diff.selectParent(
+    insertUnindexedChildren(node.children, Diff.selectChildren(log))
+  )
 
 const insertIndexedFragment = <a, x>(
   node: IndexedFragment<a>,
@@ -123,10 +144,10 @@ const insertTagged = <inner, outer, x>(
 ): Diff<x> => insertNode(tagged.node, log)
 
 const replaceWithText = <a, x>(node: Text<a>, log: Diff<x>): Diff<x> =>
-  log.replaceWithText(node.data)
+  Diff.replaceWithText(log, node.data)
 
 const replaceWithComment = <a, x>(node: Comment<a>, log: Diff<x>): Diff<x> =>
-  log.replaceWithComment(node.data)
+  Diff.replaceWithComment(log, node.data)
 
 const replaceWithElementNode = <a, x>(
   node: Element<a>,
@@ -135,8 +156,8 @@ const replaceWithElementNode = <a, x>(
   const { localName, namespaceURI } = node
   const out =
     namespaceURI == null
-      ? log.replaceWithElement(localName)
-      : log.replaceWithElementNS(namespaceURI, localName)
+      ? Diff.replaceWithElement(log, localName)
+      : Diff.replaceWithElementNS(log, namespaceURI, localName)
   return out
 }
 
@@ -168,13 +189,19 @@ const replaceWithIndexedFragment = <a, x>(
   node: IndexedFragment<a>,
   log: Diff<x>
 ): Diff<x> =>
-  insertIndexedFragment(node, log.selectSibling(-1).removeNextSibling())
+  insertIndexedFragment(
+    node,
+    Diff.removeNextSibling(Diff.selectSibling(log, -1))
+  )
 
 const replaceWithUnindexedFragment = <a, x>(
   node: UnindexedFragment<a>,
   log: Diff<x>
 ): Diff<x> =>
-  insertUnindexedFragment(node, log.selectSibling(-1).removeNextSibling())
+  insertUnindexedFragment(
+    node,
+    Diff.removeNextSibling(Diff.selectSibling(log, -1))
+  )
 
 const replaceWithNode = <a, x>(node: Node<a>, log: Diff<x>): Diff<x> => {
   switch (node.nodeType) {
@@ -211,10 +238,10 @@ const replaceWithNode = <a, x>(node: Node<a>, log: Diff<x>): Diff<x> => {
 const insertNode = <a, x>(node: Node<a>, log: Diff<x>): Diff<x> => {
   switch (node.nodeType) {
     case nodeType.TEXT_NODE: {
-      return log.insertText(node.data)
+      return Diff.insertText(log, node.data)
     }
     case nodeType.COMMENT_NODE: {
-      return log.insertComment(node.data)
+      return Diff.insertComment(log, node.data)
     }
     case nodeType.ELEMENT_NODE: {
       return insertUnindexedElement(node, log)
@@ -416,20 +443,27 @@ const diffTextData = <x>(last: string, next: string, log: Diff<x>): Diff<x> => {
   const nextLength = next.length
   const lastLength = last.length
   if (nextLength <= 6) {
-    return log.setTextData(next)
+    return Diff.setTextData(log, next)
   } else if (lastLength > nextLength) {
     const index = last.indexOf(next)
     if (index === -1) {
-      return log.setTextData(next)
+      return Diff.setTextData(log, next)
     } else {
-      return log.editTextData(index, lastLength - index - nextLength, "", "")
+      return Diff.editTextData(
+        log,
+        index,
+        lastLength - index - nextLength,
+        "",
+        ""
+      )
     }
   } else {
     const index = next.indexOf(last)
     if (index === -1) {
-      return log.setTextData(next)
+      return Diff.setTextData(log, next)
     } else {
-      return log.editTextData(
+      return Diff.editTextData(
+        log,
         0,
         0,
         next.substr(0, index),
@@ -448,11 +482,13 @@ const diffUnindexedElement = <a, x>(
     next.localName === last.localName &&
     next.namespaceURI === next.namespaceURI
   ) {
-    return diffUnindexedChildren(
-      last.children,
-      next.children,
-      diffSettings(last, next, log).selectChildren()
-    ).selectParent()
+    return Diff.selectParent(
+      diffUnindexedChildren(
+        last.children,
+        next.children,
+        Diff.selectChildren(diffSettings(last, next, log))
+      )
+    )
   } else {
     return replaceWithUnindexedElement(next, log)
   }
@@ -477,17 +513,17 @@ const diffUnindexedChildren = <a, x>(
     // If last and next versions contain a child for the given index, just
     // diff them and move on.
     if (lastChild != null && nextChild != null) {
-      log = diffNode(lastChild, nextChild, log.selectSibling(1))
+      log = diffNode(lastChild, nextChild, Diff.selectSibling(log, 1))
       index += 1
       // If child is present in next version but not in the last version
       // insert it and select it.
     } else if (nextChild != null) {
-      log = insertNode(nextChild, log).selectSibling(1)
+      log = Diff.selectSibling(insertNode(nextChild, log), 1)
       index += 1
       // If child is present in last version but isn't present in new version
       // remove child
     } else if (lastChild != null) {
-      log = log.removeNextSibling()
+      log = Diff.removeNextSibling(log)
       index += 1
     } else {
       index = -1
@@ -506,11 +542,13 @@ const diffIndexedElement = <a, x>(
     next.localName === last.localName &&
     next.namespaceURI === next.namespaceURI
   ) {
-    return diffIndexedChildren(
-      last.children,
-      next.children,
-      diffSettings(last, next, log).selectChildren()
-    ).selectParent()
+    return Diff.selectParent(
+      diffIndexedChildren(
+        last.children,
+        next.children,
+        Diff.selectChildren(diffSettings(last, next, log))
+      )
+    )
   } else {
     return replaceWithIndexedElement(next, log)
   }
@@ -546,14 +584,14 @@ const diffIndexedChildren = <a, x>(
       // it and diff.
       if (nextIndexed && nextIndexed[0] === lastKey) {
         const [nextKey, nextNode] = next[nextIndex]
-        log = diffNode(lastNode, nextNode, log.selectSibling(1))
+        log = diffNode(lastNode, nextNode, Diff.selectSibling(log, 1))
 
         lastIndex += 1
         nextIndex += 1
         // Otherwise stash child from last version and continue.
       } else {
         const { address } = log
-        log = log.stashNextSibling(address)
+        log = Diff.stashNextSibling(log, address)
 
         migrants[lastKey] = [address, lastNode]
         lastIndex += 1
@@ -574,7 +612,7 @@ const diffIndexedChildren = <a, x>(
       // insert it back into the tree and diff against next version and move on.
       if (registered) {
         const [address, last] = registered
-        log = log.insertStashedNode(address).selectSibling(1)
+        log = Diff.selectSibling(Diff.insertStashedNode(log, address), 1)
         log = diffNode(last, node, log)
 
         delete migrants[key]
@@ -582,7 +620,7 @@ const diffIndexedChildren = <a, x>(
 
         // otherwise we just add nodes from the next version.
       } else {
-        log = insertNode(node, log).selectSibling(1)
+        log = Diff.selectSibling(insertNode(node, log), 1)
         nextIndex += 1
       }
     }
@@ -601,7 +639,7 @@ const diffIndexedChildren = <a, x>(
   // keep it simple.
   for (let key in migrants) {
     const [address] = migrants[key]
-    log = log.discardStashedNode(address)
+    log = Diff.discardStashedNode(log, address)
   }
 
   return log
@@ -634,7 +672,7 @@ const diffProperties = <x>(
 ): Diff<x> => {
   for (let name in last) {
     if (!(name in next)) {
-      log = log.deleteProperty(name)
+      log = Diff.deleteProperty(log, name)
     }
   }
 
@@ -642,9 +680,9 @@ const diffProperties = <x>(
     const value = next[name]
     if (last[name] !== value) {
       if (value === undefined) {
-        log = log.deleteProperty(name)
+        log = Diff.deleteProperty(log, name)
       } else {
-        log = log.assignProperty(name, value)
+        log = Diff.assignProperty(log, name, value)
       }
     }
   }
@@ -663,9 +701,9 @@ const diffAttributes = <x>(
       if (attribute != null) {
         const { name, namespaceURI } = attribute
         if (namespaceURI == null) {
-          log = log.removeAttribute(name)
+          log = Diff.removeAttribute(log, name)
         } else {
-          log = log.removeAttributeNS(namespaceURI, name)
+          log = Diff.removeAttributeNS(log, namespaceURI, name)
         }
       }
     }
@@ -679,15 +717,15 @@ const diffAttributes = <x>(
       if (x == null || x.value !== value) {
         if (namespaceURI == null) {
           if (value == null) {
-            log = log.removeAttribute(name)
+            log = Diff.removeAttribute(log, name)
           } else {
-            log = log.setAttribute(name, value)
+            log = Diff.setAttribute(log, name, value)
           }
         } else {
           if (value == null) {
-            log = log.removeAttributeNS(namespaceURI, name)
+            log = Diff.removeAttributeNS(log, namespaceURI, name)
           } else {
-            log = log.setAttributeNS(namespaceURI, name, value)
+            log = Diff.setAttributeNS(log, namespaceURI, name, value)
           }
         }
       }
@@ -707,7 +745,7 @@ const diffStyle = <x>(
   for (let name in last) {
     if (name !== "settingType") {
       if (!(name in next)) {
-        log = log.removeStyleRule(name)
+        log = Diff.removeStyleRule(log, name)
       }
     }
   }
@@ -717,9 +755,9 @@ const diffStyle = <x>(
       const value = next[name]
       if (last[name] !== value) {
         if (value == null) {
-          log = log.removeStyleRule(name)
+          log = Diff.removeStyleRule(log, name)
         } else {
-          log = log.setStyleRule(name, value)
+          log = Diff.setStyleRule(log, name, value)
         }
       }
     }

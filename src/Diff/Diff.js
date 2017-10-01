@@ -1,61 +1,88 @@
 /* @flow */
 
 import type { ChangeLog } from "../Log"
-
 type Nav = [-1 | 0 | 1, number]
 
-export default class Diff<x> implements ChangeLog<x> {
+export default class Diff<x> {
   isError = false
+  buffer: x
   changeLog: ChangeLog<x>
   navigationLog: Nav[]
   address: number
-  constructor(changeLog: ChangeLog<x>, address: number, navigationLog: Nav[]) {
-    this.reset(changeLog, address, navigationLog)
+  constructor(
+    buffer: x,
+    changeLog: ChangeLog<x>,
+    address: number,
+    navigationLog: Nav[]
+  ) {
+    Diff.reset(this, buffer, changeLog, address, navigationLog)
   }
-  reset(
+  static reset(
+    diff: Diff<x>,
+    buffer: x,
     changeLog: ChangeLog<x>,
     address: number,
     navigationLog: Nav[]
   ): Diff<x> {
-    this.changeLog = changeLog
-    this.address = address
-    this.navigationLog = navigationLog
-    return this
+    diff.buffer = buffer
+    diff.changeLog = changeLog
+    diff.address = address
+    diff.navigationLog = navigationLog
+    return diff
   }
-  updateAddress(address: number): Diff<x> {
-    return this.reset(this.changeLog, address, this.navigationLog)
+  static updateAddress(diff: Diff<x>, address: number): Diff<x> {
+    return Diff.reset(
+      diff,
+      diff.buffer,
+      diff.changeLog,
+      address,
+      diff.navigationLog
+    )
   }
-  updateNavigationLog(navigationLog: Nav[]): Diff<x> {
-    return this.reset(this.changeLog, this.address, navigationLog)
+  static updateNavigationLog(diff: Diff<x>, navigationLog: Nav[]): Diff<x> {
+    return Diff.reset(
+      diff,
+      diff.buffer,
+      diff.changeLog,
+      diff.address,
+      navigationLog
+    )
   }
 
-  update(changeLog: ChangeLog<x>): Diff<x> {
-    return this.reset(changeLog, this.address, this.navigationLog)
+  static update(diff: Diff<x>, buffer: x): Diff<x> {
+    return Diff.reset(
+      diff,
+      buffer,
+      diff.changeLog,
+      diff.address,
+      diff.navigationLog
+    )
   }
-  navigate(): Diff<x> {
-    const { navigationLog, changeLog } = this
+  static navigate(diff: Diff<x>): Diff<x> {
+    const { navigationLog, changeLog } = diff
+    let { buffer } = diff
 
     while (navigationLog.length > 0) {
       let [level, index] = navigationLog.pop()
 
       if (level < 0) {
-        this.changeLog = changeLog.selectParent()
+        buffer = changeLog.selectParent(buffer)
       }
 
       if (level > 0) {
-        this.changeLog = changeLog.selectChildren()
+        buffer = changeLog.selectChildren(buffer)
       }
 
       if (index !== 0) {
-        this.changeLog = changeLog.selectSibling(index)
+        buffer = changeLog.selectSibling(buffer, index)
       }
     }
 
-    return this
+    return Diff.update(diff, buffer)
   }
 
-  selectChildren(): Diff<x> {
-    const { navigationLog, changeLog } = this
+  static selectChildren(diff: Diff<x>): Diff<x> {
+    const { navigationLog } = diff
     const [level, index] =
       navigationLog.length === 0 ? [0, 0] : navigationLog[0]
     switch (level) {
@@ -75,18 +102,18 @@ export default class Diff<x> implements ChangeLog<x> {
         break
       }
     }
-    return this.updateNavigationLog(navigationLog)
+    return Diff.updateNavigationLog(diff, navigationLog)
   }
-  selectSibling(offset: number): Diff<x> {
-    const { navigationLog, changeLog } = this
+  static selectSibling(diff: Diff<x>, offset: number): Diff<x> {
+    const { navigationLog } = diff
     const [level, index] =
       navigationLog.length === 0 ? [0, 0] : navigationLog.shift()
     navigationLog.unshift([level, index + offset])
 
-    return this.updateNavigationLog(navigationLog)
+    return Diff.updateNavigationLog(diff, navigationLog)
   }
-  selectParent(): Diff<x> {
-    const { navigationLog } = this
+  static selectParent(diff: Diff<x>): Diff<x> {
+    const { navigationLog } = diff
     const [level, index] =
       navigationLog.length === 0 ? [0, 0] : navigationLog[0]
     switch (level) {
@@ -104,104 +131,147 @@ export default class Diff<x> implements ChangeLog<x> {
       }
     }
 
-    return this.updateNavigationLog(navigationLog)
+    return Diff.updateNavigationLog(diff, navigationLog)
   }
-  removeNextSibling(): Diff<x> {
-    return this.update(this.navigate().changeLog.removeNextSibling())
-  }
-
-  insertText(data: string): Diff<x> {
-    return this.update(this.navigate().changeLog.insertText(data))
-  }
-  insertComment(data: string): Diff<x> {
-    return this.update(this.navigate().changeLog.insertComment(data))
-  }
-  insertElement(localName: string): Diff<x> {
-    return this.update(this.navigate().changeLog.insertElement(localName))
-  }
-  insertElementNS(namespaceURI: string, localName: string): Diff<x> {
-    return this.update(
-      this.navigate().changeLog.insertElementNS(namespaceURI, localName)
-    )
-  }
-  insertStashedNode(address: number): Diff<x> {
-    return this.update(this.navigate().changeLog.insertStashedNode(address))
+  static removeNextSibling(diff: Diff<x>): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.removeNextSibling(buffer))
   }
 
-  replaceWithText(data: string): Diff<x> {
-    return this.update(this.navigate().changeLog.replaceWithText(data))
+  static insertText(diff: Diff<x>, data: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.insertText(buffer, data))
   }
-  replaceWithComment(data: string): Diff<x> {
-    return this.update(this.navigate().changeLog.replaceWithComment(data))
+  static insertComment(diff: Diff<x>, data: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.insertComment(buffer, data))
   }
-  replaceWithElement(localName: string): Diff<x> {
-    return this.update(this.navigate().changeLog.replaceWithElement(localName))
+  static insertElement(diff: Diff<x>, localName: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.insertElement(buffer, localName))
   }
-  replaceWithElementNS(namespaceURI: string, localName: string): Diff<x> {
-    return this.update(
-      this.navigate().changeLog.replaceWithElementNS(namespaceURI, localName)
+  static insertElementNS(
+    diff: Diff<x>,
+    namespaceURI: string,
+    localName: string
+  ): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(
+      diff,
+      changeLog.insertElementNS(buffer, namespaceURI, localName)
     )
   }
-  replaceWithStashedNode(address: number): Diff<x> {
-    return this.update(
-      this.navigate().changeLog.replaceWithStashedNode(address)
-    )
+  static insertStashedNode(diff: Diff<x>, address: number): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.insertStashedNode(buffer, address))
   }
 
-  editTextData(
+  static replaceWithText(diff: Diff<x>, data: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.replaceWithText(buffer, data))
+  }
+  static replaceWithComment(diff: Diff<x>, data: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.replaceWithComment(buffer, data))
+  }
+  static replaceWithElement(diff: Diff<x>, localName: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.replaceWithElement(buffer, localName))
+  }
+  static replaceWithElementNS(
+    diff: Diff<x>,
+    namespaceURI: string,
+    localName: string
+  ): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(
+      diff,
+      changeLog.replaceWithElementNS(buffer, namespaceURI, localName)
+    )
+  }
+  static replaceWithStashedNode(diff: Diff<x>, address: number): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.replaceWithStashedNode(buffer, address))
+  }
+
+  static editTextData(
+    diff: Diff<x>,
     start: number,
     end: number,
     prefix: string,
     suffix: string
   ): Diff<x> {
-    return this.update(
-      this.navigate().changeLog.editTextData(start, end, prefix, suffix)
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(
+      diff,
+      changeLog.editTextData(buffer, start, end, prefix, suffix)
     )
   }
-  setTextData(data: string): Diff<x> {
-    return this.update(this.navigate().changeLog.setTextData(data))
+  static setTextData(diff: Diff<x>, data: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.setTextData(buffer, data))
   }
-  setAttribute(name: string, value: string): Diff<x> {
-    return this.update(this.navigate().changeLog.setAttribute(name, value))
+  static setAttribute(diff: Diff<x>, name: string, value: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.setAttribute(buffer, name, value))
   }
-  removeAttribute(name: string): Diff<x> {
-    return this.update(this.navigate().changeLog.removeAttribute(name))
+  static removeAttribute(diff: Diff<x>, name: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.removeAttribute(buffer, name))
   }
-  setAttributeNS(namespaceURI: string, name: string, value: string): Diff<x> {
-    return this.update(
-      this.navigate().changeLog.setAttributeNS(namespaceURI, name, value)
+  static setAttributeNS(
+    diff: Diff<x>,
+    namespaceURI: string,
+    name: string,
+    value: string
+  ): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(
+      diff,
+      changeLog.setAttributeNS(buffer, namespaceURI, name, value)
     )
   }
-  removeAttributeNS(namespaceURI: string, name: string): Diff<x> {
-    return this.update(
-      this.navigate().changeLog.removeAttributeNS(namespaceURI, name)
+  static removeAttributeNS(
+    diff: Diff<x>,
+    namespaceURI: string,
+    name: string
+  ): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(
+      diff,
+      changeLog.removeAttributeNS(buffer, namespaceURI, name)
     )
   }
-  assignProperty(
+  static assignProperty(
+    diff: Diff<x>,
     name: string,
     value: string | number | boolean | null
   ): Diff<x> {
-    return this.update(this.navigate().changeLog.assignProperty(name, value))
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.assignProperty(buffer, name, value))
   }
-  deleteProperty(name: string): Diff<x> {
-    return this.update(this.navigate().changeLog.deleteProperty(name))
+  static deleteProperty(diff: Diff<x>, name: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.deleteProperty(buffer, name))
   }
-  setStyleRule(name: string, value: string): Diff<x> {
-    return this.update(this.navigate().changeLog.setStyleRule(name, value))
+  static setStyleRule(diff: Diff<x>, name: string, value: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.setStyleRule(buffer, name, value))
   }
-  removeStyleRule(name: string): Diff<x> {
-    return this.update(this.navigate().changeLog.removeStyleRule(name))
+  static removeStyleRule(diff: Diff<x>, name: string): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.removeStyleRule(buffer, name))
   }
 
-  stashNextSibling(address: number): Diff<x> {
-    return this.updateAddress(address + 1).update(
-      this.navigate().changeLog.stashNextSibling(address)
+  static stashNextSibling(diff: Diff<x>, address: number): Diff<x> {
+    const next = Diff.navigate(Diff.updateAddress(diff, address + 1))
+    return Diff.update(
+      next,
+      next.changeLog.stashNextSibling(next.buffer, address)
     )
   }
-  discardStashedNode(address: number): Diff<x> {
-    return this.update(this.navigate().changeLog.discardStashedNode(address))
-  }
-  toBuffer(): x {
-    return this.changeLog.toBuffer()
+  static discardStashedNode(diff: Diff<x>, address: number): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(diff, changeLog.discardStashedNode(buffer, address))
   }
 }

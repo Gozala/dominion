@@ -121,35 +121,43 @@ const getStashedNode = (stash: { [number]: Node }, address: number): Node => {
 
 type Stash = { [number]: Node }
 
-class DOMPatcher implements ChangeLog<Node> {
-  isError = false
+class State {
   target: Node
   childrenSelected: boolean
   stash: Stash
-  reset(target: Node, childrenSelected: boolean, stash: Stash): DOMPatcher {
+  constructor(target: Node, childrenSelected: boolean, stash: Stash) {
     this.target = target
     this.childrenSelected = childrenSelected
     this.stash = stash
-    return this
   }
+}
 
-  selectChildren(): DOMPatcher {
+class DOMPatcher implements ChangeLog<State> {
+  isError = false
+  // reset(target: Node, childrenSelected: boolean, stash: Stash): State {
+  //   state.target = target
+  //   state.childrenSelected = childrenSelected
+  //   state.stash = stash
+  //   return state
+  // }
+
+  selectChildren(state: State): State {
     console.log(`Patch: Select children`)
-    if (this.childrenSelected) {
+    if (state.childrenSelected) {
       throw Error(
         "Inavlid state: Unable to select children as they are already selected"
       )
     } else {
-      this.childrenSelected = true
-      return this
+      state.childrenSelected = true
+      return state
     }
   }
-  selectSibling(offset: number): DOMPatcher {
+  selectSibling(state: State, offset: number): State {
     console.log(`Patch: select sibling ${offset}`)
-    const { target, childrenSelected } = this
+    const { target, childrenSelected } = state
     let select = null
     if (childrenSelected) {
-      this.childrenSelected = false
+      state.childrenSelected = false
       select = target.childNodes[offset - 1]
     } else {
       select = target
@@ -163,224 +171,231 @@ class DOMPatcher implements ChangeLog<Node> {
         "sibling selection has failed, sibling being selected does not exist"
       )
     } else {
-      this.target = select
-      this.childrenSelected = false
-      return this
+      state.target = select
+      state.childrenSelected = false
+      return state
     }
   }
-  selectParent(): DOMPatcher {
+  selectParent(state: State): State {
     console.log("select parent")
-    if (this.childrenSelected) {
-      this.childrenSelected = false
-      return this
+    if (state.childrenSelected) {
+      state.childrenSelected = false
+      return state
     } else {
-      const target = this.target.parentNode
+      const target = state.target.parentNode
       if (target == null) {
         throw Error("Can not select parent of orphand node")
       } else {
-        this.target = target
-        return this
+        state.target = target
+        return state
       }
     }
   }
-  removeNextSibling(): DOMPatcher {
+  removeNextSibling(state: State): State {
     console.log("remove next sibling")
-    const next = this.childrenSelected
-      ? this.target.firstChild
-      : this.target.nextSibling
+    const next = state.childrenSelected
+      ? state.target.firstChild
+      : state.target.nextSibling
 
     if (next == null) {
       throw Error("Can not remove next sibling as it does not exist")
     } else {
-      this.target.removeChild(next)
-      return this
+      state.target.removeChild(next)
+      return state
     }
   }
 
-  insertText(data: string): DOMPatcher {
+  insertText(state: State, data: string): State {
     console.log("insert text", data)
     insertNode(
-      this.target,
-      this.childrenSelected,
-      this.target.ownerDocument.createTextNode(data)
+      state.target,
+      state.childrenSelected,
+      state.target.ownerDocument.createTextNode(data)
     )
-    return this
+    return state
   }
-  insertComment(data: string): DOMPatcher {
+  insertComment(state: State, data: string): State {
     console.log("insert comment", data)
     insertNode(
-      this.target,
-      this.childrenSelected,
-      this.target.ownerDocument.createComment(data)
+      state.target,
+      state.childrenSelected,
+      state.target.ownerDocument.createComment(data)
     )
-    return this
+    return state
   }
-  insertElement(localName: string): DOMPatcher {
+  insertElement(state: State, localName: string): State {
     console.log(`insert element <${localName}/>`)
     insertNode(
-      this.target,
-      this.childrenSelected,
-      this.target.ownerDocument.createElement(localName)
+      state.target,
+      state.childrenSelected,
+      state.target.ownerDocument.createElement(localName)
     )
-    return this
+    return state
   }
-  insertElementNS(namespaceURI: string, localName: string): DOMPatcher {
+  insertElementNS(
+    state: State,
+    namespaceURI: string,
+    localName: string
+  ): State {
     insertNode(
-      this.target,
-      this.childrenSelected,
-      this.target.ownerDocument.createElementNS(namespaceURI, localName)
+      state.target,
+      state.childrenSelected,
+      state.target.ownerDocument.createElementNS(namespaceURI, localName)
     )
-    return this
+    return state
   }
-  insertStashedNode(address: number): DOMPatcher {
+  insertStashedNode(state: State, address: number): State {
     insertNode(
-      this.target,
-      this.childrenSelected,
-      getStashedNode(this.stash, address)
+      state.target,
+      state.childrenSelected,
+      getStashedNode(state.stash, address)
     )
-    return this
+    return state
   }
 
-  replaceWithText(data: string): DOMPatcher {
+  replaceWithText(state: State, data: string): State {
     replaceNode(
-      this.target,
-      this.childrenSelected,
-      this.target.ownerDocument.createTextNode(data)
+      state.target,
+      state.childrenSelected,
+      state.target.ownerDocument.createTextNode(data)
     )
-    return this
+    return state
   }
-  replaceWithComment(data: string): DOMPatcher {
+  replaceWithComment(state: State, data: string): State {
     replaceNode(
-      this.target,
-      this.childrenSelected,
-      this.target.ownerDocument.createComment(data)
+      state.target,
+      state.childrenSelected,
+      state.target.ownerDocument.createComment(data)
     )
-    return this
+    return state
   }
-  replaceWithElement(localName: string): DOMPatcher {
+  replaceWithElement(state: State, localName: string): State {
     replaceNode(
-      this.target,
-      this.childrenSelected,
-      this.target.ownerDocument.createElement(localName)
+      state.target,
+      state.childrenSelected,
+      state.target.ownerDocument.createElement(localName)
     )
-    return this
+    return state
   }
-  replaceWithElementNS(namespaceURI: string, localName: string): DOMPatcher {
+  replaceWithElementNS(
+    state: State,
+    namespaceURI: string,
+    localName: string
+  ): State {
     replaceNode(
-      this.target,
-      this.childrenSelected,
-      this.target.ownerDocument.createElementNS(namespaceURI, localName)
+      state.target,
+      state.childrenSelected,
+      state.target.ownerDocument.createElementNS(namespaceURI, localName)
     )
-    return this
+    return state
   }
-  replaceWithStashedNode(address: number): DOMPatcher {
-    const node = this.stash[address]
+  replaceWithStashedNode(state: State, address: number): State {
+    const node = state.stash[address]
     if (node == null) {
       throw Error(`Unable to find stashed node with address #${address}`)
     }
-    replaceNode(this.target, this.childrenSelected, node)
-    return this
+    replaceNode(state.target, state.childrenSelected, node)
+    return state
   }
 
   editTextData(
+    state: State,
     start: number,
     end: number,
     prefix: string,
     suffix: string
-  ): DOMPatcher {
-    const node = getTextDataUpdateTarget(this.childrenSelected, this.target)
+  ): State {
+    const node = getTextDataUpdateTarget(state.childrenSelected, state.target)
     const { data } = node
     const content = data.substring(start, data.length - end)
     node.data = `${prefix}${content}${suffix}`
-    return this
+    return state
   }
-  setTextData(data: string): DOMPatcher {
-    const node = getTextDataUpdateTarget(this.childrenSelected, this.target)
+  setTextData(state: State, data: string): State {
+    const node = getTextDataUpdateTarget(state.childrenSelected, state.target)
     node.data = data
-    return this
+    return state
   }
-  setAttribute(name: string, value: string): DOMPatcher {
+  setAttribute(state: State, name: string, value: string): State {
     console.log(`Patch: Set attribute ${name}="${value}"`)
-    const node = getUpdateTargetElement(this.childrenSelected, this.target)
+    const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.setAttribute(name, value)
-    return this
+    return state
   }
-  removeAttribute(name: string): DOMPatcher {
+  removeAttribute(state: State, name: string): State {
     console.log(`Patch: Remove attribute ${name}`)
-    const node = getUpdateTargetElement(this.childrenSelected, this.target)
+    const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.removeAttribute(name)
-    return this
+    return state
   }
   setAttributeNS(
+    state: State,
     namespaceURI: string,
     name: string,
     value: string
-  ): DOMPatcher {
+  ): State {
     console.log(`Patch: Set attribute NS ${namespaceURI} ${name}="${value}"`)
-    const node = getUpdateTargetElement(this.childrenSelected, this.target)
+    const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.setAttributeNS(namespaceURI, name, value)
-    return this
+    return state
   }
-  removeAttributeNS(namespaceURI: string, name: string): DOMPatcher {
+  removeAttributeNS(state: State, namespaceURI: string, name: string): State {
     console.log(`Patch: Remove attribute NS ${namespaceURI} ${name}`)
-    const node = getUpdateTargetElement(this.childrenSelected, this.target)
+    const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.removeAttributeNS(namespaceURI, name)
-    return this
+    return state
   }
   assignProperty(
+    state: State,
     name: string,
     value: string | number | boolean | null
-  ): DOMPatcher {
+  ): State {
     console.log(`Patch: Assign property ${name}=${JSON.stringify(value)}`)
     const node: Object = getUpdateTargetElement(
-      this.childrenSelected,
-      this.target
+      state.childrenSelected,
+      state.target
     )
     node[name] = value
-    return this
+    return state
   }
-  deleteProperty(name: string): DOMPatcher {
+  deleteProperty(state: State, name: string): State {
     console.log(`Patch: Delete property ${name}`)
     const node: Object = getUpdateTargetElement(
-      this.childrenSelected,
-      this.target
+      state.childrenSelected,
+      state.target
     )
     delete node[name]
-    return this
+    return state
   }
-  setStyleRule(name: string, value: string) {
+  setStyleRule(state: State, name: string, value: string) {
     console.log(`Patch: Style style.${name}="${value}"`)
-    const style = getTargetStyle(this.childrenSelected, this.target)
+    const style = getTargetStyle(state.childrenSelected, state.target)
     style[(name: any)] = value
-    return this
+    return state
   }
-  removeStyleRule(name: string) {
+  removeStyleRule(state: State, name: string) {
     console.log(`Patch: Remove style rule ${name}`)
-    const style = getTargetStyle(this.childrenSelected, this.target)
+    const style = getTargetStyle(state.childrenSelected, state.target)
     delete style[(name: any)]
-    return this
+    return state
   }
 
-  stashNextSibling(address: number): DOMPatcher {
-    const next = this.childrenSelected
-      ? this.target.firstChild
-      : this.target.nextSibling
+  stashNextSibling(state: State, address: number): State {
+    const next = state.childrenSelected
+      ? state.target.firstChild
+      : state.target.nextSibling
 
     if (next == null) {
       throw Error("Unable to stash next sibling as there is not one")
     } else {
-      this.stash[address] = next
+      state.stash[address] = next
       removeNode(next)
-      return this
+      return state
     }
   }
-  discardStashedNode(address: number): DOMPatcher {
-    delete this.stash[address]
-    return this
-  }
-
-  toBuffer(): Node {
-    return this.target
+  discardStashedNode(state: State, address: number): State {
+    delete state.stash[address]
+    return state
   }
 }
 
@@ -389,10 +404,10 @@ const patcher = new DOMPatcher()
 export default (target: Node): Encoder<Node> => (
   changeList: ChangeList
 ): Result<Node> => {
-  const result = changeList(patcher.reset(target, false, {}))
-  if (result.isError === true) {
-    throw error(result)
+  const result = changeList.reduce(patcher, new State(target, false, {}))
+  if (result instanceof State) {
+    return result.target
   } else {
-    return ok(result.toBuffer())
+    return result
   }
 }

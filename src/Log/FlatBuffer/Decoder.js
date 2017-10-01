@@ -1,11 +1,11 @@
 /* @flow */
 
-import type { Encoder, Decoder, ChangeList } from "../../Log"
+import type { Encoder, Decoder, Result, ChangeList, ChangeLog } from "../../Log"
 import * as Log from "../../Log"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
 import type { Builder, ByteBuffer } from "flatbuffers"
-import ChangeLog from "./ChangeLog"
+import Changes from "./ChangeLog"
 
 import {
   type Op,
@@ -38,11 +38,18 @@ import {
   StashNextSibling
 } from "./Op"
 
-export const decode: Decoder<Uint8Array> = (data: Uint8Array) => <x>(
-  changeLog: Log.ChangeLog<x>
-): Log.ChangeLog<x> | Log.DecoderError => {
-  const buffer = new flatbuffers.ByteBuffer(data)
-  const table = new ChangeLog.Table()
-  ChangeLog.Table.getRootAsChangeLog(buffer, table)
-  return ChangeLog.decode(table, changeLog)
+class FlatChangeList implements ChangeList {
+  data: Uint8Array
+  constructor(data: Uint8Array) {
+    this.data = data
+  }
+  reduce<buffer>(changeLog: ChangeLog<buffer>, init: buffer): Result<buffer> {
+    const byteBuffer = new flatbuffers.ByteBuffer(this.data)
+    const table = new Changes.Table()
+    Changes.Table.getRootAsChangeLog(byteBuffer, table)
+    return Changes.decode(table, changeLog, init)
+  }
 }
+
+export const decode: Decoder<Uint8Array> = (data: Uint8Array) =>
+  new FlatChangeList(data)

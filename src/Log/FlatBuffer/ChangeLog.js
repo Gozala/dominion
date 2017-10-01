@@ -80,8 +80,9 @@ class Codec {
   Table = ChangeLog
   decode<x>(
     table: ChangeLog,
-    changeLog: Log.ChangeLog<x>
-  ): Log.ChangeLog<x> | DecoderError {
+    changeLog: Log.ChangeLog<x>,
+    buffer: x
+  ): Log.Result<x> {
     const count = table.logLength()
     console.log(`Decode: ChangeLog contains ${count} changes`)
 
@@ -93,16 +94,16 @@ class Codec {
         console.error(`Decode: Change is null log[${index}]`)
         return new IndexError(index)
       }
-      const result = Change.decode(change, changeLog)
+      const result = Change.decode(change, changeLog, buffer)
       if (result instanceof DecoderError) {
         return new ChangeError(index, result)
       } else {
-        changeLog = result
+        buffer = result
       }
       index++
     }
 
-    return changeLog
+    return buffer
   }
   encode(builder: Builder, changes: change[]): Offset {
     const logOffset = ChangeLog.createLogVector(builder, (changes: any))

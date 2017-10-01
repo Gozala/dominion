@@ -9,17 +9,12 @@ import type { DecoderError } from "../lib/Log"
 export const diff = <a>(
   left: DOM.Node<a>,
   right: DOM.Node<a>
-): string[] | DecoderError => {
+): string[] | Object => {
   const delta = FlatBuffer.encode(DOM.diff(left, right))
-  if (delta.isOk) {
-    const result = DOM.patch(Log, FlatBuffer.decode(delta.value))
-    if (result.isOk) {
-      return result.value
-    } else {
-      return result.error
-    }
+  if (delta.isError === true) {
+    return delta
   } else {
-    return delta.error
+    return DOM.patch(Log, FlatBuffer.decode(delta))
   }
 }
 

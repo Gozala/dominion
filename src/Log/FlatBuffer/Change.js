@@ -1,7 +1,7 @@
 /* @flow */
 
 import type { Builder, Offset } from "flatbuffers"
-import type { Encoder, Decoder, ChangeLog } from "../../Log"
+import type { Encoder, Decoder, ChangeLog, Result } from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
 import { Change } from "../../DOM/DOM.fbs.ts.js"
 import * as op from "./Op"
@@ -93,8 +93,9 @@ export class Codec {
   }
   decode<x>(
     change: Change,
-    changeLog: ChangeLog<x>
-  ): ChangeLog<x> | DecoderError {
+    changeLog: ChangeLog<x>,
+    buffer: x
+  ): x | DecoderError {
     const type = change.opType()
     const variant = this.pool[type]
     if (variant == null) {
@@ -106,7 +107,7 @@ export class Codec {
         return new OpError(variant.constructor.name)
       }
       console.log(`Decode: op ${op.constructor.name}`)
-      return op.decode(changeLog)
+      return op.decode(changeLog, buffer)
     }
   }
   encode(builder: Builder, opType: OpType, opOffset: Op): change {

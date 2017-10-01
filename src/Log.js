@@ -3,56 +3,53 @@
 import * as result from "result.flow"
 
 export interface ChangeLog<buffer> {
-  isError: false,
-  selectParent(): ChangeLog<buffer>,
-  selectChildren(): ChangeLog<buffer>,
-  selectSibling(offset: number): ChangeLog<buffer>,
+  selectParent(buffer): buffer,
+  selectChildren(buffer): buffer,
+  selectSibling(buffer, offset: number): buffer,
 
-  removeNextSibling(): ChangeLog<buffer>,
+  removeNextSibling(buffer): buffer,
 
-  replaceWithText(data: string): ChangeLog<buffer>,
-  replaceWithComment(data: string): ChangeLog<buffer>,
-  replaceWithElement(localName: string): ChangeLog<buffer>,
-  replaceWithElementNS(
-    namespaceURI: string,
-    localName: string
-  ): ChangeLog<buffer>,
-  replaceWithStashedNode(address: number): ChangeLog<buffer>,
+  replaceWithText(buffer, data: string): buffer,
+  replaceWithComment(buffer, data: string): buffer,
+  replaceWithElement(buffer, localName: string): buffer,
+  replaceWithElementNS(buffer, namespaceURI: string, localName: string): buffer,
+  replaceWithStashedNode(buffer, address: number): buffer,
 
-  insertText(data: string): ChangeLog<buffer>,
-  insertComment(data: string): ChangeLog<buffer>,
-  insertElement(name: string): ChangeLog<buffer>,
-  insertElementNS(namespaceURI: string, name: string): ChangeLog<buffer>,
-  insertStashedNode(address: number): ChangeLog<buffer>,
+  insertText(buffer, data: string): buffer,
+  insertComment(buffer, data: string): buffer,
+  insertElement(buffer, name: string): buffer,
+  insertElementNS(buffer, namespaceURI: string, name: string): buffer,
+  insertStashedNode(buffer, address: number): buffer,
 
-  setTextData(data: string): ChangeLog<buffer>,
+  setTextData(buffer, data: string): buffer,
   editTextData(
+    buffer,
     start: number,
     end: number,
     prefix: string,
     suffix: string
-  ): ChangeLog<buffer>,
+  ): buffer,
 
-  setAttribute(name: string, value: string): ChangeLog<buffer>,
+  setAttribute(buffer, name: string, value: string): buffer,
   setAttributeNS(
+    buffer,
     namespaceURI: string,
     name: string,
     value: string
-  ): ChangeLog<buffer>,
-  removeAttribute(name: string): ChangeLog<buffer>,
-  removeAttributeNS(namespaceURI: string, name: string): ChangeLog<buffer>,
+  ): buffer,
+  removeAttribute(buffer, name: string): buffer,
+  removeAttributeNS(buffer, namespaceURI: string, name: string): buffer,
   assignProperty(
+    buffer,
     name: string,
     value: string | number | boolean | null
-  ): ChangeLog<buffer>,
-  deleteProperty(name: string): ChangeLog<buffer>,
-  setStyleRule(name: string, value: string): ChangeLog<buffer>,
-  removeStyleRule(name: string): ChangeLog<buffer>,
+  ): buffer,
+  deleteProperty(buffer, name: string): buffer,
+  setStyleRule(buffer, name: string, value: string): buffer,
+  removeStyleRule(buffer, name: string): buffer,
 
-  stashNextSibling(address: number): ChangeLog<buffer>,
-  discardStashedNode(address: number): ChangeLog<buffer>,
-
-  toBuffer(): buffer
+  stashNextSibling(buffer, address: number): buffer,
+  discardStashedNode(buffer, address: number): buffer
 }
 
 export interface DecoderError {
@@ -60,10 +57,10 @@ export interface DecoderError {
   toString(): string
 }
 
-export type Result<value> = result.Result<DecoderError, value>
+export type Result<value> = value | DecoderError
 
 export interface ChangeList {
-  <buffer>(ChangeLog<buffer>): ChangeLog<buffer> | DecoderError
+  reduce<buffer>(ChangeLog<buffer>, buffer): Result<buffer>
 }
 
 export interface Encoder<buffer> {

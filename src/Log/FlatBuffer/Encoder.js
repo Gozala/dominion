@@ -41,172 +41,197 @@ import {
 
 const push = <a>(item: a, items: a[]): a[] => (items.push(item), items)
 
-class Log implements ChangeLog<Uint8Array> {
-  isError: false
+class Log {
   builder: Builder
   log: change[]
-  address: number
-  reset(builder: Builder, log: Array<change>): self {
+  constructor(builder: Builder, log: change[]) {
+    this.reset(builder, log)
+  }
+  reset(builder: Builder, log: change[]): Log {
     this.builder = builder
     this.log = log
 
     return this
   }
-
-  change(opType: OpType, opOffset: Op): self {
+  change(opType: OpType, opOffset: Op): Log {
     return this.reset(
       this.builder,
       push(Change.encode(this.builder, opType, opOffset), this.log)
     )
   }
 
-  selectChildren(): self {
-    return this.change(
+  static selectChildren(state: Log): Log {
+    return state.change(
       SelectChildren.opType,
-      SelectChildren.encode(this.builder)
+      SelectChildren.encode(state.builder)
     )
   }
-  selectSibling(offset: number): self {
-    return this.change(
+  static selectSibling(state: Log, offset: number): Log {
+    return state.change(
       SelectSibling.opType,
-      SelectSibling.encode(this.builder, offset)
+      SelectSibling.encode(state.builder, offset)
     )
   }
-  selectParent(): self {
-    return this.change(SelectParent.opType, SelectParent.encode(this.builder))
+  static selectParent(state: Log): Log {
+    return state.change(SelectParent.opType, SelectParent.encode(state.builder))
   }
-  removeNextSibling(): self {
-    return this.change(
+  static removeNextSibling(state: Log): Log {
+    return state.change(
       RemoveNextSibling.opType,
-      RemoveNextSibling.encode(this.builder)
+      RemoveNextSibling.encode(state.builder)
     )
   }
 
-  insertText(data: string): self {
-    return this.change(InsertText.opType, InsertText.encode(this.builder, data))
+  static insertText(state: Log, data: string): Log {
+    return state.change(
+      InsertText.opType,
+      InsertText.encode(state.builder, data)
+    )
   }
-  insertComment(data: string): self {
-    return this.change(
+  static insertComment(state: Log, data: string): Log {
+    return state.change(
       InsertComment.opType,
-      InsertComment.encode(this.builder, data)
+      InsertComment.encode(state.builder, data)
     )
   }
-  insertElement(localName: string): self {
-    return this.change(
+  static insertElement(state: Log, localName: string): Log {
+    return state.change(
       InsertElement.opType,
-      InsertElement.encode(this.builder, null, localName)
+      InsertElement.encode(state.builder, null, localName)
     )
   }
-  insertElementNS(namespaceURI: string, localName: string): self {
-    return this.change(
+  static insertElementNS(
+    state: Log,
+    namespaceURI: string,
+    localName: string
+  ): Log {
+    return state.change(
       InsertElement.opType,
-      InsertElement.encode(this.builder, namespaceURI, localName)
+      InsertElement.encode(state.builder, namespaceURI, localName)
     )
   }
-  insertStashedNode(address: number): self {
-    return this.change(
+  static insertStashedNode(state: Log, address: number): Log {
+    return state.change(
       InsertStashedNode.opType,
-      InsertStashedNode.encode(this.builder, address)
+      InsertStashedNode.encode(state.builder, address)
     )
   }
 
-  replaceWithText(data: string): self {
-    return this.change(
+  static replaceWithText(state: Log, data: string): Log {
+    return state.change(
       ReplaceWithText.opType,
-      ReplaceWithText.encode(this.builder, data)
+      ReplaceWithText.encode(state.builder, data)
     )
   }
-  replaceWithComment(data: string): self {
-    return this.change(
+  static replaceWithComment(state: Log, data: string): Log {
+    return state.change(
       ReplaceWithComment.opType,
-      ReplaceWithComment.encode(this.builder, data)
+      ReplaceWithComment.encode(state.builder, data)
     )
   }
-  replaceWithElement(localName: string): self {
-    return this.change(
+  static replaceWithElement(state: Log, localName: string): Log {
+    return state.change(
       ReplaceWithElement.opType,
-      ReplaceWithElement.encode(this.builder, null, localName)
+      ReplaceWithElement.encode(state.builder, null, localName)
     )
   }
-  replaceWithElementNS(namespaceURI: string, localName: string): self {
-    return this.change(
+  static replaceWithElementNS(
+    state: Log,
+    namespaceURI: string,
+    localName: string
+  ): Log {
+    return state.change(
       ReplaceWithElement.opType,
-      ReplaceWithElement.encode(this.builder, namespaceURI, localName)
+      ReplaceWithElement.encode(state.builder, namespaceURI, localName)
     )
   }
-  replaceWithStashedNode(address: number): self {
-    return this.change(
+  static replaceWithStashedNode(state: Log, address: number): Log {
+    return state.change(
       ReplaceWithStashedNode.opType,
-      ReplaceWithStashedNode.encode(this.builder, address)
+      ReplaceWithStashedNode.encode(state.builder, address)
     )
   }
 
-  editTextData(
+  static editTextData(
+    state: Log,
     start: number,
     end: number,
     prefix: string,
     suffix: string
-  ): self {
-    return this.change(
+  ): Log {
+    return state.change(
       EditTextData.opType,
-      EditTextData.encode(this.builder, start, end, prefix, suffix)
+      EditTextData.encode(state.builder, start, end, prefix, suffix)
     )
   }
-  setTextData(data: string): self {
-    return this.change(
+  static setTextData(state: Log, data: string): Log {
+    return state.change(
       SetTextData.opType,
-      SetTextData.encode(this.builder, data)
+      SetTextData.encode(state.builder, data)
     )
   }
-  setAttribute(name: string, value: string): self {
-    return this.change(
+  static setAttribute(state: Log, name: string, value: string): Log {
+    return state.change(
       SetAttribute.opType,
-      SetAttribute.encode(this.builder, null, name, value)
+      SetAttribute.encode(state.builder, null, name, value)
     )
   }
-  removeAttribute(name: string): self {
-    return this.change(
+  static removeAttribute(state: Log, name: string): Log {
+    return state.change(
       RemoveAttribute.opType,
-      RemoveAttribute.encode(this.builder, null, name)
+      RemoveAttribute.encode(state.builder, null, name)
     )
   }
-  setAttributeNS(namespaceURI: string, name: string, value: string): self {
-    return this.change(
+  static setAttributeNS(
+    state: Log,
+    namespaceURI: string,
+    name: string,
+    value: string
+  ): Log {
+    return state.change(
       SetAttribute.opType,
-      SetAttribute.encode(this.builder, namespaceURI, name, value)
+      SetAttribute.encode(state.builder, namespaceURI, name, value)
     )
   }
-  removeAttributeNS(namespaceURI: string, name: string): self {
-    return this.change(
+  static removeAttributeNS(
+    state: Log,
+    namespaceURI: string,
+    name: string
+  ): Log {
+    return state.change(
       RemoveAttribute.opType,
-      RemoveAttribute.encode(this.builder, namespaceURI, name)
+      RemoveAttribute.encode(state.builder, namespaceURI, name)
     )
   }
-  assignProperty(name: string, value: string | number | boolean | null): self {
+  static assignProperty(
+    state: Log,
+    name: string,
+    value: string | number | boolean | null
+  ): Log {
     switch (typeof value) {
       case "string": {
-        return this.change(
+        return state.change(
           AssignStringProperty.opType,
-          AssignStringProperty.encode(this.builder, name, value)
+          AssignStringProperty.encode(state.builder, name, value)
         )
       }
       case "number": {
-        return this.change(
+        return state.change(
           AssignNumberProperty.opType,
-          AssignNumberProperty.encode(this.builder, name, value)
+          AssignNumberProperty.encode(state.builder, name, value)
         )
       }
       case "boolean": {
-        return this.change(
+        return state.change(
           AssignBooleanProperty.opType,
-          AssignBooleanProperty.encode(this.builder, name, value)
+          AssignBooleanProperty.encode(state.builder, name, value)
         )
       }
       default: {
         if (value === null) {
-          return this.change(
+          return state.change(
             AssignNullProperty.opType,
-            AssignNullProperty.encode(this.builder, name, value)
+            AssignNullProperty.encode(state.builder, name, value)
           )
         } else {
           return unreachable(value)
@@ -214,54 +239,49 @@ class Log implements ChangeLog<Uint8Array> {
       }
     }
   }
-  deleteProperty(name: string): self {
-    return this.change(
+  static deleteProperty(state: Log, name: string): Log {
+    return state.change(
       DeleteProperty.opType,
-      DeleteProperty.encode(this.builder, name)
+      DeleteProperty.encode(state.builder, name)
     )
   }
-  setStyleRule(name: string, value: string) {
-    return this.change(
+  static setStyleRule(state: Log, name: string, value: string) {
+    return state.change(
       SetStyleRule.opType,
-      SetStyleRule.encode(this.builder, name, value)
+      SetStyleRule.encode(state.builder, name, value)
     )
   }
-  removeStyleRule(name: string) {
-    return this.change(
+  static removeStyleRule(state: Log, name: string) {
+    return state.change(
       RemoveStyleRule.opType,
-      RemoveStyleRule.encode(this.builder, name)
+      RemoveStyleRule.encode(state.builder, name)
     )
   }
 
-  stashNextSibling(address): self {
-    return this.change(
+  static stashNextSibling(state: Log, address): Log {
+    return state.change(
       StashNextSibling.opType,
-      StashNextSibling.encode(this.builder, address)
+      StashNextSibling.encode(state.builder, address)
     )
   }
-  discardStashedNode(address: number): self {
-    return this.change(
+  static discardStashedNode(state: Log, address: number): Log {
+    return state.change(
       DiscardStashed.opType,
-      DiscardStashed.encode(this.builder, address)
+      DiscardStashed.encode(state.builder, address)
     )
-  }
-
-  toBuffer(): Uint8Array {
-    const { builder, log } = this
-    builder.finish(Changes.encode(builder, log.splice(0)))
-    return builder.asUint8Array()
   }
 }
-
-const changeLog = new Log()
 
 export const encode: Encoder<Uint8Array> = (
   changeList: ChangeList
 ): Result<Uint8Array> => {
-  const result = changeList(changeLog.reset(new flatbuffers.Builder(1024), []))
-  if (result && result.isError === true) {
-    return error(result)
+  const builder = new flatbuffers.Builder(1024)
+  const result = changeList.reduce(Log, new Log(builder, []))
+  if (result instanceof Log) {
+    const { builder, log } = result
+    builder.finish(Changes.encode(builder, log))
+    return builder.asUint8Array()
   } else {
-    return ok(result.toBuffer())
+    return result
   }
 }
