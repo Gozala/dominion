@@ -3,7 +3,7 @@
 import type { Builder, Offset } from "flatbuffers"
 import type { Encoder, Decode, Encode, Result } from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
-import { Change } from "../../DOM/DOM.fbs.ts.js"
+import { Change } from "./DOMinion.fbs.ts.js"
 import * as op from "./Op"
 
 import {

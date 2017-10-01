@@ -3,7 +3,7 @@
 import { flatbuffers } from "flatbuffers"
 import type { Builder, Offset } from "flatbuffers"
 import type { Encode, Encoder } from "../../Log"
-import * as FBS from "../../DOM/DOM.fbs.ts.js"
+import * as FBS from "./DOMinion.fbs.ts.js"
 
 export type OpType = FBS.Op
 const opType = FBS.OpValue

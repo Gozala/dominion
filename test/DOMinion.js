@@ -1,12 +1,12 @@
 /* @flow */
 
-import * as DOM from "../"
+import * as DOMinion from "../"
 import { createHost, diff } from "./Util"
 import test from "blue-tape"
 
 test("empty div", async test => {
-  const v1 = DOM.createHost()
-  const v2 = DOM.createHost([], [DOM.createElement("div")])
+  const v1 = DOMinion.createHost()
+  const v2 = DOMinion.createHost([], [DOMinion.createElement("div")])
 
   test.deepEqual(
     diff(v1, v2),
@@ -16,14 +16,14 @@ test("empty div", async test => {
 })
 
 test("div with attributes", async test => {
-  const v1 = DOM.createHost()
-  const v2 = DOM.createHost([], [DOM.createElement("div")])
-  const v3 = DOM.createHost(
+  const v1 = DOMinion.createHost()
+  const v2 = DOMinion.createHost([], [DOMinion.createElement("div")])
+  const v3 = DOMinion.createHost(
     [],
     [
-      DOM.createElement("div", [
-        DOM.setAttribute("class", "standard"),
-        DOM.setAttribute("e-text", "custom")
+      DOMinion.createElement("div", [
+        DOMinion.setAttribute("class", "standard"),
+        DOMinion.setAttribute("e-text", "custom")
       ])
     ]
   )
@@ -53,10 +53,16 @@ test("div with attributes", async test => {
 })
 
 test("div with properties", async test => {
-  const v1 = DOM.createHost()
-  const v2 = DOM.createHost(
+  const v1 = DOMinion.createHost()
+  const v2 = DOMinion.createHost(
     [],
-    [DOM.createElement("div", [DOM.setAttribute("class", "standard")], [])]
+    [
+      DOMinion.createElement(
+        "div",
+        [DOMinion.setAttribute("class", "standard")],
+        []
+      )
+    ]
   )
 
   test.deepEqual(
@@ -70,12 +76,12 @@ test("div with properties", async test => {
     "add div with attribute"
   )
 
-  const v3 = DOM.createHost(
+  const v3 = DOMinion.createHost(
     [],
     [
-      DOM.createElement("div", [
-        DOM.setAttribute("e-text", "custom"),
-        DOM.property("testProp", 5)
+      DOMinion.createElement("div", [
+        DOMinion.setAttribute("e-text", "custom"),
+        DOMinion.property("testProp", 5)
       ])
     ]
   )
@@ -92,12 +98,12 @@ test("div with properties", async test => {
     "set / remove attribute and assign property"
   )
 
-  const v4 = DOM.createHost(
+  const v4 = DOMinion.createHost(
     [],
     [
-      DOM.createElement("div", [
-        DOM.setAttribute("e-text", "custom"),
-        DOM.property("otherProp", null)
+      DOMinion.createElement("div", [
+        DOMinion.setAttribute("e-text", "custom"),
+        DOMinion.property("otherProp", null)
       ])
     ]
   )
@@ -113,12 +119,12 @@ test("div with properties", async test => {
     "set / remove attribute and assign property"
   )
 
-  const v5 = DOM.createHost(
+  const v5 = DOMinion.createHost(
     [],
     [
-      DOM.createElement("div", [
-        DOM.setAttribute("e-text", "custom"),
-        DOM.property("otherProp", true)
+      DOMinion.createElement("div", [
+        DOMinion.setAttribute("e-text", "custom"),
+        DOMinion.property("otherProp", true)
       ])
     ]
   )
@@ -135,14 +141,14 @@ test("div with properties", async test => {
 })
 
 test("div with style rules", async test => {
-  const v1 = DOM.createHost()
-  const v2 = DOM.createHost(
+  const v1 = DOMinion.createHost()
+  const v2 = DOMinion.createHost(
     [],
     [
-      DOM.createElement(
+      DOMinion.createElement(
         "div",
         [
-          DOM.style({
+          DOMinion.style({
             backgroundColor: "red"
           })
         ],
@@ -162,11 +168,11 @@ test("div with style rules", async test => {
     "add div with style"
   )
 
-  const v3 = DOM.createHost(
+  const v3 = DOMinion.createHost(
     [],
     [
-      DOM.createElement("div", [
-        DOM.style({
+      DOMinion.createElement("div", [
+        DOMinion.style({
           color: "white"
         })
       ])
@@ -184,11 +190,11 @@ test("div with style rules", async test => {
     "set / remove style rule"
   )
 
-  const v4 = DOM.createHost(
+  const v4 = DOMinion.createHost(
     [],
     [
-      DOM.createElement("div", [
-        DOM.style({
+      DOMinion.createElement("div", [
+        DOMinion.style({
           color: null,
           backgroundColor: "blue"
         })
@@ -207,11 +213,11 @@ test("div with style rules", async test => {
     "set / remove style rules"
   )
 
-  const v5 = DOM.createHost(
+  const v5 = DOMinion.createHost(
     [],
     [
-      DOM.createElement("div", [
-        DOM.style({
+      DOMinion.createElement("div", [
+        DOMinion.style({
           color: "white",
           backgroundColor: "green"
         })

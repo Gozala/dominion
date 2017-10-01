@@ -1,4 +1,4 @@
-namespace DOMLog;
+namespace DOMinion;
 
 table StashNextSibling {
   address:int;

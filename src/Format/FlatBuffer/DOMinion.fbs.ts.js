@@ -1,5 +1,7 @@
 /* @flow */
 
+// Transformed verison of DOMinion.fbs.ts
+
 import * as flatbuffers from "flatbuffers"
 
 export type OpType = {
@@ -96,8 +98,10 @@ export class StashNextSibling {
     bb: flatbuffers.ByteBuffer,
     obj?: StashNextSibling
   ): StashNextSibling {
-    return (obj || new StashNextSibling())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new StashNextSibling()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -165,8 +169,10 @@ export class DiscardStashed {
     bb: flatbuffers.ByteBuffer,
     obj?: DiscardStashed
   ): DiscardStashed {
-    return (obj || new DiscardStashed())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new DiscardStashed()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -234,8 +240,10 @@ export class AssignStringProperty {
     bb: flatbuffers.ByteBuffer,
     obj?: AssignStringProperty
   ): AssignStringProperty {
-    return (obj || new AssignStringProperty())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new AssignStringProperty()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -330,8 +338,10 @@ export class AssignBooleanProperty {
     bb: flatbuffers.ByteBuffer,
     obj?: AssignBooleanProperty
   ): AssignBooleanProperty {
-    return (obj || new AssignBooleanProperty())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new AssignBooleanProperty()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -420,8 +430,10 @@ export class AssignNumberProperty {
     bb: flatbuffers.ByteBuffer,
     obj?: AssignNumberProperty
   ): AssignNumberProperty {
-    return (obj || new AssignNumberProperty())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new AssignNumberProperty()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -510,8 +522,10 @@ export class AssignNullProperty {
     bb: flatbuffers.ByteBuffer,
     obj?: AssignNullProperty
   ): AssignNullProperty {
-    return (obj || new AssignNullProperty())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new AssignNullProperty()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -584,8 +598,10 @@ export class DeleteProperty {
     bb: flatbuffers.ByteBuffer,
     obj?: DeleteProperty
   ): DeleteProperty {
-    return (obj || new DeleteProperty())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new DeleteProperty()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -656,8 +672,10 @@ export class SetStyleRule {
     bb: flatbuffers.ByteBuffer,
     obj?: SetStyleRule
   ): SetStyleRule {
-    return (obj || new SetStyleRule())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new SetStyleRule()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -750,8 +768,10 @@ export class RemoveStyleRule {
     bb: flatbuffers.ByteBuffer,
     obj?: RemoveStyleRule
   ): RemoveStyleRule {
-    return (obj || new RemoveStyleRule())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new RemoveStyleRule()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -822,8 +842,10 @@ export class SetAttribute {
     bb: flatbuffers.ByteBuffer,
     obj?: SetAttribute
   ): SetAttribute {
-    return (obj || new SetAttribute())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new SetAttribute()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -938,8 +960,10 @@ export class RemoveAttribute {
     bb: flatbuffers.ByteBuffer,
     obj?: RemoveAttribute
   ): RemoveAttribute {
-    return (obj || new RemoveAttribute())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new RemoveAttribute()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1032,8 +1056,10 @@ export class InsertText {
     bb: flatbuffers.ByteBuffer,
     obj?: InsertText
   ): InsertText {
-    return (obj || new InsertText())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new InsertText()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1104,8 +1130,10 @@ export class InsertComment {
     bb: flatbuffers.ByteBuffer,
     obj?: InsertComment
   ): InsertComment {
-    return (obj || new InsertComment())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new InsertComment()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1176,8 +1204,10 @@ export class InsertElement {
     bb: flatbuffers.ByteBuffer,
     obj?: InsertElement
   ): InsertElement {
-    return (obj || new InsertElement())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new InsertElement()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1273,8 +1303,10 @@ export class InsertStashedNode {
     bb: flatbuffers.ByteBuffer,
     obj?: InsertStashedNode
   ): InsertStashedNode {
-    return (obj || new InsertStashedNode())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new InsertStashedNode()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1344,8 +1376,10 @@ export class ReplaceWithText {
     bb: flatbuffers.ByteBuffer,
     obj?: ReplaceWithText
   ): ReplaceWithText {
-    return (obj || new ReplaceWithText())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new ReplaceWithText()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1416,8 +1450,10 @@ export class ReplaceWithComment {
     bb: flatbuffers.ByteBuffer,
     obj?: ReplaceWithComment
   ): ReplaceWithComment {
-    return (obj || new ReplaceWithComment())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new ReplaceWithComment()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1490,8 +1526,10 @@ export class ReplaceWithElement {
     bb: flatbuffers.ByteBuffer,
     obj?: ReplaceWithElement
   ): ReplaceWithElement {
-    return (obj || new ReplaceWithElement())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new ReplaceWithElement()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1589,8 +1627,10 @@ export class ReplaceWithStashedNode {
     bb: flatbuffers.ByteBuffer,
     obj?: ReplaceWithStashedNode
   ): ReplaceWithStashedNode {
-    return (obj || new ReplaceWithStashedNode())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new ReplaceWithStashedNode()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1660,8 +1700,10 @@ export class SetTextData {
     bb: flatbuffers.ByteBuffer,
     obj?: SetTextData
   ): SetTextData {
-    return (obj || new SetTextData())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new SetTextData()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1732,8 +1774,10 @@ export class EditTextData {
     bb: flatbuffers.ByteBuffer,
     obj?: EditTextData
   ): EditTextData {
-    return (obj || new EditTextData())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new EditTextData()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1861,8 +1905,10 @@ export class SelectChildren {
     bb: flatbuffers.ByteBuffer,
     obj?: SelectChildren
   ): SelectChildren {
-    return (obj || new SelectChildren())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new SelectChildren()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1914,8 +1960,10 @@ export class SelectSibling {
     bb: flatbuffers.ByteBuffer,
     obj?: SelectSibling
   ): SelectSibling {
-    return (obj || new SelectSibling())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new SelectSibling()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -1983,8 +2031,10 @@ export class SelectParent {
     bb: flatbuffers.ByteBuffer,
     obj?: SelectParent
   ): SelectParent {
-    return (obj || new SelectParent())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new SelectParent()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -2036,8 +2086,10 @@ export class RemoveNextSibling {
     bb: flatbuffers.ByteBuffer,
     obj?: RemoveNextSibling
   ): RemoveNextSibling {
-    return (obj || new RemoveNextSibling())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new RemoveNextSibling()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -2088,8 +2140,10 @@ export class Change {
    * @returns {Change}
    */
   static getRootAsChange(bb: flatbuffers.ByteBuffer, obj?: Change): Change {
-    return (obj || new Change())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new Change()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -2176,8 +2230,10 @@ export class ChangeLog {
     bb: flatbuffers.ByteBuffer,
     obj?: ChangeLog
   ): ChangeLog {
-    return (obj || new ChangeLog())
-      .__init(bb.readInt32(bb.position()) + bb.position(), bb)
+    return (obj || new ChangeLog()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
   }
 
   /**
@@ -2188,13 +2244,12 @@ export class ChangeLog {
   log(index: number, obj?: Change): Change | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
-      ? (obj || new Change())
-          .__init(
-            this.bb.__indirect(
-              this.bb.__vector(this.bb_pos + offset) + index * 4
-            ),
-            this.bb
-          )
+      ? (obj || new Change()).__init(
+          this.bb.__indirect(
+            this.bb.__vector(this.bb_pos + offset) + index * 4
+          ),
+          this.bb
+        )
       : null
   }
 

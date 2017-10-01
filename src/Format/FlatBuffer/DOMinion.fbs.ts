@@ -3,7 +3,7 @@
 /**
  * @enum
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export enum Op{
   NONE= 0,
   SelectChildren= 1,
@@ -36,7 +36,7 @@ export enum Op{
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class StashNextSibling {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -104,7 +104,7 @@ static endStashNextSibling(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class DiscardStashed {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -172,7 +172,7 @@ static endDiscardStashed(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class AssignStringProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -262,7 +262,7 @@ static endAssignStringProperty(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class AssignBooleanProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -349,7 +349,7 @@ static endAssignBooleanProperty(builder:flatbuffers.Builder):flatbuffers.Offset 
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class AssignNumberProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -436,7 +436,7 @@ static endAssignNumberProperty(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class AssignNullProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -507,7 +507,7 @@ static endAssignNullProperty(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class DeleteProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -578,7 +578,7 @@ static endDeleteProperty(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class SetStyleRule {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -668,7 +668,7 @@ static endSetStyleRule(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class RemoveStyleRule {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -739,7 +739,7 @@ static endRemoveStyleRule(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class SetAttribute {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -848,7 +848,7 @@ static endSetAttribute(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class RemoveAttribute {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -938,7 +938,7 @@ static endRemoveAttribute(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class InsertText {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1009,7 +1009,7 @@ static endInsertText(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class InsertComment {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1080,7 +1080,7 @@ static endInsertComment(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class InsertElement {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1170,7 +1170,7 @@ static endInsertElement(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class InsertStashedNode {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1238,7 +1238,7 @@ static endInsertStashedNode(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class ReplaceWithText {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1309,7 +1309,7 @@ static endReplaceWithText(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class ReplaceWithComment {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1380,7 +1380,7 @@ static endReplaceWithComment(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class ReplaceWithElement {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1470,7 +1470,7 @@ static endReplaceWithElement(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class ReplaceWithStashedNode {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1538,7 +1538,7 @@ static endReplaceWithStashedNode(builder:flatbuffers.Builder):flatbuffers.Offset
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class SetTextData {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1609,7 +1609,7 @@ static endSetTextData(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class EditTextData {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1731,7 +1731,7 @@ static endEditTextData(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class SelectChildren {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1783,7 +1783,7 @@ static endSelectChildren(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class SelectSibling {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1851,7 +1851,7 @@ static endSelectSibling(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class SelectParent {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1903,7 +1903,7 @@ static endSelectParent(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class RemoveNextSibling {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1955,7 +1955,7 @@ static endRemoveNextSibling(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class Change {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1987,11 +1987,11 @@ static getRootAsChange(bb:flatbuffers.ByteBuffer, obj?:Change):Change {
 };
 
 /**
- * @returns {DOMLog.Op}
+ * @returns {DOMinion.Op}
  */
-opType():DOMLog.Op {
+opType():DOMinion.Op {
   var offset = this.bb.__offset(this.bb_pos, 4);
-  return offset ? /** @type {DOMLog.Op} */ (this.bb.readUint8(this.bb_pos + offset)) : DOMLog.Op.NONE;
+  return offset ? /** @type {DOMinion.Op} */ (this.bb.readUint8(this.bb_pos + offset)) : DOMinion.Op.NONE;
 };
 
 /**
@@ -2012,10 +2012,10 @@ static startChange(builder:flatbuffers.Builder) {
 
 /**
  * @param {flatbuffers.Builder} builder
- * @param {DOMLog.Op} opType
+ * @param {DOMinion.Op} opType
  */
-static addOpType(builder:flatbuffers.Builder, opType:DOMLog.Op) {
-  builder.addFieldInt8(0, opType, DOMLog.Op.NONE);
+static addOpType(builder:flatbuffers.Builder, opType:DOMinion.Op) {
+  builder.addFieldInt8(0, opType, DOMinion.Op.NONE);
 };
 
 /**
@@ -2040,7 +2040,7 @@ static endChange(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMLog{
+export namespace DOMinion{
 export class ChangeLog {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -2073,12 +2073,12 @@ static getRootAsChangeLog(bb:flatbuffers.ByteBuffer, obj?:ChangeLog):ChangeLog {
 
 /**
  * @param {number} index
- * @param {DOMLog.Change=} obj
- * @returns {DOMLog.Change}
+ * @param {DOMinion.Change=} obj
+ * @returns {DOMinion.Change}
  */
-log(index: number, obj?:DOMLog.Change):DOMLog.Change|null {
+log(index: number, obj?:DOMinion.Change):DOMinion.Change|null {
   var offset = this.bb.__offset(this.bb_pos, 4);
-  return offset ? (obj || new DOMLog.Change).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
+  return offset ? (obj || new DOMinion.Change).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
 };
 
 /**

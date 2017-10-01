@@ -8,7 +8,7 @@
 [include]
 
 [options]
-module.name_mapper='dom-log' -> '<PROJECT_ROOT>/src/DOM'
-module.name_mapper='lib/DOM' -> '<PROJECT_ROOT>/src/DOM'
+module.name_mapper='dominion' -> '<PROJECT_ROOT>/src/DOMinion'
+module.name_mapper='lib/DOMinion' -> '<PROJECT_ROOT>/src/DOMinion'
 suppress_comment= \\(.\\|\n\\)*\\@FlowIssue
 suppress_comment= \\(.\\|\n\\)*\\@FlowIgnore
