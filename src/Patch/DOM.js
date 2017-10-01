@@ -1,12 +1,6 @@
 /* @flow */
 
-import type {
-  Encoder,
-  ChangeLog,
-  ChangeList,
-  DecoderError,
-  Result
-} from "../Log"
+import type { Encode, Encoder, ChangeList, DecoderError, Result } from "../Log"
 import { ok, error } from "result.flow"
 import { nodeType } from "../DOM/Node"
 import unreachable from "unreachable"
@@ -132,15 +126,7 @@ class State {
   }
 }
 
-class DOMPatcher implements ChangeLog<State> {
-  isError = false
-  // reset(target: Node, childrenSelected: boolean, stash: Stash): State {
-  //   state.target = target
-  //   state.childrenSelected = childrenSelected
-  //   state.stash = stash
-  //   return state
-  // }
-
+class DOMPatcher implements Encoder<State> {
   selectChildren(state: State): State {
     console.log(`Patch: Select children`)
     if (state.childrenSelected) {
@@ -401,10 +387,10 @@ class DOMPatcher implements ChangeLog<State> {
 
 const patcher = new DOMPatcher()
 
-export default (target: Node): Encoder<Node> => (
+export default (target: Node): Encode<Node> => (
   changeList: ChangeList
 ): Result<Node> => {
-  const result = changeList.reduce(patcher, new State(target, false, {}))
+  const result = changeList.encode(patcher, new State(target, false, {}))
   if (result instanceof State) {
     return result.target
   } else {

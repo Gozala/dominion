@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Encoder, Decoder, ChangeLog, ChangeList, Result } from "../Log"
+import type { Encoder, Decode, Encode, ChangeList, Result } from "../Log"
 import { ok, error } from "result.flow"
 import unreachable from "unreachable"
 
@@ -36,7 +36,7 @@ class StashNextSibling {
   constructor(address: number) {
     this.address = address
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.stashNextSibling(buffer, this.address)
   }
 }
@@ -47,7 +47,7 @@ class DiscardStashed {
   constructor(address: number) {
     this.address = address
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.discardStashedNode(buffer, this.address)
   }
 }
@@ -60,7 +60,7 @@ class AssignProperty {
     this.name = name
     this.value = value
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.assignProperty(buffer, this.name, this.value)
   }
 }
@@ -71,7 +71,7 @@ class DeleteProperty {
   constructor(name: string) {
     this.name = name
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.deleteProperty(buffer, this.name)
   }
 }
@@ -84,7 +84,7 @@ class SetStyleRule {
     this.name = name
     this.value = value
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.setStyleRule(buffer, this.name, this.value)
   }
 }
@@ -95,7 +95,7 @@ class RemoveStyleRule {
   constructor(name: string) {
     this.name = name
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.removeStyleRule(buffer, this.name)
   }
 }
@@ -110,7 +110,7 @@ class SetAttribute {
     this.value = value
     this.namespaceURI = namespaceURI
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.setStyleRule(buffer, this.name, this.value)
   }
 }
@@ -123,7 +123,7 @@ class RemoveAttribute {
     this.namespaceURI = namespaceURI
     this.name = name
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     const { namespaceURI, name } = this
     if (namespaceURI == null) {
       return changeLog.removeAttribute(buffer, name)
@@ -139,7 +139,7 @@ class InsertText {
   constructor(data: string) {
     this.data = data
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.insertText(buffer, this.data)
   }
 }
@@ -150,7 +150,7 @@ class InsertComment {
   constructor(data: string) {
     this.data = data
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.insertComment(buffer, this.data)
   }
 }
@@ -163,7 +163,7 @@ class InsertElement {
     this.namespaceURI = namespaceURI
     this.localName = localName
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     const { namespaceURI, localName } = this
     if (namespaceURI == null) {
       return changeLog.insertElement(buffer, localName)
@@ -179,7 +179,7 @@ class InsertStashedNode {
   constructor(address: number) {
     this.address = address
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.insertStashedNode(buffer, this.address)
   }
 }
@@ -190,7 +190,7 @@ class ReplaceWithText {
   constructor(data: string) {
     this.data = data
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.replaceWithText(buffer, this.data)
   }
 }
@@ -201,7 +201,7 @@ class ReplaceWithComment {
   constructor(data: string) {
     this.data = data
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.replaceWithComment(buffer, this.data)
   }
 }
@@ -214,7 +214,7 @@ class ReplaceWithElement {
     this.namespaceURI = namespaceURI
     this.name = name
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     const { namespaceURI, name } = this
     if (namespaceURI == null) {
       return changeLog.replaceWithElement(buffer, name)
@@ -230,7 +230,7 @@ class ReplaceWithStashedNode {
   constructor(address: number) {
     this.address = address
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.replaceWithStashedNode(buffer, this.address)
   }
 }
@@ -241,7 +241,7 @@ class SetTextData {
   constructor(data: string) {
     this.data = data
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.setTextData(buffer, this.data)
   }
 }
@@ -258,7 +258,7 @@ class EditTextData {
     this.prefix = prefix
     this.suffix = suffix
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.editTextData(
       buffer,
       this.start,
@@ -271,7 +271,7 @@ class EditTextData {
 
 class SelectChildren {
   kind: "SelectChildren" = "SelectChildren"
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.selectChildren(buffer)
   }
 }
@@ -282,28 +282,28 @@ class SelectSibling {
   constructor(offset: number) {
     this.offset = offset
   }
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.selectSibling(buffer, this.offset)
   }
 }
 
 class SelectParent {
   kind: "SelectParent" = "SelectParent"
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.selectParent(buffer)
   }
 }
 
 class RemoveNextSibling {
   kind: "RemoveNextSibling" = "RemoveNextSibling"
-  decode<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
     return changeLog.removeNextSibling(buffer)
   }
 }
 
 const push = <a>(x: a, xs: a[]): a[] => (xs.push(x), xs)
 
-class JSONLog implements ChangeLog<Op[]> {
+class JSONLog implements Encoder<Op[]> {
   isError = false
 
   selectChildren(log: Op[]): Op[] {
@@ -411,7 +411,7 @@ class JSONDecoder {
   constructor(log: Op[]) {
     this.log = log
   }
-  reduce<x>(changeLog: ChangeLog<x>, buffer: x): x {
+  encode<x>(changeLog: Encoder<x>, buffer: x): x {
     for (let op of this.log) {
       buffer = op.decode(changeLog, buffer)
     }
@@ -419,7 +419,7 @@ class JSONDecoder {
   }
 }
 
-const decoder: Decoder<Op[]> = (log: Op[]) => new JSONDecoder(log)
+export const decode: Decode<Op[]> = (log: Op[]) => new JSONDecoder(log)
 
-export const encoder: Encoder<Op[]> = (changeList: ChangeList): Result<Op[]> =>
-  changeList.reduce(changeLog, [])
+export const encode: Encode<Op[]> = (changeList: ChangeList): Result<Op[]> =>
+  changeList.encode(changeLog, [])

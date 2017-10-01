@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Decoder, Encoder, ChangeList } from "../../Log"
+import type { Decode, Encode, Encoder, ChangeList } from "../../Log"
 import * as Log from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
 import type { Builder, Offset } from "flatbuffers"
@@ -78,11 +78,7 @@ const changePool = new Change.Table()
 
 class Codec {
   Table = ChangeLog
-  decode<x>(
-    table: ChangeLog,
-    changeLog: Log.ChangeLog<x>,
-    buffer: x
-  ): Log.Result<x> {
+  decode<x>(table: ChangeLog, changeLog: Encoder<x>, buffer: x): Log.Result<x> {
     const count = table.logLength()
     console.log(`Decode: ChangeLog contains ${count} changes`)
 

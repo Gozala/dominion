@@ -1,11 +1,11 @@
 /* @flow */
 
 import { error, ok } from "result.flow"
-import type { Encoder, ChangeList, ChangeLog, Result } from "../Log"
+import type { Encode, Encoder, ChangeList, Result } from "../Log"
 
 const push = <a>(x: a, xs: a[]): a[] => (xs.push(x), xs)
 
-class LogPatcher implements ChangeLog<string[]> {
+class LogPatcher implements Encoder<string[]> {
   isError = false
   selectChildren(log: string[]): string[] {
     return push("selectChildren()", log)
@@ -119,7 +119,7 @@ class LogPatcher implements ChangeLog<string[]> {
 }
 
 const log = new LogPatcher()
-const encoder: Encoder<string[]> = (changeList: ChangeList): Result<string[]> =>
-  changeList.reduce(log, [])
+const encoder: Encode<string[]> = (changeList: ChangeList): Result<string[]> =>
+  changeList.encode(log, [])
 
 export default encoder

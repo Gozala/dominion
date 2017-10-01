@@ -2,7 +2,7 @@
 
 import * as result from "result.flow"
 
-export interface ChangeLog<buffer> {
+export interface Encoder<buffer> {
   selectParent(buffer): buffer,
   selectChildren(buffer): buffer,
   selectSibling(buffer, offset: number): buffer,
@@ -60,13 +60,13 @@ export interface DecoderError {
 export type Result<value> = value | DecoderError
 
 export interface ChangeList {
-  reduce<buffer>(ChangeLog<buffer>, buffer): Result<buffer>
+  encode<buffer>(Encoder<buffer>, buffer): Result<buffer>
 }
 
-export interface Encoder<buffer> {
+export interface Encode<buffer> {
   (ChangeList): Result<buffer>
 }
 
-export interface Decoder<buffer> {
+export interface Decode<buffer> {
   (buffer): ChangeList
 }

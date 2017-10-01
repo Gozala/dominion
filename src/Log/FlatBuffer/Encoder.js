@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Encoder, Decoder, ChangeLog, ChangeList, Result } from "../../Log"
+import type { Encode, Decode, Encoder, ChangeList, Result } from "../../Log"
 import type { Builder, ByteBuffer } from "flatbuffers"
 import type { OpType, Op } from "./Op"
 import unreachable from "unreachable"
@@ -272,11 +272,11 @@ class Log {
   }
 }
 
-export const encode: Encoder<Uint8Array> = (
+export const encode: Encode<Uint8Array> = (
   changeList: ChangeList
 ): Result<Uint8Array> => {
   const builder = new flatbuffers.Builder(1024)
-  const result = changeList.reduce(Log, new Log(builder, []))
+  const result = changeList.encode(Log, new Log(builder, []))
   if (result instanceof Log) {
     const { builder, log } = result
     builder.finish(Changes.encode(builder, log))

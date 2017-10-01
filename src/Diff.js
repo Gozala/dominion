@@ -19,7 +19,7 @@ import type {
   Attributes,
   StyleRules
 } from "./DOM/Node"
-import type { Encoder, ChangeList, ChangeLog, Result } from "./Log"
+import type { Encoder, ChangeList, Result } from "./Log"
 import { nodeType } from "./DOM/Node"
 import Diff from "./Diff/Diff"
 import unreachable from "unreachable"
@@ -34,7 +34,7 @@ class Changes<a> implements ChangeList {
     this.last = last
     this.next = next
   }
-  reduce<buffer>(changeLog: ChangeLog<buffer>, init: buffer): Result<buffer> {
+  encode<buffer>(changeLog: Encoder<buffer>, init: buffer): Result<buffer> {
     return diffNode(this.last, this.next, new Diff(init, changeLog, 1, []))
       .buffer
   }

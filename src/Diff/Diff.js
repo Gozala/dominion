@@ -1,17 +1,17 @@
 /* @flow */
 
-import type { ChangeLog } from "../Log"
+import type { Encoder } from "../Log"
 type Nav = [-1 | 0 | 1, number]
 
 export default class Diff<x> {
   isError = false
   buffer: x
-  changeLog: ChangeLog<x>
+  changeLog: Encoder<x>
   navigationLog: Nav[]
   address: number
   constructor(
     buffer: x,
-    changeLog: ChangeLog<x>,
+    changeLog: Encoder<x>,
     address: number,
     navigationLog: Nav[]
   ) {
@@ -20,7 +20,7 @@ export default class Diff<x> {
   static reset(
     diff: Diff<x>,
     buffer: x,
-    changeLog: ChangeLog<x>,
+    changeLog: Encoder<x>,
     address: number,
     navigationLog: Nav[]
   ): Diff<x> {
