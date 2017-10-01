@@ -480,7 +480,7 @@ const diffUnindexedElement = <a, x>(
 ): Diff<x> => {
   if (
     next.localName === last.localName &&
-    next.namespaceURI === next.namespaceURI
+    next.namespaceURI === last.namespaceURI
   ) {
     return Diff.selectParent(
       diffUnindexedChildren(
