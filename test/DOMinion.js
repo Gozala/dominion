@@ -1390,6 +1390,112 @@ test("deleteProperty", async test => {
   )
 })
 
-test("setStyleRule", async test => {})
+test("setStyleRule", async test => {
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.style({
+              backgroundColor: "red",
+              position: null
+            })
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'setStyleRule("backgroundColor", "red")'
+    ],
+    "set backgroundColor"
+  )
 
-test("removeStyleRule", async test => {})
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.style({
+              display: "block"
+            })
+          ])
+        ]
+      ),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.style({
+              backgroundColor: "red",
+              display: null
+            })
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'setStyleRule("backgroundColor", "red")',
+      'removeStyleRule("display")'
+    ],
+    "set backgroundColor remove display"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.style({
+              color: "white",
+              backgroundColor: "red"
+            }),
+            DOMinion.style({
+              backgroundColor: "blue"
+            })
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'setStyleRule("color", "white")',
+      'setStyleRule("backgroundColor", "blue")'
+    ],
+    "color mix"
+  )
+})
+
+test("removeStyleRule", async test => {
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.style({
+              backgroundColor: "red",
+              position: null
+            })
+          ])
+        ]
+      ),
+      DOMinion.createHost([], [DOMinion.createElement("div")])
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'removeStyleRule("backgroundColor")'
+    ],
+    "remove backgroundColor"
+  )
+})
