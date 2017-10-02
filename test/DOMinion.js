@@ -1036,9 +1036,359 @@ test("removeAttributeNS", async test => {
   )
 })
 
-test("assignProperty", async test => {})
+test("assignProperty", async test => {
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("x", 50)])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'assignProperty("x", 50)'],
+    "assign number property"
+  )
 
-test("deleteProperty", async test => {})
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("x", 50)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("x", 50)])]
+      )
+    ),
+    [],
+    "proprety unchanged"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("x", 51)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("x", 50)])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'assignProperty("x", 50)'],
+    "proprety unchanged"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("isHidden", true)])]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'assignProperty("isHidden", true)'
+    ],
+    "set false expando property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("isHidden", false)])]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'assignProperty("isHidden", false)'
+    ],
+    "set true expando property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("isHidden", false)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("isHidden", true)])]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'assignProperty("isHidden", true)'
+    ],
+    "update boolean property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("isHidden", false)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("isHidden", null)])]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'assignProperty("isHidden", null)'
+    ],
+    "update boolean property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("isHidden", false)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("isHidden", "Yes")])]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'assignProperty("isHidden", "Yes")'
+    ],
+    "update boolean property to string"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "cat")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'assignProperty("value", "cat")'],
+    "set string expando property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "cat")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "cat")])]
+      )
+    ),
+    [],
+    "string properties match"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "cat")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "dog")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'assignProperty("value", "dog")'],
+    "override string property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "cat")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'assignProperty("value", "cat")'],
+    "set string expando property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'assignProperty("value", "")'],
+    "set empty string expando property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", null)])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'assignProperty("value", null)'],
+    "set null expando property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", null)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", null)])]
+      )
+    ),
+    [],
+    "same null property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", undefined)])]
+      )
+    ),
+    [],
+    "property with undefined as value is treated as delete property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div")]),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value")])]
+      )
+    ),
+    [],
+    "optional fallback value defaults to undefined"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", undefined)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value")])]
+      )
+    ),
+    [],
+    "no proprety values"
+  )
+})
+
+test("deleteProperty", async test => {
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("x", 50)])]
+      ),
+      DOMinion.createHost([], [DOMinion.createElement("div")])
+    ),
+    ["selectChildren()", "selectSibling(1)", 'deleteProperty("x")'],
+    "delete missing property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "what")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'deleteProperty("value")'],
+    "delete property with no value"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", "what")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'deleteProperty("value")'],
+    "delete property with no value"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", true)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", undefined)])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'deleteProperty("value")'],
+    "delete property with no value"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", null)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", undefined)])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'deleteProperty("value")'],
+    "delete null property"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value", null)])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.property("value")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'deleteProperty("value")'],
+    "delete null property"
+  )
+})
 
 test("setStyleRule", async test => {})
 
