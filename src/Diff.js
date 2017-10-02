@@ -744,7 +744,7 @@ const diffStyle = <x>(
 
   for (let name in last) {
     if (name !== "settingType") {
-      if (!(name in next)) {
+      if (!(name in next) && last[name] != null) {
         log = Diff.removeStyleRule(log, name)
       }
     }
@@ -753,9 +753,12 @@ const diffStyle = <x>(
   for (let name in next) {
     if (name != "settingType") {
       const value = next[name]
-      if (last[name] !== value) {
+      const lastValue = last[name]
+      if (lastValue !== value) {
         if (value == null) {
-          log = Diff.removeStyleRule(log, name)
+          if (lastValue != null) {
+            log = Diff.removeStyleRule(log, name)
+          }
         } else {
           log = Diff.setStyleRule(log, name, value)
         }
