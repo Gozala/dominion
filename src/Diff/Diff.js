@@ -102,6 +102,7 @@ export default class Diff<x> {
         break
       }
     }
+
     return Diff.updateNavigationLog(diff, navigationLog)
   }
   static selectSibling(diff: Diff<x>, offset: number): Diff<x> {
@@ -116,6 +117,7 @@ export default class Diff<x> {
     const { navigationLog } = diff
     const [level, index] =
       navigationLog.length === 0 ? [0, 0] : navigationLog[0]
+
     switch (level) {
       case -1: {
         navigationLog.unshift([-1, 0])
@@ -123,6 +125,7 @@ export default class Diff<x> {
       }
       case 0: {
         navigationLog.shift()
+        navigationLog.unshift([-1, 0])
         break
       }
       default: {
