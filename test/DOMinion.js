@@ -750,11 +750,291 @@ test("setAttribute", async test => {
   )
 })
 
-test("setAttributeNS", async test => {})
+test("setAttributeNS", async test => {
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      ),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      )
+    ),
+    [],
+    "attribute present in both versions"
+  )
 
-test("removeAttribute", async test => {})
+  test.deepEqual(
+    diff(
+      DOMinion.createHost([], [DOMinion.createElement("div", [])]),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'setAttributeNS("http://www.w3.org/2000/svg", "x", "50")'
+    ],
+    "attribute was added"
+  )
 
-test("removeAttributeNS", async test => {})
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      ),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "5")
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'setAttributeNS("http://www.w3.org/2000/svg", "x", "5")'
+    ],
+    "update attribute value"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/", "x", "50")
+          ])
+        ]
+      ),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'removeAttributeNS("http://www.w3.org/2000/", "x")',
+      'setAttributeNS("http://www.w3.org/2000/svg", "x", "50")'
+    ],
+    "namespaced attributes are different"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'removeAttribute("x")',
+      'setAttributeNS("http://www.w3.org/2000/svg", "x", "50")'
+    ],
+    "namespaced attributes are different"
+  )
+})
+
+test("removeAttribute", async test => {
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      ),
+      DOMinion.createHost([], [DOMinion.createElement("div", [])])
+    ),
+    ["selectChildren()", "selectSibling(1)", 'removeAttribute("x")'],
+    "attribute was added"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'setAttribute("x", "")'],
+    "if attribute value is omitted it's empty string"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", null)])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'removeAttribute("x")'],
+    "attribute value was null"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+      ),
+      DOMinion.createHost(
+        [],
+        [DOMinion.createElement("div", [DOMinion.setAttribute("x", "")])]
+      )
+    ),
+    ["selectChildren()", "selectSibling(1)", 'setAttribute("x", "")'],
+    "attribute value was ''"
+  )
+})
+
+test("removeAttributeNS", async test => {
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      ),
+      DOMinion.createHost([], [DOMinion.createElement("div", [])])
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'removeAttributeNS("http://www.w3.org/2000/svg", "x")'
+    ],
+    "attribute was added"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      ),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x")
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'setAttributeNS("http://www.w3.org/2000/svg", "x", "")'
+    ],
+    "if attribute value is omitted it's empty string"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      ),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", null)
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'removeAttributeNS("http://www.w3.org/2000/svg", "x")'
+    ],
+    "attribute value was null"
+  )
+
+  test.deepEqual(
+    diff(
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+          ])
+        ]
+      ),
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement("div", [
+            DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "")
+          ])
+        ]
+      )
+    ),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'setAttributeNS("http://www.w3.org/2000/svg", "x", "")'
+    ],
+    "attribute value was ''"
+  )
+})
 
 test("assignProperty", async test => {})
 
