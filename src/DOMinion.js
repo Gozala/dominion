@@ -236,13 +236,13 @@ class ThunkNode<message, params: Array<mixed>>
   }
 }
 
-export const setAttribute = (name: string, value: ?string = null): Attribute =>
+export const setAttribute = (name: string, value: ?string = ""): Attribute =>
   new AttributeSetting(null, name, value == null ? null : value)
 
 export const setAttributeNS = (
   namespaceURI: string,
   name: string,
-  value: ?string = null
+  value: ?string = ""
 ): Attribute =>
   new AttributeSetting(namespaceURI, name, value == null ? null : value)
 
