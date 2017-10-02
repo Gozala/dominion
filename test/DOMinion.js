@@ -1499,3 +1499,198 @@ test("removeStyleRule", async test => {
     "remove backgroundColor"
   )
 })
+
+test("nested children", async test => {
+  const v1 = DOMinion.createHost()
+  const v2 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement(
+        "div",
+        [
+          DOMinion.setAttribute("id", "main"),
+          DOMinion.property("autofocus", true),
+          DOMinion.style({
+            backgroundColor: "blue",
+            color: "white"
+          })
+        ],
+        [
+          DOMinion.createTextNode("hi there"),
+          DOMinion.createComment("this is"),
+          DOMinion.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle",
+            [
+              DOMinion.setAttribute("cx", "40"),
+              DOMinion.setAttribute("cy", "50"),
+              DOMinion.setAttribute("r", "26")
+            ],
+            [
+              DOMinion.createElement(
+                "span",
+                [],
+                [DOMinion.createTextNode("what's up ?")]
+              )
+            ]
+          )
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v1, v2),
+    [
+      "selectChildren()",
+      'insertElement("div")',
+      "selectSibling(1)",
+      'assignProperty("autofocus", true)',
+      'setAttribute("id", "main")',
+      'setStyleRule("backgroundColor", "blue")',
+      'setStyleRule("color", "white")',
+      "selectChildren()",
+      'insertText("hi there")',
+      "selectSibling(1)",
+      'insertComment("this is")',
+      "selectSibling(1)",
+      'insertElementNS("http://www.w3.org/2000/svg", "circle")',
+      "selectSibling(1)",
+      'setAttribute("cx", "40")',
+      'setAttribute("cy", "50")',
+      'setAttribute("r", "26")',
+      "selectChildren()",
+      'insertElement("span")',
+      "selectSibling(1)",
+      "selectChildren()",
+      `insertText("what's up ?")`
+    ],
+    "initial tree"
+  )
+
+  const v3 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement(
+        "div",
+        [
+          DOMinion.setAttribute("id", "main"),
+          DOMinion.property("autofocus", true),
+          DOMinion.style({
+            backgroundColor: "blue",
+            color: "white"
+          })
+        ],
+        [
+          DOMinion.createTextNode("hi there"),
+          DOMinion.createComment("this is"),
+          DOMinion.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle",
+            [
+              DOMinion.setAttribute("cx", "40"),
+              DOMinion.setAttribute("cy", "50"),
+              DOMinion.setAttribute("r", "26")
+            ],
+            [
+              DOMinion.createElement(
+                "span",
+                [],
+                [DOMinion.createTextNode("bye")]
+              )
+            ]
+          )
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v2, v3),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(3)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      'setTextData("bye")'
+    ],
+    "nested text update"
+  )
+
+  const v4 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement(
+        "div",
+        [
+          DOMinion.setAttribute("id", "main"),
+          DOMinion.property("autofocus", true),
+          DOMinion.style({
+            backgroundColor: "blue",
+            color: "white"
+          })
+        ],
+        [DOMinion.createTextNode("hi there")]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v3, v4),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "removeNextSibling()",
+      "removeNextSibling()"
+    ],
+    "some children got removed"
+  )
+
+  const v5 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement(
+        "div",
+        [
+          DOMinion.setAttribute("id", "main"),
+          DOMinion.property("autofocus", true),
+          DOMinion.style({
+            backgroundColor: "blue",
+            color: "white"
+          })
+        ],
+        [
+          DOMinion.createElement(
+            "h1",
+            [DOMinion.setAttribute("class", "title")],
+            [DOMinion.createTextNode("Example")]
+          ),
+          DOMinion.createElement("p")
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v4, v5),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      'replaceWithElement("h1")',
+      'setAttribute("class", "title")',
+      "selectChildren()",
+      'insertText("Example")',
+      "selectParent()",
+      'insertElement("p")'
+    ],
+    "replace child and add one"
+  )
+})
