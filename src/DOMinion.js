@@ -179,7 +179,7 @@ const setSetting = <message>(
     case settingType.style: {
       element.style =
         element.style === blank
-          ? setting
+          ? Object.assign((Object.create(null): Object), setting)
           : Object.assign((element.style: Object), setting)
       return element
     }
