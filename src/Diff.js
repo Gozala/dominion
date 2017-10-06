@@ -624,7 +624,6 @@ const diffIndexedChildren = <a, x>(
         nextIndex += 1
       }
     }
-    return log
   }
 
   // Finally remove things from the register. It would be nice if we could avoid

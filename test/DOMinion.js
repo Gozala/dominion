@@ -1735,3 +1735,37 @@ test("nested children", async test => {
     "change property, remove child's attribute, insert grand grand child"
   )
 })
+
+test("indexed element", async test => {
+  const v1 = DOMinion.createHost()
+  const v2 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v1, v2),
+    [
+      "selectChildren()",
+      'insertElement("ul")',
+      "selectSibling(1)",
+      "selectChildren()",
+      'insertElement("li")',
+      "selectSibling(1)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      'insertElement("li")'
+    ],
+    "tree is created"
+  )
+})
