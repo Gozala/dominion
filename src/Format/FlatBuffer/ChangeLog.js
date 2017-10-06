@@ -80,11 +80,9 @@ class Codec {
   Table = ChangeLog
   decode<x>(table: ChangeLog, changeLog: Encoder<x>, buffer: x): Log.Result<x> {
     const count = table.logLength()
-    console.log(`Decode: ChangeLog contains ${count} changes`)
 
     let index = 0
     while (index < count) {
-      console.log(`Decode: log[${index}]`)
       const change = table.log(index, changePool)
       if (change == null) {
         console.error(`Decode: Change is null log[${index}]`)

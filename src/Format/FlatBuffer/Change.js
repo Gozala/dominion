@@ -101,12 +101,10 @@ export class Codec {
     if (variant == null) {
       return new UnknownOpType(type)
     } else {
-      console.log(`Decode: Decode op as ${variant.constructor.name}`)
       const op = change.op(variant)
       if (op == null) {
         return new OpError(variant.constructor.name)
       }
-      console.log(`Decode: op ${op.constructor.name}`)
       return op.decode(changeLog, buffer)
     }
   }

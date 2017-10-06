@@ -504,8 +504,6 @@ export class SetStyleRule extends FBS.SetStyleRule {
     return SetStyleRule.endSetStyleRule(builder)
   }
   decode<x>(changeLog: Encoder<x>, buffer: x): x | FieldError {
-    console.log(`Decode: SetStyleRule`)
-
     const name = this.name()
     if (name == null) {
       return new FieldError("name", "SetStyleRule")

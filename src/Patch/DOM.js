@@ -126,7 +126,6 @@ export default class DOMPatch {
   }
 
   static selectChildren(state: DOMPatch): DOMPatch {
-    console.log(`Patch: Select children`)
     if (state.childrenSelected) {
       throw Error(
         "Inavlid state: Unable to select children as they are already selected"
@@ -137,7 +136,6 @@ export default class DOMPatch {
     }
   }
   static selectSibling(state: DOMPatch, offset: number): DOMPatch {
-    console.log(`Patch: select sibling ${offset}`)
     const { target, childrenSelected } = state
     let select = null
     if (childrenSelected) {
@@ -161,7 +159,6 @@ export default class DOMPatch {
     }
   }
   static selectParent(state: DOMPatch): DOMPatch {
-    console.log("select parent")
     if (state.childrenSelected) {
       state.childrenSelected = false
       return state
@@ -176,7 +173,6 @@ export default class DOMPatch {
     }
   }
   static removeNextSibling(state: DOMPatch): DOMPatch {
-    console.log("remove next sibling")
     const next = state.childrenSelected
       ? state.target.firstChild
       : state.target.nextSibling
@@ -190,7 +186,6 @@ export default class DOMPatch {
   }
 
   static insertText(state: DOMPatch, data: string): DOMPatch {
-    console.log("insert text", data)
     insertNode(
       state.target,
       state.childrenSelected,
@@ -199,7 +194,6 @@ export default class DOMPatch {
     return state
   }
   static insertComment(state: DOMPatch, data: string): DOMPatch {
-    console.log("insert comment", data)
     insertNode(
       state.target,
       state.childrenSelected,
@@ -208,7 +202,6 @@ export default class DOMPatch {
     return state
   }
   static insertElement(state: DOMPatch, localName: string): DOMPatch {
-    console.log(`insert element <${localName}/>`)
     insertNode(
       state.target,
       state.childrenSelected,
@@ -301,13 +294,11 @@ export default class DOMPatch {
     return state
   }
   static setAttribute(state: DOMPatch, name: string, value: string): DOMPatch {
-    console.log(`Patch: Set attribute ${name}="${value}"`)
     const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.setAttribute(name, value)
     return state
   }
   static removeAttribute(state: DOMPatch, name: string): DOMPatch {
-    console.log(`Patch: Remove attribute ${name}`)
     const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.removeAttribute(name)
     return state
@@ -318,7 +309,6 @@ export default class DOMPatch {
     name: string,
     value: string
   ): DOMPatch {
-    console.log(`Patch: Set attribute NS ${namespaceURI} ${name}="${value}"`)
     const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.setAttributeNS(namespaceURI, name, value)
     return state
@@ -328,7 +318,6 @@ export default class DOMPatch {
     namespaceURI: string,
     name: string
   ): DOMPatch {
-    console.log(`Patch: Remove attribute NS ${namespaceURI} ${name}`)
     const node = getUpdateTargetElement(state.childrenSelected, state.target)
     node.removeAttributeNS(namespaceURI, name)
     return state
@@ -338,7 +327,6 @@ export default class DOMPatch {
     name: string,
     value: string | number | boolean | null
   ): DOMPatch {
-    console.log(`Patch: Assign property ${name}=${JSON.stringify(value)}`)
     const node: Object = getUpdateTargetElement(
       state.childrenSelected,
       state.target
@@ -347,7 +335,6 @@ export default class DOMPatch {
     return state
   }
   static deleteProperty(state: DOMPatch, name: string): DOMPatch {
-    console.log(`Patch: Delete property ${name}`)
     const node: Object = getUpdateTargetElement(
       state.childrenSelected,
       state.target
@@ -356,13 +343,11 @@ export default class DOMPatch {
     return state
   }
   static setStyleRule(state: DOMPatch, name: string, value: string) {
-    console.log(`Patch: Style style.${name}="${value}"`)
     const style = getTargetStyle(state.childrenSelected, state.target)
     style[(name: any)] = value
     return state
   }
   static removeStyleRule(state: DOMPatch, name: string) {
-    console.log(`Patch: Remove style rule ${name}`)
     const style = getTargetStyle(state.childrenSelected, state.target)
     delete style[(name: any)]
     return state
