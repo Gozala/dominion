@@ -1693,4 +1693,45 @@ test("nested children", async test => {
     ],
     "replace child and add one"
   )
+
+  const v6 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement(
+        "div",
+        [
+          DOMinion.setAttribute("id", "main"),
+          DOMinion.property("autofocus", false),
+          DOMinion.style({
+            backgroundColor: "blue",
+            color: "white"
+          })
+        ],
+        [
+          DOMinion.createElement(
+            "h1",
+            [],
+            [DOMinion.createTextNode("Example")]
+          ),
+          DOMinion.createElement("p", [], [DOMinion.createTextNode("Hi")])
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v5, v6),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'assignProperty("autofocus", false)',
+      "selectChildren()",
+      "selectSibling(1)",
+      'removeAttribute("class")',
+      "selectSibling(1)",
+      "selectChildren()",
+      'insertText("Hi")'
+    ],
+    "change property, remove child's attribute, insert grand grand child"
+  )
 })
