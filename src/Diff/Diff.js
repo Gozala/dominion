@@ -274,7 +274,9 @@ export default class Diff<x> {
     )
   }
   static discardStashedNode(diff: Diff<x>, address: number): Diff<x> {
-    const { changeLog, buffer } = Diff.navigate(diff)
+    // We don't do not encode navigation as it's not really necessary to discard
+    // nodes.
+    const { changeLog, buffer } = diff
     return Diff.update(diff, changeLog.discardStashedNode(buffer, address))
   }
 }
