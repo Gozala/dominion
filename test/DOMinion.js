@@ -1736,7 +1736,7 @@ test("nested children", async test => {
   )
 })
 
-test("indexed element", async test => {
+test("indexed element ordering", async test => {
   const v1 = DOMinion.createHost()
   const v2 = DOMinion.createHost(
     [],
@@ -1766,6 +1766,1091 @@ test("indexed element", async test => {
       "selectSibling(1)",
       'insertElement("li")'
     ],
-    "tree is created"
+    "[] -> [a, b, c]"
+  )
+
+  const v3 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["b", DOMinion.createElement("li")],
+          ["a", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v2, v3),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "selectSibling(1)",
+      "stashNextSibling(2)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)"
+    ],
+    "[a, b, c] -> [b, a, c]"
+  )
+
+  const v4 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["c", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["a", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v2, v4),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "selectSibling(1)",
+      "insertStashedNode(2)",
+      "selectSibling(1)",
+      "insertStashedNode(1)"
+    ],
+    "[a, b, c] -> [c, b, a]"
+  )
+
+  test.deepEqual(
+    diff(v3, v4),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)"
+    ],
+    "[b, a, c] -> [c, b, a]"
+  )
+
+  const v5 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["a", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v2, v5),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "selectSibling(2)",
+      "insertStashedNode(1)"
+    ],
+    "[a, b, c] -> [b, c, a]"
+  )
+
+  test.deepEqual(
+    diff(v3, v5),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "selectSibling(1)",
+      "insertStashedNode(1)"
+    ],
+    "[b, a, c] -> [b, c, a]"
+  )
+
+  test.deepEqual(
+    diff(v4, v5),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "selectSibling(1)",
+      "stashNextSibling(2)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)"
+    ],
+    "[c, b, a] -> [b, c, a]"
+  )
+
+  const v6 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(v2, v6),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "selectSibling(1)",
+      "insertStashedNode(1)"
+    ],
+    "[a, b, c] -> [a, c, b]"
+  )
+
+  test.deepEqual(
+    diff(v3, v6),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "selectSibling(2)",
+      "insertStashedNode(1)"
+    ],
+    "[b, a, c] -> [a, c, b]"
+  )
+
+  test.deepEqual(
+    diff(v4, v6),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)"
+    ],
+    "[c, b, a] -> [a, c, b]"
+  )
+
+  test.deepEqual(
+    diff(v5, v6),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "selectSibling(1)",
+      "insertStashedNode(2)",
+      "selectSibling(1)",
+      "insertStashedNode(1)"
+    ],
+    "[b, c, a] -> [a, c, b]"
+  )
+})
+
+test("indexed element random insert", async test => {
+  const abc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  const abcX = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["X", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, abcX),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(3)",
+      'insertElement("li")'
+    ],
+    "[a, b, c] -> [a, b, c, X]"
+  )
+
+  const Xabc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["X", DOMinion.createElement("li")],
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, Xabc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)",
+      "selectSibling(1)",
+      "insertStashedNode(3)"
+    ],
+    "[a, b, c] -> [X, a, b, c]"
+  )
+
+  const aXbc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["X", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, aXbc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)"
+    ],
+    "[a, b, c] -> [a, X, b, c]"
+  )
+
+  const abXc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["X", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, abXc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(2)",
+      "stashNextSibling(1)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)"
+    ],
+    "[a, b, c] -> [a, b, X, c]"
+  )
+
+  const abcXY = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["X", DOMinion.createElement("li")],
+          ["Y", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, abcXY),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(3)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      'insertElement("li")'
+    ],
+    "[a, b, c] -> [a, b, c, X, Y]"
+  )
+
+  const abXcY = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["X", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["Y", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, abXcY),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(2)",
+      "stashNextSibling(1)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      'insertElement("li")'
+    ],
+    "[a, b, c] -> [a, b, X, c, Y]"
+  )
+
+  const aXbcY = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["X", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["Y", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, aXbcY),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)",
+      "selectSibling(1)",
+      'insertElement("li")'
+    ],
+    "[a, b, c] -> [a, X, b, c, Y]"
+  )
+
+  const XabcY = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["X", DOMinion.createElement("li")],
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["Y", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, XabcY),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)",
+      "selectSibling(1)",
+      "insertStashedNode(3)",
+      "selectSibling(1)",
+      'insertElement("li")'
+    ],
+    "[a, b, c] -> [X, a, b, c, Y]"
+  )
+
+  const XabYc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["X", DOMinion.createElement("li")],
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["Y", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, XabYc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)",
+      "selectSibling(1)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(3)"
+    ],
+    "[a, b, c] -> [X, a, b, Y, c]"
+  )
+
+  const XaYbc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["X", DOMinion.createElement("li")],
+          ["a", DOMinion.createElement("li")],
+          ["Y", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, XaYbc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(2)",
+      "selectSibling(1)",
+      "insertStashedNode(3)"
+    ],
+    "[a, b, c] -> [X, a, Y, b, c]"
+  )
+
+  const XYabc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["X", DOMinion.createElement("li")],
+          ["Y", DOMinion.createElement("li")],
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, XYabc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      "insertStashedNode(2)",
+      "selectSibling(1)",
+      "insertStashedNode(3)"
+    ],
+    "[a, b, c] -> [X, Y, a, b, c]"
+  )
+
+  const aXbYc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["X", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["Y", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abc, aXbYc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(1)",
+      "selectSibling(1)",
+      'insertElement("li")',
+      "selectSibling(1)",
+      "insertStashedNode(2)"
+    ],
+    "[a, b, c] -> [a, X, b, Y, c]"
+  )
+})
+
+test("indexed element random delete", async test => {
+  const abcd = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["d", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  const abc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, abc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(3)",
+      "stashNextSibling(1)",
+      "discardStashedNode(1)"
+    ],
+    "[a, b, c, d] -> [a, b, c]"
+  )
+
+  const abd = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["d", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, abd),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(2)",
+      "stashNextSibling(1)",
+      "discardStashedNode(1)"
+    ],
+    "[a, b, c, d] -> [a, b, d]"
+  )
+
+  const acd = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["d", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, acd),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "discardStashedNode(1)"
+    ],
+    "[a, b, c, d] -> [a, b, d]"
+  )
+
+  const bcd = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["d", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, bcd),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "discardStashedNode(1)"
+    ],
+    "[a, b, c, d] -> [b, c, d]"
+  )
+
+  const ab = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, ab),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(2)",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)"
+    ],
+    "[a, b, c, d] -> [a, b]"
+  )
+
+  const ac = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, ac),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "selectSibling(1)",
+      "stashNextSibling(2)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)"
+    ],
+    "[a, b, c, d] -> [a, c]"
+  )
+
+  const ad = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["d", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, ad),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)"
+    ],
+    "[a, b, c, d] -> [a, d]"
+  )
+
+  const bd = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["b", DOMinion.createElement("li")],
+          ["d", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, bd),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "selectSibling(1)",
+      "stashNextSibling(2)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)"
+    ],
+    "[a, b, c, d] -> [b, d]"
+  )
+
+  const bc = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["b", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, bc),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "selectSibling(2)",
+      "stashNextSibling(2)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)"
+    ],
+    "[a, b, c, d] -> [b, c]"
+  )
+
+  const cd = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["c", DOMinion.createElement("li")],
+          ["d", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, cd),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)"
+    ],
+    "[a, b, c, d] -> [c, d]"
+  )
+
+  const a = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [["a", DOMinion.createElement("li")]]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, a),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(1)",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)",
+      "discardStashedNode(3)"
+    ],
+    "[a, b, c, d] -> [a]"
+  )
+
+  const b = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [["b", DOMinion.createElement("li")]]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, b),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "selectSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)",
+      "discardStashedNode(3)"
+    ],
+    "[a, b, c, d] -> [b]"
+  )
+
+  const c = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [["c", DOMinion.createElement("li")]]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, c),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "selectSibling(1)",
+      "stashNextSibling(3)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)",
+      "discardStashedNode(3)"
+    ],
+    "[a, b, c, d] -> [c]"
+  )
+
+  const d = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [["d", DOMinion.createElement("li")]]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abcd, d),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)",
+      "discardStashedNode(3)"
+    ],
+    "[a, b, c, d] -> [d]"
+  )
+
+  const _ = DOMinion.createHost([], [DOMinion.createIndexedElement("ul")])
+
+  test.deepEqual(
+    diff(abcd, _),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "stashNextSibling(1)",
+      "stashNextSibling(2)",
+      "stashNextSibling(3)",
+      "stashNextSibling(4)",
+      "discardStashedNode(1)",
+      "discardStashedNode(2)",
+      "discardStashedNode(3)",
+      "discardStashedNode(4)"
+    ],
+    "[a, b, c, d] -> []"
   )
 })
