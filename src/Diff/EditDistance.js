@@ -1,10 +1,12 @@
 // @flow
 
-import { empty, singleton, type List } from "./List"
+import { empty, singleton, type List } from "../List"
 import unreachable from "unreachable"
 
 export const Retain = "Retain"
 export const Delete = "Delete"
+
+type $Array<a> = Array<[a]>
 
 type Edit<a> = a | typeof Retain | typeof Delete
 
@@ -60,7 +62,7 @@ const get = <a>(table: EditTable<a>, x: number, y: number): Cell<a> => {
   }
 }
 
-const makeEditsTable = <a>(last: Array<a>, next: Array<a>): EditTable<a> => {
+const makeEditsTable = <a>(last: $Array<a>, next: $Array<a>): EditTable<a> => {
   var table = {},
     n = last.length,
     m = next.length,
@@ -70,13 +72,13 @@ const makeEditsTable = <a>(last: Array<a>, next: Array<a>): EditTable<a> => {
   put(table, 0, 0, new Cell(empty()))
 
   for (i = 1; i <= m; i += 1) {
-    console.log(`${i}.0=[+${next[i - 1]} ...${i - 1}.0]`)
-    put(table, i, 0, get(table, i - 1, 0).insert(next[i - 1]))
+    // console.log(`${i}.0=[+${next[i - 1]} ...${i - 1}.0]`)
+    put(table, i, 0, get(table, i - 1, 0).insert(next[i - 1][0]))
   }
 
   for (j = 1; j <= n; j += 1) {
-    console.log(`0.${j}=[-${last[j - 1]} ...${0}.${j - 1}]`)
-    put(table, 0, j, get(table, 0, j - 1).delete(last[j - 1]))
+    // console.log(`0.${j}=[-${last[j - 1]} ...${0}.${j - 1}]`)
+    put(table, 0, j, get(table, 0, j - 1).delete(last[j - 1][0]))
   }
 
   return table
@@ -88,14 +90,14 @@ const chooseCell = <a>(
   table: EditTable<a>,
   x: number,
   y: number,
-  last: Array<a>,
-  next: Array<a>,
+  last: $Array<a>,
+  next: $Array<a>,
   edit: <a>(
     Direction,
     EditTable<a>,
     Cell<a>,
-    Array<a>,
-    Array<a>
+    $Array<a>,
+    $Array<a>
   ) => EditTable<a>
 ): EditTable<a> => {
   var edits = get(table, x, y - 1),
@@ -123,7 +125,10 @@ const chooseCell = <a>(
 
 // Constructor for operations (which are a stream of edits). Uses
 // variation of Levenshtein Distance.
-export const editDistance = <a>(last: Array<a>, next: Array<a>): Edit<a>[] => {
+export const editDistance = <a>(
+  last: $Array<a>,
+  next: $Array<a>
+): Edit<a>[] => {
   let n = last.length,
     m = next.length,
     i,
@@ -143,26 +148,26 @@ export const editDistance = <a>(last: Array<a>, next: Array<a>): Edit<a>[] => {
           direction: Direction,
           table: EditTable<a>,
           edits: Cell<a>,
-          last: a[],
-          next: a[]
+          last: $Array<a>,
+          next: $Array<a>
         ): EditTable<a> => {
           console.log(direction)
           switch (direction) {
             case "Left": {
-              return put(table, i, j, edits.insert(next[i - 1]))
+              return put(table, i, j, edits.insert(next[i - 1][0]))
             }
             case "Up": {
-              return put(table, i, j, edits.delete(last[j - 1]))
+              return put(table, i, j, edits.delete(last[j - 1][0]))
             }
             case "Diagonal": {
               if (last[j - 1] === next[i - 1]) {
-                return put(table, i, j, edits.retain(last[j - 1]))
+                return put(table, i, j, edits.retain(last[j - 1][0]))
               } else {
                 return put(
                   table,
                   i,
                   j,
-                  edits.delete(last[j - 1]).insert(next[i - 1])
+                  edits.delete(last[j - 1][0]).insert(next[i - 1][0])
                 )
               }
             }
@@ -179,61 +184,10 @@ export const editDistance = <a>(last: Array<a>, next: Array<a>): Edit<a>[] => {
     .reverse()
 }
 
-export const diff = <a>(last: Array<a>, next: Array<a>): Object[] => {
-  const edits = editDistance(last, next)
-  const moves = {}
-  const ops = []
-
-  let index = 0
-  for (let edit of edits) {
-    switch (edit) {
-      case Delete: {
-        const key = String(last[index])
-        const op = moves[key]
-        if (op == null) {
-          const op = { kind: "removeNextSibling()", index, key: key }
-          ops.push(op)
-          moves[key] = op
-          index++
-        } else {
-          op.kind = `shiftSiblings(${index - op.index - 1})`
-          op.n = index - op.index - 1
-          index++
-        }
-        break
-      }
-      case Retain: {
-        const key = String(last[index])
-        const op = { kind: "selectSibling(1)", key }
-        ops.push(op)
-        index++
-        break
-      }
-      default: {
-        const key = String(edit)
-        const op = moves[key]
-        if (op == null) {
-          const op = { kind: `insertNode(${key})`, key, index }
-          moves[key] = op
-          ops.push(op)
-          index++
-        } else {
-          op.kind = `stashNextSibling()`
-          ops.push({ kind: "insertStashed()", key, index })
-          index++
-        }
-        break
-      }
-    }
-  }
-
-  return ops
-}
-
 // const edits = diff(["a", "b", "c"], ["b", "c", "a"])
 // edits
 
-editDistance(["a", "b", "c"], ["b", "c", "a"]) //?
+editDistance([["a"], ["b"], ["c"]], [["b"], ["c"], ["a"]]) //?
 // a b c d e f
 // b c d e f a
 
