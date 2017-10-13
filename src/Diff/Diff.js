@@ -265,7 +265,19 @@ export default class Diff<x> {
     const { changeLog, buffer } = Diff.navigate(diff)
     return Diff.update(diff, changeLog.removeStyleRule(buffer, name))
   }
-
+  static shiftSiblings(diff: Diff<x>, n: number): Diff<x> {
+    if (n > 0) {
+      // TODO: Create an OP for this instead of using stashing
+      const address = diff.address
+      diff = Diff.selectSibling(diff, n)
+      diff = Diff.stashNextSibling(diff, address)
+      diff = Diff.selectSibling(diff, -n)
+      diff = Diff.insertStashedNode(diff, address)
+      return diff
+    } else {
+      return diff
+    }
+  }
   static stashNextSibling(diff: Diff<x>, address: number): Diff<x> {
     const next = Diff.navigate(Diff.updateAddress(diff, address + 1))
     return Diff.update(

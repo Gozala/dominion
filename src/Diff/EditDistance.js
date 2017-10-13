@@ -6,190 +6,172 @@ import unreachable from "unreachable"
 export const Retain = "Retain"
 export const Delete = "Delete"
 
-type $Array<a> = Array<[a]>
-
 type Edit<a> = a | typeof Retain | typeof Delete
 
 // We don't want to copy arrays all the time, aren't mutating lists, and
 // only need O(1) prepend and length, we can get away with a custom singly
 // linked list implementation.
 
-// TODO: keep track of number of non-retain edits and use this instead of
-// length when choosing which path to take.
-
 // Abstract out the table in case I want to edit the implementation to
 // arrays of arrays or something.
 
-type EditTable<a> = { [string]: Cell<a> }
+export class Table<a> {
+  cells: { [string]: Cell<a> }
+  last: { [string]: number }
+  next: { [string]: a }
+  constructor() {
+    this.cells = (Object.create(null): Object)
+    this.last = (Object.create(null): Object)
+    this.next = (Object.create(null): Object)
+  }
+  static init(last: Array<[string, a]>, next: Array<[string, a]>): Table<a> {
+    const table = new this()
+    let n = last.length
+    let m = next.length
+    let i = 0
+    let j = 0
+
+    table.put(i, j, new Cell(empty()))
+
+    for (i = 1; i <= m; i += 1) {
+      const [key, node] = next[i - 1]
+      table.next[key] = node
+      table.put(i, 0, table.get(i - 1, 0).insert(key))
+    }
+
+    for (j = 1; j <= n; j += 1) {
+      const [key, node] = last[j - 1]
+      table.last[key] = j - 1
+      table.put(0, j, table.get(0, j - 1).delete(key))
+    }
+
+    return table
+  }
+  static create(last: Array<[string, a]>, next: Array<[string, a]>): Table<a> {
+    const n = last.length
+    const m = next.length
+
+    let table = Table.init(last, next)
+    let i = 0
+    let j = 0
+
+    for (i = 1; i <= m; i += 1) {
+      for (j = 1; j <= n; j += 1) {
+        table = chooseCell(
+          table,
+          i,
+          j,
+          last,
+          next,
+          <a>(
+            direction: Direction,
+            table: Table<a>,
+            edits: Cell<a>,
+            last: Array<[string, a]>,
+            next: Array<[string, a]>
+          ): Table<a> => {
+            switch (direction) {
+              case "Left": {
+                return table.put(i, j, edits.insert(next[i - 1][0]))
+              }
+              case "Up": {
+                return table.put(i, j, edits.delete(last[j - 1][0]))
+              }
+              case "Diagonal": {
+                if (last[j - 1][0] === next[i - 1][0]) {
+                  return table.put(i, j, edits.retain(last[j - 1][0]))
+                } else {
+                  return table.put(
+                    i,
+                    j,
+                    edits.delete(last[j - 1][0]).insert(next[i - 1][0])
+                  )
+                }
+              }
+              default:
+                return unreachable(direction)
+            }
+          }
+        )
+      }
+    }
+
+    return table
+  }
+  put(x: number, y: number, cell: Cell<a>): Table<a> {
+    this.cells[`${x},${y}`] = cell
+    return this
+  }
+  get(x: number, y: number): Cell<a> {
+    const cell = this.cells[`${x},${y}`]
+    if (cell) {
+      return cell
+    } else {
+      return (this.cells[`${x},${y}`] = new Cell(empty()))
+    }
+  }
+}
 
 class Cell<a> {
-  edits: List<Edit<a>>
+  edits: List<Edit<string>>
   length: number
-  deleted: { [string]: a }
-  constructor(edits: List<Edit<a>>) {
+  constructor(edits: List<Edit<string>>) {
     this.edits = edits
     this.length = edits.length
   }
-  insert(node: a): Cell<a> {
-    return new Cell(this.edits.push(node))
+  insert(key: string): Cell<a> {
+    return new Cell(this.edits.push(key))
   }
-  delete(node: a): Cell<a> {
+  delete(key: string): Cell<a> {
     return new Cell(this.edits.push(Delete))
   }
-  retain(node: a): Cell<a> {
+  retain(key: string): Cell<a> {
     const { edits } = this
     return new Cell(edits.push(Retain))
   }
-}
-
-const put = <a>(
-  table: EditTable<a>,
-  x: number,
-  y: number,
-  edits: Cell<a>
-): EditTable<a> => {
-  console.log(`put(${x},${y},@${edits.length})`)
-  return (table[`${x},${y}`] = edits), table
-}
-
-const get = <a>(table: EditTable<a>, x: number, y: number): Cell<a> => {
-  console.log(`get(${x},${y}, @${table[`${x},${y}`].length})`)
-  const edits = table[`${x},${y}`]
-  if (edits) {
-    return edits
-  } else {
-    return (table[`${x},${y}`] = new Cell(empty()))
+  toArray(): Edit<string>[] {
+    return this.edits.toArray().reverse()
   }
-}
-
-const makeEditsTable = <a>(last: $Array<a>, next: $Array<a>): EditTable<a> => {
-  var table = {},
-    n = last.length,
-    m = next.length,
-    i,
-    j
-
-  put(table, 0, 0, new Cell(empty()))
-
-  for (i = 1; i <= m; i += 1) {
-    // console.log(`${i}.0=[+${next[i - 1]} ...${i - 1}.0]`)
-    put(table, i, 0, get(table, i - 1, 0).insert(next[i - 1][0]))
-  }
-
-  for (j = 1; j <= n; j += 1) {
-    // console.log(`0.${j}=[-${last[j - 1]} ...${0}.${j - 1}]`)
-    put(table, 0, j, get(table, 0, j - 1).delete(last[j - 1][0]))
-  }
-
-  return table
 }
 
 type Direction = "Up" | "Left" | "Diagonal"
 
 const chooseCell = <a>(
-  table: EditTable<a>,
+  table: Table<a>,
   x: number,
   y: number,
-  last: $Array<a>,
-  next: $Array<a>,
+  last: Array<[string, a]>,
+  next: Array<[string, a]>,
   edit: <a>(
     Direction,
-    EditTable<a>,
+    Table<a>,
     Cell<a>,
-    $Array<a>,
-    $Array<a>
-  ) => EditTable<a>
-): EditTable<a> => {
-  var edits = get(table, x, y - 1),
-    min = edits.length,
-    direction: Direction = "Up"
-  console.log(`${x}.${y - 1}:${min}`)
+    Array<[string, a]>,
+    Array<[string, a]>
+  ) => Table<a>
+): Table<a> => {
+  let edits = table.get(x, y - 1)
+  let min = edits.length
+  let direction: Direction = "Up"
 
-  if (get(table, x - 1, y).length < min) {
-    console.log("LEFT")
-    edits = get(table, x - 1, y)
+  if (table.get(x - 1, y).length < min) {
+    edits = table.get(x - 1, y)
     min = edits.length
     direction = "Left"
   }
 
-  if (get(table, x - 1, y - 1).length < min) {
-    console.log("Diagonal")
-    edits = get(table, x - 1, y - 1)
+  if (table.get(x - 1, y - 1).length < min) {
+    edits = table.get(x - 1, y - 1)
     min = edits.length
     direction = "Diagonal"
   }
 
-  console.log(direction)
   return edit(direction, table, edits, last, next)
 }
 
 // Constructor for operations (which are a stream of edits). Uses
 // variation of Levenshtein Distance.
 export const editDistance = <a>(
-  last: $Array<a>,
-  next: $Array<a>
-): Edit<a>[] => {
-  let n = last.length,
-    m = next.length,
-    i,
-    j,
-    table = makeEditsTable(last, next)
-
-  for (i = 1; i <= m; i += 1) {
-    for (j = 1; j <= n; j += 1) {
-      console.log(`${i}.${j}`)
-      table = chooseCell(
-        table,
-        i,
-        j,
-        last,
-        next,
-        <a>(
-          direction: Direction,
-          table: EditTable<a>,
-          edits: Cell<a>,
-          last: $Array<a>,
-          next: $Array<a>
-        ): EditTable<a> => {
-          console.log(direction)
-          switch (direction) {
-            case "Left": {
-              return put(table, i, j, edits.insert(next[i - 1][0]))
-            }
-            case "Up": {
-              return put(table, i, j, edits.delete(last[j - 1][0]))
-            }
-            case "Diagonal": {
-              if (last[j - 1] === next[i - 1]) {
-                return put(table, i, j, edits.retain(last[j - 1][0]))
-              } else {
-                return put(
-                  table,
-                  i,
-                  j,
-                  edits.delete(last[j - 1][0]).insert(next[i - 1][0])
-                )
-              }
-            }
-            default:
-              return unreachable(direction)
-          }
-        }
-      )
-    }
-  }
-
-  return get(table, m, n)
-    .edits.toArray()
-    .reverse()
-}
-
-// const edits = diff(["a", "b", "c"], ["b", "c", "a"])
-// edits
-
-editDistance([["a"], ["b"], ["c"]], [["b"], ["c"], ["a"]]) //?
-// a b c d e f
-// b c d e f a
-
-// a b c d e f
-// x a b c d e f
+  last: Array<[string, a]>,
+  next: Array<[string, a]>
+): Cell<a> => Table.create(last, next).get(next.length, last.length)

@@ -23,6 +23,7 @@ import type { Encoder, ChangeList, Result } from "./Log"
 import { nodeType } from "./DOM/Node"
 import Diff from "./Diff/Diff"
 import unreachable from "unreachable"
+import { Table, Retain, Delete } from "./Diff/EditDistance"
 
 const empty: Array<any> = Object.freeze([])
 const blank: Object = Object.freeze(Object.create(null))
@@ -560,89 +561,171 @@ const diffIndexedFragment = <a, x>(
   log: Diff<x>
 ): Diff<x> => diffIndexedChildren(last.children, next.children, log)
 
+const push = <a>(x: a, xs: ?(a[])): a[] => {
+  if (xs != null) {
+    xs.push(x)
+    return xs
+  } else {
+    return [x]
+  }
+}
+
+type Insert<a> = { kind: "insert", node: Node<a> }
+type DiffStash<a> = { kind: "diff", last: Node<a>, next: Node<a> | null }
+
+type QOP<a> = Insert<a> | DiffStash<a>
+
 const diffIndexedChildren = <a, x>(
   last: IndexedChildren<a>,
   next: IndexedChildren<a>,
-  log: Diff<x>
+  diff: Diff<x>
 ): Diff<x> => {
-  const migrants: { [string]: [number, Node<a>] } = (Object.create(
-    null
-  ): Object)
-  let lastIndex = 0
-  let nextIndex = 0
+  const table = Table.create(last, next)
+  const edits = table.get(next.length, last.length).toArray()
+  const stash = {}
+  const shifted = {}
 
-  while (lastIndex >= 0) {
-    const lastIndexed = last[lastIndex]
-    // If child in last version does not exist we just break a loop.
-    if (lastIndexed == null) {
-      lastIndex = -1
-    } else {
-      const [lastKey, lastNode] = lastIndexed
-      const nextIndexed = next[nextIndex]
-
-      // If child is present in last and next version and has same index select
-      // it and diff.
-      if (nextIndexed && nextIndexed[0] === lastKey) {
-        const [nextKey, nextNode] = next[nextIndex]
-        log = diffNode(lastNode, nextNode, Diff.selectSibling(log, 1))
-
-        lastIndex += 1
-        nextIndex += 1
-        // Otherwise stash child from last version and continue.
-      } else {
-        const { address } = log
-        log = Diff.stashNextSibling(log, address)
-
-        migrants[lastKey] = [address, lastNode]
-        lastIndex += 1
+  let index = 0
+  for (let edit of edits) {
+    switch (edit) {
+      case Delete: {
+        const key = last[index][0]
+        if (table.next[key] == null) {
+          diff == Diff.removeNextSibling(diff)
+        } else if (shifted[key] == null) {
+          stash[key] = diff.address
+          diff = Diff.stashNextSibling(diff, diff.address)
+        }
+        index++
+        break
+      }
+      case Retain: {
+        const [key, node] = last[index]
+        diff = diffNode(node, table.next[key], Diff.selectSibling(diff, 1))
+        index++
+        break
+      }
+      default: {
+        const key = edit
+        if (table.last[key] == null) {
+          diff = insertNode(table.next[key], diff)
+          diff = Diff.selectSibling(diff, 1)
+        } else {
+          if (stash[key] == null) {
+            shifted[key] = true
+            diff = Diff.shiftSiblings(diff, table.last[key] - index)
+            diff = Diff.selectSibling(diff, 1)
+          } else {
+            diff = Diff.insertStashedNode(diff, stash[key])
+            diff = Diff.selectSibling(diff, 1)
+          }
+        }
       }
     }
   }
 
-  // At this point no more children left in last version, so we will just add
-  // children from next version if there are some left.
-  while (nextIndex >= 0) {
-    const nextIndexed = next[nextIndex]
-    if (nextIndexed == null) {
-      nextIndex = -1
-    } else {
-      const [key, node] = nextIndexed
-      const registered = migrants[key]
-      // If child is in migrants dict it means it was reordered, in that case we
-      // insert it back into the tree and diff against next version and move on.
-      if (registered) {
-        const [address, last] = registered
-        log = Diff.selectSibling(Diff.insertStashedNode(log, address), 1)
-        log = diffNode(last, node, log)
-
-        delete migrants[key]
-        nextIndex += 1
-
-        // otherwise we just add nodes from the next version.
-      } else {
-        log = Diff.selectSibling(insertNode(node, log), 1)
-        nextIndex += 1
-      }
-    }
-  }
-
-  // Finally remove things from the register. It would be nice if we could avoid
-  // optimize following operations:
-  // `StashNextSibling(17) -> ... -> DiscardStashedNode(17)`
-  // to:
-  // `Remove -> ...`
-  // if `...` contains no `InsertStashedNode(17)` but trouble with that is that
-  // we'd have to queue up everything up until we reach this point and then
-  // move stuff from queue while optimizing it. This would add ton of complexity
-  // and it's unclear if optimization will matter in practice, so for now we
-  // keep it simple.
-  for (let key in migrants) {
-    const [address] = migrants[key]
-    log = Diff.discardStashedNode(log, address)
-  }
-
-  return log
+  return diff
 }
+// const diffIndexedChildren = <a, x>(
+//   last: IndexedChildren<a>,
+//   next: IndexedChildren<a>,
+//   log: Diff<x>
+// ): Diff<x> => {
+//   let migrants: ?{ [string]: [number, Node<a>] } = null
+//   let lastIndex = 0
+//   let nextIndex = 0
+//   let offset = 0
+
+//   while (lastIndex >= 0) {
+//     const lastIndexed = last[lastIndex]
+//     // If child in last version does not exist we just break a loop.
+//     if (lastIndexed == null) {
+//       lastIndex = -1
+//     } else {
+//       const [lastKey, lastNode] = lastIndexed
+//       // If migrants table is empty we have not encountered index missmatch yet
+//       // which allows us to write diff directly into the log.
+//       if (migrants == null) {
+//         const nextIndexed = next[nextIndex]
+//         // If indexes match then just diff nodes and move to next sibling
+//         if (nextIndexed && nextIndexed[0] === lastKey) {
+//           const [nextKey, nextNode] = next[nextIndex]
+//           log = diffNode(lastNode, nextNode, Diff.selectSibling(log, 1))
+//           lastIndex += 1
+//           nextIndex += 1
+//         } else {
+//           // If indexes did not match then last child either got moved or removed
+//           // but we won't know which one until we complete iteration over the next
+//           // children. There for we store child and it's original position to the
+//           // migration table move to the next child.
+//           migrants = { [lastKey]: [lastIndex, lastNode] }
+//           lastIndex += 1
+//         }
+//       } else {
+//         // If table isn't empty then we'll need to either rearrange or remove
+//         // children but for that we'll need to populate the table with rest of the
+//         // children and figure out how the need to be (re)moved during iteration
+//         // over the next children.
+//         migrants[lastKey] = [lastIndex, lastNode]
+//         lastIndex += 1
+//       }
+//     }
+//   }
+
+//   // At this point no more children left in last version, so we will just add
+//   // children from next version if there are some left.
+//   while (nextIndex >= 0) {
+//     const nextIndexed = next[nextIndex]
+//     if (nextIndexed == null) {
+//       nextIndex = -1
+//     } else {
+//       const [key, node] = nextIndexed
+//       const migrant = migrants != null ? migrants[key] : null
+//       // If child is in migrants table it means it was reordered, in that case we
+//       // insert it back into the tree and diff against next version and move on.
+//       if (migrant) {
+//         const [lastIndex, lastNode] = migrant
+//         // Calculate how many children are between currently selected node and
+//         // and a child matching the key.
+//         const n = lastIndex + offset - nextIndex
+//         // If number is positive, then move child for this key to the next
+//         // sibling position.
+//         if (n > 0) {
+//           log = Diff.shiftSiblings(log, n)
+//           offset += 1
+//         } else {
+//           offset -= 1
+//         }
+
+//         log = diffNode(lastNode, node, Diff.selectSibling(log, 1))
+
+//         if (migrants != null) {
+//           delete migrants[key]
+//         }
+//         nextIndex += 1
+//       } else {
+//         // If child was not in the migrants table then it's a new child and we
+//         // just insert it and select next. We also increment offset as all the
+//         // children in migrants table would move position further due to inserted
+//         // child.
+//         log = Diff.selectSibling(insertNode(node, log), 1)
+//         nextIndex += 1
+//         offset += 1
+//       }
+//     }
+//   }
+
+//   // if there are children left in the migrants table those are left overs from
+//   // last child list there for we remove each one. Note that we don't actually
+//   // care about their indexes as we just going to remove them.
+//   if (migrants) {
+//     for (let key in migrants) {
+//       log = Diff.removeNextSibling(log)
+//     }
+//   }
+
+//   return log
+// }
 
 const setSettings = <a, x>(node: Element<a>, log: Diff<x>): Diff<x> => {
   const v1 = log
