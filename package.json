@@ -35,7 +35,7 @@
     "build:docs":
       "documentation build --document-exported src/** -f html --o docs",
     "build:schema":
-      "flatc --ts --no-fb-import src/Format/FlatBuffer/DOMinion.fbs && mv src/Format/FlatBuffer/DOMinion_generated.ts src/Format/FlatBuffer/DOMinion.fbs.ts",
+      "flatc --ts --no-fb-import src/Format/FlatBuffer/DOMinion.fbs && mv DOMinion_generated.ts src/Format/FlatBuffer/DOMinion.fbs.ts",
     "build": "npm run build:node && npm run build:types",
     "prepublish": "npm run build && npm test",
     "precommit": "lint-staged",
