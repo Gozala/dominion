@@ -115,6 +115,9 @@ export default class LogEncoder {
   static discardStashedNode(log: string[], address: number): string[] {
     return push(`discardStashedNode(${address})`, log)
   }
+  static shiftSiblings(log: string[], count: number): string[] {
+    return push(`shiftSiblings(${count})`, log)
+  }
 
   static encode(changeList: ChangeList): Result<string[]> {
     return changeList.encode(LogEncoder, [])

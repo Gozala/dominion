@@ -4,6 +4,10 @@ table StashNextSibling {
   address:int;
 }
 
+table ShiftSiblings {
+  count:int;
+}
+
 table DiscardStashed {
   address:int;
 }
@@ -138,7 +142,8 @@ union Op {
   SetStyleRule,
   RemoveStyleRule,
   StashNextSibling,
-  DiscardStashed
+  DiscardStashed,
+  ShiftSiblings
 }
 
 table Change {

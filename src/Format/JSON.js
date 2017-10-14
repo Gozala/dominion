@@ -27,6 +27,7 @@ type Update =
   | RemoveStyleRule
   | StashNextSibling
   | DiscardStashed
+  | ShiftSiblings
 
 type Op = Update
 
@@ -301,6 +302,17 @@ class RemoveNextSibling {
   }
 }
 
+class ShiftSiblings {
+  kind: "ShiftSiblings" = "ShiftSiblings"
+  count: number
+  constructor(count: number) {
+    this.count = count
+  }
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
+    return changeLog.shiftSiblings(buffer, this.count)
+  }
+}
+
 const push = <a>(x: a, xs: a[]): a[] => (xs.push(x), xs)
 
 export default class JSONEncoder {
@@ -407,6 +419,9 @@ export default class JSONEncoder {
   }
   static discardStashedNode(log: Op[], address: number): Op[] {
     return push(new DiscardStashed(address), log)
+  }
+  static shiftSiblings(log: Op[], count: number): Op[] {
+    return push(new ShiftSiblings(count), log)
   }
 
   static encode(changeList: ChangeList): Result<Op[]> {

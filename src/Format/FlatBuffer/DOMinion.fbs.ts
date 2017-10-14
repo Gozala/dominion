@@ -30,7 +30,8 @@ export enum Op{
   SetStyleRule= 22,
   RemoveStyleRule= 23,
   StashNextSibling= 24,
-  DiscardStashed= 25
+  DiscardStashed= 25,
+  ShiftSiblings= 26
 }};
 
 /**
@@ -95,6 +96,74 @@ static addAddress(builder:flatbuffers.Builder, address:number) {
  * @returns {flatbuffers.Offset}
  */
 static endStashNextSibling(builder:flatbuffers.Builder):flatbuffers.Offset {
+  var offset = builder.endObject();
+  return offset;
+};
+
+}
+}
+/**
+ * @constructor
+ */
+export namespace DOMinion{
+export class ShiftSiblings {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  bb: flatbuffers.ByteBuffer;
+
+  /**
+   * @type {number}
+   */
+  bb_pos:number = 0;
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {ShiftSiblings}
+ */
+__init(i:number, bb:flatbuffers.ByteBuffer):ShiftSiblings {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {ShiftSiblings=} obj
+ * @returns {ShiftSiblings}
+ */
+static getRootAsShiftSiblings(bb:flatbuffers.ByteBuffer, obj?:ShiftSiblings):ShiftSiblings {
+  return (obj || new ShiftSiblings).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {number}
+ */
+count():number {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+static startShiftSiblings(builder:flatbuffers.Builder) {
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} count
+ */
+static addCount(builder:flatbuffers.Builder, count:number) {
+  builder.addFieldInt32(0, count, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+static endShiftSiblings(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   return offset;
 };

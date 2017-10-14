@@ -144,7 +144,7 @@ export default class DOMPatch {
     } else {
       select = target
       while (select && offset--) {
-        select = target.nextSibling
+        select = select.nextSibling
       }
     }
 
@@ -368,6 +368,27 @@ export default class DOMPatch {
   }
   static discardStashedNode(state: DOMPatch, address: number): DOMPatch {
     delete state.stash[address]
+    return state
+  }
+
+  static shiftSiblings(state: DOMPatch, count: number): DOMPatch {
+    const { target, childrenSelected } = state
+    let offset = count
+    let select = null
+    if (childrenSelected) {
+      select = target.childNodes[count]
+    } else {
+      select = target
+      while (select && offset--) {
+        select = select.nextSibling
+      }
+    }
+
+    if (select == null) {
+      throw Error(`Not enough siblings ${count} to shift them`)
+    } else {
+      insertNode(target, childrenSelected, select)
+    }
     return state
   }
 

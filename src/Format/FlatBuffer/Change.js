@@ -32,7 +32,8 @@ import {
   SetAttribute,
   SetStyleRule,
   SetTextData,
-  StashNextSibling
+  StashNextSibling,
+  ShiftSiblings
 } from "./Op"
 
 export opaque type change: Offset = Offset
@@ -89,7 +90,8 @@ export class Codec {
     [EditTextData.opType]: new EditTextData(),
     [SetTextData.opType]: new SetTextData(),
     [DiscardStashed.opType]: new DiscardStashed(),
-    [StashNextSibling.opType]: new StashNextSibling()
+    [StashNextSibling.opType]: new StashNextSibling(),
+    [ShiftSiblings.opType]: new ShiftSiblings()
   }
   decode<x>(
     change: Change,

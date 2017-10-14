@@ -145,6 +145,19 @@ export class DiscardStashed extends FBS.DiscardStashed {
   }
 }
 
+export class ShiftSiblings extends FBS.ShiftSiblings {
+  static opType = opType.ShiftSiblings
+  opType: typeof opType.ShiftSiblings = opType.ShiftSiblings
+  static encode(builder: Builder, count: number): Op {
+    ShiftSiblings.startShiftSiblings(builder)
+    ShiftSiblings.addCount(builder, count)
+    return ShiftSiblings.endShiftSiblings(builder)
+  }
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
+    return changeLog.shiftSiblings(buffer, this.count())
+  }
+}
+
 export class EditTextData extends FBS.EditTextData {
   static opType = opType.EditTextData
   opType: typeof opType.EditTextData = opType.EditTextData
@@ -576,3 +589,4 @@ export type OpVariant =
   | SetStyleRule
   | SetTextData
   | StashNextSibling
+  | ShiftSiblings

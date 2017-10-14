@@ -36,7 +36,8 @@ import {
   SetAttribute,
   SetStyleRule,
   SetTextData,
-  StashNextSibling
+  StashNextSibling,
+  ShiftSiblings
 } from "./Op"
 
 const push = <a>(item: a, items: a[]): a[] => (items.push(item), items)
@@ -318,6 +319,15 @@ export default class FlatBufferEncoder {
     return state.change(
       DiscardStashed.opType,
       DiscardStashed.encode(state.builder, address)
+    )
+  }
+  static shiftSiblings(
+    state: FlatBufferEncoder,
+    count: number
+  ): FlatBufferEncoder {
+    return state.change(
+      ShiftSiblings.opType,
+      ShiftSiblings.encode(state.builder, count)
     )
   }
 
