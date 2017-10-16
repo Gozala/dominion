@@ -2725,3 +2725,63 @@ test("indexed element random delete", async test => {
     "[a, b, c, d] -> []"
   )
 })
+
+test("indexed element insert+remove+reorder", async test => {
+  const abscdef = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["a", DOMinion.createElement("li")],
+          ["b", DOMinion.createElement("li")],
+          ["s", DOMinion.createElement("li")],
+          ["c", DOMinion.createElement("li")],
+          ["d", DOMinion.createElement("li")],
+          ["e", DOMinion.createElement("li")],
+          ["f", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  const dsfegh = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createIndexedElement(
+        "ul",
+        [],
+        [
+          ["d", DOMinion.createElement("li")],
+          ["s", DOMinion.createElement("li")],
+          ["f", DOMinion.createElement("li")],
+          ["e", DOMinion.createElement("li")],
+          ["g", DOMinion.createElement("li")],
+          ["h", DOMinion.createElement("li")]
+        ]
+      )
+    ]
+  )
+
+  test.deepEqual(
+    diff(abscdef, dsfegh),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()", // []abscdef
+      "removeNextSibling()", // []bscdef
+      "removeNextSibling()", // []scdef
+
+      "shiftSiblings(2)", // []dscef
+      "selectSibling(2)", // d[s]cef
+      "removeNextSibling()", // d[s]ef
+      "shiftSiblings(1)", // d[s]fe
+      "selectSibling(2)", // dsf[e]
+      'insertElement("li")', // dsf[e]g
+      "selectSibling(1)", // dsfe[g]
+      'insertElement("li")' // dsfe[g]h
+    ],
+    "[a b s c d e f] -> [d s f e g h]"
+  )
+})
