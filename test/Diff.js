@@ -2785,3 +2785,129 @@ test("indexed element insert+remove+reorder", async test => {
     "[a b s c d e f] -> [d s f e g h]"
   )
 })
+
+test("thunk", async test => {
+  let greeted = 0
+  const greeting = (name: string, color: string) => {
+    greeted++
+    return DOMinion.createElement(
+      "div",
+      [DOMinion.setAttribute("role", "greeting"), DOMinion.style({ color })],
+      [DOMinion.createTextNode("Hello "), DOMinion.createTextNode(name)]
+    )
+  }
+
+  const v1 = DOMinion.createHost()
+  const v2 = DOMinion.createHost(
+    [],
+    [DOMinion.createThunk(greeting, "Jack", "red")]
+  )
+  const v3 = DOMinion.createHost(
+    [],
+    [DOMinion.createThunk(greeting, "Jane", "red")]
+  )
+  const v4 = DOMinion.createHost(
+    [],
+    [DOMinion.createThunk(greeting, "Jane", "green")]
+  )
+
+  const v5 = DOMinion.createHost(
+    [],
+    [DOMinion.createThunk(greeting, "Jane", "green")]
+  )
+
+  test.equal(greeted, 0, "Thunks are not called during tree construction")
+  const v6 = DOMinion.createHost([], [greeting("Jane", "green")])
+  greeted = 0
+
+  test.deepEqual(
+    diff(v1, v2),
+    [
+      "selectChildren()",
+      'insertElement("div")',
+      "selectSibling(1)",
+      'setAttribute("role", "greeting")',
+      'setStyleRule("color", "red")',
+      "selectChildren()",
+      'insertText("Hello ")',
+      "selectSibling(1)",
+      'insertText("Jack")'
+    ],
+    "bulid a lazy tree"
+  )
+  test.equal(greeted, 1, "thunk was invoked once during diffing")
+
+  test.deepEqual(
+    diff(v2, v3),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      "selectChildren()",
+      "selectSibling(2)",
+      'setTextData("Jane")'
+    ],
+    "change nested text node data"
+  )
+  test.equal(greeted, 2, "thunk was invoked once during diffing")
+
+  test.deepEqual(
+    diff(v3, v4),
+    ["selectChildren()", "selectSibling(1)", 'setStyleRule("color", "green")'],
+    "change node style rule"
+  )
+  test.equal(greeted, 3, "thunk was invoked once during diffing")
+
+  test.deepEqual(diff(v4, v5), [], "thunks are equivalent")
+  test.equal(
+    greeted,
+    3,
+    "thunk was invoked as it was diffed against equal thunk"
+  )
+
+  test.deepEqual(
+    diff(v5, v6),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'replaceWithElement("div")',
+      'setAttribute("role", "greeting")',
+      'setStyleRule("color", "green")',
+      "selectChildren()",
+      'insertText("Hello ")',
+      "selectSibling(1)",
+      'insertText("Jane")'
+    ],
+    "diffing thunk vs non thunk replaced node"
+  )
+
+  test.equal(greeted, 3, "thunk was not invoked as it was already computed")
+
+  test.deepEqual(
+    diff(v6, v5),
+    [
+      "selectChildren()",
+      "selectSibling(1)",
+      'replaceWithElement("div")',
+      'setAttribute("role", "greeting")',
+      'setStyleRule("color", "green")',
+      "selectChildren()",
+      'insertText("Hello ")',
+      "selectSibling(1)",
+      'insertText("Jane")'
+    ],
+    "diffing non thunk vs thunk replaces node"
+  )
+
+  test.equal(greeted, 3, "thunk was not invoked as it was already computed")
+
+  test.deepEqual(
+    diff(v4, v3),
+    ["selectChildren()", "selectSibling(1)", 'setStyleRule("color", "red")'],
+    "change node style rule"
+  )
+  test.equal(
+    greeted,
+    3,
+    "both thunk were already computed so view isn't invoked"
+  )
+})
