@@ -94,7 +94,7 @@ const getUpdateTargetElement = (
 const getTargetStyle = (
   selectChildren: boolean,
   target: Node
-): CSSStyleDeclaration => {
+): CSSStyleDeclaration & { [string]: string } => {
   if (selectChildren) {
     throw new Error("Unable to update node when children are selected.")
   } else if (target.style) {
@@ -344,12 +344,12 @@ export default class DOMPatch {
   }
   static setStyleRule(state: DOMPatch, name: string, value: string) {
     const style = getTargetStyle(state.childrenSelected, state.target)
-    style[(name: any)] = value
+    style[name] = value
     return state
   }
   static removeStyleRule(state: DOMPatch, name: string) {
     const style = getTargetStyle(state.childrenSelected, state.target)
-    delete style[(name: any)]
+    style[name] = ""
     return state
   }
 
