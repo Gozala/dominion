@@ -235,6 +235,54 @@ test("style rules", async test => {
     ],
     "update / add style rule"
   )
+
+  const mixed = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement("div", [
+        DOMinion.style({
+          color: "white",
+          fontSize: "20px"
+        }),
+        DOMinion.style({
+          color: "yellow",
+          backgroundColor: "green"
+        })
+      ])
+    ]
+  )
+
+  test.deepEqual(
+    diff(v1, mixed),
+    [
+      "selectChildren()",
+      'insertElement("div")',
+      "selectSibling(1)",
+      'setStyleRule("color", "yellow")',
+      'setStyleRule("fontSize", "20px")',
+      'setStyleRule("backgroundColor", "green")'
+    ],
+    "add div with style mixture"
+  )
+
+  const premixed = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement("div", [
+        DOMinion.style({
+          fontSize: "20px",
+          color: "yellow",
+          backgroundColor: "green"
+        })
+      ])
+    ]
+  )
+
+  test.deepEqual(
+    diff(mixed, premixed),
+    [],
+    "there is no diff between mixed styles or combined"
+  )
 })
 
 test("insertText", async test => {
