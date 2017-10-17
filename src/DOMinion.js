@@ -27,6 +27,7 @@ import { patch } from "./Patch"
 import DOMPatch from "./Patch/DOM"
 import * as Dictionary from "dictionary.flow"
 import unreachable from "unreachable"
+export type { Encoder, Decode, Encode, ChangeList, DecoderError } from "./Log"
 
 const empty: Array<any> = Object.freeze([])
 const blank: Dict<any> = Dictionary.empty()

@@ -392,17 +392,20 @@ export default class DOMPatch {
     return state
   }
 
-  static encode(target: Node, changeList: ChangeList): Result<Node> {
+  static encode<node: Node>(
+    target: node,
+    changeList: ChangeList
+  ): Result<node> {
     const result = changeList.encode(DOMPatch, new DOMPatch(target, false, {}))
     if (result instanceof DOMPatch) {
-      return result.target
+      return target
     } else {
       return result
     }
   }
 
-  static encoder(target: Node): Encode<Node> {
-    return (changeList: ChangeList): Result<Node> =>
+  static encoder<node: Node>(target: node): Encode<node> {
+    return (changeList: ChangeList): Result<node> =>
       DOMPatch.encode(target, changeList)
   }
 }
