@@ -656,3 +656,201 @@ test("text editTextData", async test => {
     "remove text in the back"
   )
 })
+
+test("comment editTextData", async test => {
+  const tree = createHostMount()
+  const v0 = DOMinion.createHost()
+  const v1 = DOMinion.createHost([], [DOMinion.createComment("my name is")])
+  const v2 = DOMinion.createHost(
+    [],
+    [DOMinion.createComment("Hello, my name is")]
+  )
+  const v3 = DOMinion.createHost(
+    [],
+    [DOMinion.createComment("my name is Jack")]
+  )
+  const v4 = DOMinion.createHost(
+    [],
+    [DOMinion.createComment("Hello, my name is Jack")]
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v0, v1).innerHTML,
+    "<!--my name is-->",
+    "insert comment node"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v1, v2).innerHTML,
+    "<!--Hello, my name is-->",
+    "prepend text"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v2, v1).innerHTML,
+    "<!--my name is-->",
+    "remove text from the front"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v1, v3).innerHTML,
+    "<!--my name is Jack-->",
+    "add text to the end"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v3, v1).innerHTML,
+    "<!--my name is-->",
+    "remove text from the end"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v1, v4).innerHTML,
+    "<!--Hello, my name is Jack-->",
+    "add text at the front and at the end"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v4, v1).innerHTML,
+    "<!--my name is-->",
+    "remove text from frond and end"
+  )
+
+  const v5 = DOMinion.createHost(
+    [],
+    [DOMinion.createComment("Hello, my name is J")]
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v1, v4).innerHTML,
+    "<!--Hello, my name is Jack-->",
+    "add text from frond and end"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v4, v5).innerHTML,
+    "<!--Hello, my name is J-->",
+    "Remove last 3 characters"
+  )
+})
+
+test("setAttribute", async test => {
+  const tree = createHostMount()
+  const v0 = DOMinion.createHost()
+  const v1 = DOMinion.createHost(
+    [],
+    [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+  )
+  const v2 = DOMinion.createHost(
+    [],
+    [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+  )
+  const v3 = DOMinion.createHost([], [DOMinion.createElement("div", [])])
+
+  test.deepEqual(
+    applyDiff(tree, v0, v1).innerHTML,
+    '<div x="50"></div>',
+    "insert div with an x attribute"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v1, v2).innerHTML,
+    '<div x="50"></div>',
+    "no changes were made"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v2, v3).innerHTML,
+    "<div></div>",
+    "x attribute as remove"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v3, v2).innerHTML,
+    '<div x="50"></div>',
+    "x attribute was set"
+  )
+
+  const v4 = DOMinion.createHost(
+    [],
+    [DOMinion.createElement("div", [DOMinion.setAttribute("x", "10")])]
+  )
+
+  test.deepEqual(
+    applyDiff(tree, v2, v4).innerHTML,
+    '<div x="10"></div>',
+    "x attribute was updated"
+  )
+
+  const v5 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement("div", [
+        DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+      ])
+    ]
+  )
+
+  const div = applyDiff(tree, v4, v5).firstElementChild
+
+  if (div == null) {
+    test.fail("div was not returned")
+  } else {
+    test.deepEqual(
+      div.getAttribute("x"),
+      "50",
+      "x was removed so svg:x is returned"
+    )
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      "50",
+      "svg:x is set to 50"
+    )
+
+    test.deepEqual(
+      applyDiff(tree, v5, v2).innerHTML,
+      '<div x="50"></div>',
+      "x attribute was set"
+    )
+
+    test.deepEqual(div.getAttribute("x"), "50", "x was set")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      null,
+      "svg:x was removed"
+    )
+
+    const v6 = DOMinion.createHost(
+      [],
+      [
+        DOMinion.createElement("div", [
+          DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "8"),
+          DOMinion.setAttribute("x", "5"),
+          DOMinion.setAttributeNS(
+            "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
+            "x",
+            "50"
+          )
+        ])
+      ]
+    )
+
+    applyDiff(tree, v2, v6)
+
+    test.deepEqual(div.getAttribute("x"), "5", "x was updated to 5")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      "8",
+      "svg:x was set to 8"
+    )
+
+    test.deepEqual(
+      div.getAttributeNS(
+        "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
+        "x"
+      ),
+      "50",
+      "xul:x was set to 50"
+    )
+  }
+})
