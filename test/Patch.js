@@ -854,3 +854,65 @@ test("setAttribute", async test => {
     )
   }
 })
+
+test("removeAttribute", async test => {
+  const tree = createHostMount()
+  const _ = DOMinion.createHost()
+  const div$ = DOMinion.createHost([], [DOMinion.createElement("div", [])])
+  const div$x50 = DOMinion.createHost(
+    [],
+    [DOMinion.createElement("div", [DOMinion.setAttribute("x", "50")])]
+  )
+
+  test.deepEqual(
+    applyDiff(tree, _, div$).innerHTML,
+    "<div></div>",
+    "div is inserted"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, div$, div$x50).innerHTML,
+    '<div x="50"></div>',
+    'attribute x="50"'
+  )
+
+  test.deepEqual(
+    applyDiff(tree, div$x50, div$).innerHTML,
+    "<div></div>",
+    "attribute was removed"
+  )
+
+  const div$x = DOMinion.createHost(
+    [],
+    [DOMinion.createElement("div", [DOMinion.setAttribute("x")])]
+  )
+
+  test.deepEqual(
+    applyDiff(tree, div$, div$x).innerHTML,
+    '<div x=""></div>',
+    "if attribute value is omitted it is empty string"
+  )
+
+  const div$xnull = DOMinion.createHost(
+    [],
+    [DOMinion.createElement("div", [DOMinion.setAttribute("x", null)])]
+  )
+
+  test.deepEqual(
+    applyDiff(tree, div$x, div$xnull).innerHTML,
+    "<div></div>",
+    "if value null attribute is removed"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, div$xnull, div$x50).innerHTML,
+    '<div x="50"></div>',
+    "attribute is set"
+  )
+
+  test.deepEqual(
+    applyDiff(tree, div$x50, div$x).innerHTML,
+    '<div x=""></div>',
+    'attribute value is set to "" if value is omitted'
+  )
+})
