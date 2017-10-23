@@ -1167,3 +1167,72 @@ test("deleteProperty", async test => {
   test.equal(div.value === undefined, true, "value expando is undefined")
   test.equal("value" in div, false, "value expand was removed")
 })
+
+test("setStyleRule", async test => {
+  const tree = createHostMount()
+
+  const styled = (...rules) =>
+    DOMinion.createHost(
+      [],
+      [DOMinion.createElement("div", rules.map(rule => DOMinion.style(rule)))]
+    )
+
+  const assert = cases =>
+    cases.reduce((last, [next, style]) => {
+      test.deepEqual(
+        applyDiff(tree, last, next).innerHTML,
+        `<div style="${style}"></div>`,
+        `expect style ${style}`
+      )
+      return next
+    }, DOMinion.createHost())
+
+  assert([
+    [
+      styled({
+        backgroundColor: "red",
+        position: null
+      }),
+      "background-color: red;"
+    ],
+    [
+      styled({
+        display: "block"
+      }),
+      "display: block;"
+    ],
+    [
+      styled({
+        backgroundColor: "red",
+        display: null
+      }),
+      "background-color: red;"
+    ],
+    [
+      styled({
+        color: "white",
+        backgroundColor: "red"
+      }),
+      "background-color: red; color: white;"
+    ],
+    [
+      styled({
+        backgroundColor: "blue"
+      }),
+      "background-color: blue;"
+    ],
+    [
+      styled(
+        {
+          color: "white",
+          backgroundColor: "red"
+        },
+        {
+          backgroundColor: "green"
+        }
+      ),
+      "background-color: green; color: white;"
+    ],
+    [styled(), ""]
+  ])
+})
