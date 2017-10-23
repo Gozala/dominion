@@ -1038,3 +1038,132 @@ test("removeAttributeNS", async test => {
     )
   }
 })
+
+test("assignProperty", async test => {
+  const tree = createHostMount()
+  const host = DOMinion.createHost()
+  const _ = DOMinion.createHost([], [DOMinion.createElement("div")])
+  const x = value =>
+    DOMinion.createHost(
+      [],
+      [DOMinion.createElement("div", [DOMinion.property("x", value)])]
+    )
+
+  const isHidden = value =>
+    DOMinion.createHost(
+      [],
+      [DOMinion.createElement("div", [DOMinion.property("isHidden", value)])]
+    )
+
+  const value = value =>
+    DOMinion.createHost(
+      [],
+      [DOMinion.createElement("div", [DOMinion.property("value", value)])]
+    )
+
+  const div: Object = Object(applyDiff(tree, host, _).firstElementChild)
+
+  applyDiff(tree, _, x(50))
+  test.equal(div.x, 50, "x was set to 50")
+
+  applyDiff(tree, x(50), x(51))
+  test.equal(div.x, 51, "x was updated to 51")
+
+  applyDiff(tree, x(51), _)
+  test.equal("x" in div, false, "x was removed")
+
+  applyDiff(tree, _, isHidden(true))
+  test.equal(div.isHidden, true, "isHidden was set to true")
+
+  applyDiff(tree, isHidden(true), isHidden(false))
+  test.equal(div.isHidden, false, "isHidden was updated to false")
+
+  applyDiff(tree, isHidden(false), isHidden(true))
+  test.equal(div.isHidden, true, "isHidden was updated to true")
+
+  applyDiff(tree, isHidden(true), isHidden(null))
+  test.equal(div.isHidden, null, "isHidden was updated to null")
+
+  applyDiff(tree, isHidden(null), isHidden("Yes"))
+  test.equal(div.isHidden, "Yes", 'isHidden was updated to "Yes"')
+
+  applyDiff(tree, isHidden("Yes"), _)
+  test.equal("isHidden" in div, false, "isHidden was removed")
+
+  applyDiff(tree, _, value("cat"))
+  test.equal(div.value, "cat", 'expando value was set to "cat"')
+
+  applyDiff(tree, value("cat"), value("cat"))
+  test.equal(div.value, "cat", 'expando value is still "cat"')
+
+  applyDiff(tree, value("cat"), value("dog"))
+  test.equal(div.value, "dog", 'expando value changed to "dog"')
+
+  applyDiff(tree, value("dog"), value(""))
+  test.equal(div.value, "", 'expando value changed to ""')
+
+  applyDiff(tree, value("dog"), value(null))
+  test.ok(div.value === null, "expando value changed to null")
+
+  applyDiff(tree, value(null), value(undefined))
+  test.ok(div.value === undefined, "expando value changed to undefined")
+  test.equal("value" in div, false, "expando value was removed")
+})
+
+test("deleteProperty", async test => {
+  const tree = createHostMount()
+  const host = DOMinion.createHost()
+  const property = name => (...args) =>
+    DOMinion.createHost(
+      [],
+      [
+        DOMinion.createElement("div", [
+          args.length === 0
+            ? DOMinion.property(name)
+            : DOMinion.property(name, args[0])
+        ])
+      ]
+    )
+
+  const _ = DOMinion.createHost([], [DOMinion.createElement("div")])
+  const x = property("x")
+  const isHidden = property("isHidden")
+  const value = property("value")
+
+  const div: Object = Object(applyDiff(tree, host, _).firstElementChild)
+  applyDiff(tree, _, x(50))
+
+  test.equal(div.x, 50, "x was set to 50")
+
+  applyDiff(tree, x(50), _)
+  test.ok(div.x === undefined, "x expando is undefined")
+  test.equal("x" in div, false, "x expando was removed")
+
+  applyDiff(tree, _, value("what"))
+  test.equal(div.value, "what", 'value expand set to "what"')
+
+  applyDiff(tree, value("what"), value())
+  test.equal(div.value === undefined, true, "value expando is undefined")
+  test.equal("value" in div, false, "vale expand was removed")
+
+  applyDiff(tree, _, value(true))
+  test.equal(div.value, true, "value expand set to true")
+
+  applyDiff(tree, value(true), value(undefined))
+  test.equal(div.value === undefined, true, "value expando is undefined")
+  test.equal("value" in div, false, "value expand was removed")
+
+  applyDiff(tree, value(undefined), value(null))
+  test.equal(div.value === null, true, "value expando is null")
+
+  applyDiff(tree, value(null), value(undefined))
+  test.equal(div.value === undefined, true, "value expando is undefined")
+  test.equal("value" in div, false, "value expand was removed")
+
+  applyDiff(tree, value(undefined), value(null))
+  test.equal(div.value === null, true, "value expando is null")
+
+  applyDiff(tree, value(null), value())
+  test.equal(div.value === undefined, true, "value expando is undefined")
+  test.equal("value" in div, false, "value expand was removed")
+})
