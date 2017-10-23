@@ -916,3 +916,125 @@ test("removeAttribute", async test => {
     'attribute value is set to "" if value is omitted'
   )
 })
+
+test("removeAttributeNS", async test => {
+  const tree = createHostMount()
+  const host = DOMinion.createHost()
+  const _ = DOMinion.createHost([], [DOMinion.createElement("div", [])])
+  const svgx50 = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement("div", [
+        DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "50")
+      ])
+    ]
+  )
+  const svgx = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement("div", [
+        DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x")
+      ])
+    ]
+  )
+  const svgxnull = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement("div", [
+        DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", null)
+      ])
+    ]
+  )
+  const svgx_ = DOMinion.createHost(
+    [],
+    [
+      DOMinion.createElement("div", [
+        DOMinion.setAttributeNS("http://www.w3.org/2000/svg", "x", "")
+      ])
+    ]
+  )
+
+  {
+    const div = Object(applyDiff(tree, host, svgx50).firstElementChild)
+    test.deepEqual(div.outerHTML, '<div x="50"></div>', "div was inserted")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      "50",
+      "svg:x=50 was set"
+    )
+  }
+
+  {
+    const div = Object(applyDiff(tree, svgx50, _).firstElementChild)
+    test.deepEqual(div.outerHTML, "<div></div>", "attribute was removed")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      null,
+      "svg:x was removed"
+    )
+    test.deepEqual(div.getAttribute("x"), null, "x attribute is removed")
+  }
+
+  {
+    const div = Object(applyDiff(tree, _, svgx50).firstElementChild)
+    test.deepEqual(div.outerHTML, '<div x="50"></div>', "div was inserted")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      "50",
+      "svg:x=50 was set"
+    )
+  }
+
+  {
+    const div = Object(applyDiff(tree, svgx50, svgx).firstElementChild)
+    test.deepEqual(div.outerHTML, '<div x=""></div>', "x attribute is present")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      "",
+      `svg:x is ""`
+    )
+  }
+
+  {
+    const div = Object(applyDiff(tree, svgx, svgxnull).firstElementChild)
+    test.deepEqual(div.outerHTML, "<div></div>", "attribute was removed")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      null,
+      "svg:x was removed"
+    )
+    test.deepEqual(div.getAttribute("x"), null, "x attribute is removed")
+  }
+
+  {
+    const div = Object(applyDiff(tree, svgx, svgx50).firstElementChild)
+    test.deepEqual(div.outerHTML, '<div x="50"></div>', "x=50")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      "50",
+      "svg:x=50 was set"
+    )
+  }
+
+  {
+    const div = Object(applyDiff(tree, svgx50, svgxnull).firstElementChild)
+    test.deepEqual(div.outerHTML, "<div></div>", "attribute was removed")
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      null,
+      "svg:x was removed"
+    )
+    test.deepEqual(div.getAttribute("x"), null, "x attribute is removed")
+  }
+
+  {
+    const div = Object(applyDiff(tree, svgxnull, svgx_).firstElementChild)
+    test.deepEqual(div.outerHTML, '<div x=""></div>', "x attribute is present")
+    test.deepEqual(div.getAttribute("x"), "", `x=""`)
+    test.deepEqual(
+      div.getAttributeNS("http://www.w3.org/2000/svg", "x"),
+      "",
+      `svg:x=""`
+    )
+  }
+})
