@@ -359,12 +359,12 @@ export default class DOMPatch {
 
   static shiftSiblings(state: DOMPatch, count: number): DOMPatch {
     const { target, childrenSelected } = state
-    let offset = count
     let select = null
     if (childrenSelected) {
       select = target.childNodes[count]
     } else {
-      select = target
+      let offset = count
+      select = target.nextSibling
       while (select && offset--) {
         select = select.nextSibling
       }
