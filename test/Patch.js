@@ -1494,3 +1494,181 @@ test("indexed element ordering", async test => {
 
   assert(combinations(["a", "b", "c"]))
 })
+
+test("indexed element random insert", async test => {
+  const tree = createHostMount()
+
+  const toHTML = items =>
+    `<ul>${items.map(item => `<li id="${item}"></li>`).join("")}</ul>`
+
+  const toDOM = items =>
+    items == null
+      ? DOMinion.createHost()
+      : DOMinion.createHost(
+          [],
+          [
+            DOMinion.createIndexedElement(
+              "ul",
+              [],
+              items.map(item => [
+                item,
+                DOMinion.createElement("li", [
+                  DOMinion.setAttribute("id", item)
+                ])
+              ])
+            )
+          ]
+        )
+
+  const assert = cases =>
+    cases.reduce((last, next) => {
+      test.equal(
+        applyDiff(tree, toDOM(last), toDOM(next)).innerHTML,
+        toHTML(next),
+        `${String(last)} -> ${String(next)}`
+      )
+      return next
+    }, null)
+
+  const combinations = (source: Array<string>, inserts: Array<string>) => {
+    let all = [source]
+    for (const insert of inserts) {
+      const limit = all.length
+      let index = 0
+      while (index < limit) {
+        const items = all[index]
+        const count = items.length
+        let n = 0
+        while (n <= count) {
+          all.push([...items.slice(0, n), insert, ...items.slice(n)])
+          all.push(source)
+          n++
+        }
+        index++
+      }
+    }
+    return all
+  }
+
+  assert(combinations(["a", "b", "c"], ["X", "Y"]))
+})
+
+test("indexed element random delete", async test => {
+  const tree = createHostMount()
+
+  const toHTML = items =>
+    `<ul>${items.map(item => `<li id="${item}"></li>`).join("")}</ul>`
+
+  const toDOM = items =>
+    items == null
+      ? DOMinion.createHost()
+      : DOMinion.createHost(
+          [],
+          [
+            DOMinion.createIndexedElement(
+              "ul",
+              [],
+              items.map(item => [
+                item,
+                DOMinion.createElement("li", [
+                  DOMinion.setAttribute("id", item)
+                ])
+              ])
+            )
+          ]
+        )
+
+  const assert = cases =>
+    cases.reduce((last, next) => {
+      test.equal(
+        applyDiff(tree, toDOM(last), toDOM(next)).innerHTML,
+        toHTML(next),
+        `${String(last)} -> ${String(next)}`
+      )
+      return next
+    }, null)
+
+  const combinations = (source: Array<string>) => {
+    let all = [source]
+    for (const item of source) {
+      const limit = all.length
+      let index = 0
+      while (index < limit) {
+        const items = all[index]
+        const n = items.indexOf(item)
+        all.push([...items.slice(0, n), ...items.slice(n + 1)])
+        all.push(source)
+        index++
+      }
+    }
+    return all
+  }
+
+  assert(combinations(["a", "b", "c", "d"]))
+})
+
+test("indexed element insert/remove/reorder", async test => {
+  const tree = createHostMount()
+
+  const toHTML = items =>
+    `<ul>${items.map(item => `<li id="${item}"></li>`).join("")}</ul>`
+
+  const toDOM = items =>
+    items == null
+      ? DOMinion.createHost()
+      : DOMinion.createHost(
+          [],
+          [
+            DOMinion.createIndexedElement(
+              "ul",
+              [],
+              items.map(item => [
+                item,
+                DOMinion.createElement("li", [
+                  DOMinion.setAttribute("id", item)
+                ])
+              ])
+            )
+          ]
+        )
+
+  const assert = cases =>
+    cases.reduce((last, next) => {
+      test.equal(
+        applyDiff(tree, toDOM(last), toDOM(next)).innerHTML,
+        toHTML(next),
+        `${String(last)} -> ${String(next)}`
+      )
+      return next
+    }, null)
+
+  const combinations = (source: Array<string>) => {
+    let all = [[]]
+    for (const item of source) {
+      const limit = all.length
+      let index = 0
+      while (index < limit) {
+        const items = all[index]
+        const count = items.length
+        let n = 0
+        while (n <= count) {
+          all.push([...items.slice(0, n), item, ...items.slice(n)])
+          n++
+        }
+        index++
+      }
+    }
+
+    const combos = []
+    for (let from of all) {
+      for (let to of all) {
+        combos.push(from)
+        combos.push(to)
+      }
+    }
+
+    return combos
+  }
+
+  assert(combinations(["a", "b", "c"]))
+})
