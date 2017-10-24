@@ -37,22 +37,20 @@ const removeNode = (target: Node): Node => {
   }
 }
 
-const replaceNode = (
-  target: Node,
-  childrenSelected: boolean,
-  node: Node
-): Node => {
-  if (childrenSelected) {
+const replaceNode = (state: DOMPatch, node: Node): DOMPatch => {
+  if (state.childrenSelected) {
     throw Error(
       "Invalid state. Unable to replace node when children are seleted"
     )
   }
-  const parent = target.parentNode
+  const parent = state.target.parentNode
   if (parent == null) {
     throw Error("Ivarid state. Unable to replace an orphand node")
   }
 
-  return parent.replaceChild(node, target)
+  parent.replaceChild(node, state.target)
+  state.target = node
+  return state
 }
 
 const getTextDataUpdateTarget = (
@@ -231,48 +229,33 @@ export default class DOMPatch {
   }
 
   static replaceWithText(state: DOMPatch, data: string): DOMPatch {
-    replaceNode(
-      state.target,
-      state.childrenSelected,
-      state.target.ownerDocument.createTextNode(data)
-    )
-    return state
+    return replaceNode(state, state.target.ownerDocument.createTextNode(data))
   }
   static replaceWithComment(state: DOMPatch, data: string): DOMPatch {
-    replaceNode(
-      state.target,
-      state.childrenSelected,
-      state.target.ownerDocument.createComment(data)
-    )
-    return state
+    return replaceNode(state, state.target.ownerDocument.createComment(data))
   }
   static replaceWithElement(state: DOMPatch, localName: string): DOMPatch {
-    replaceNode(
-      state.target,
-      state.childrenSelected,
+    return replaceNode(
+      state,
       state.target.ownerDocument.createElement(localName)
     )
-    return state
   }
   static replaceWithElementNS(
     state: DOMPatch,
     namespaceURI: string,
     localName: string
   ): DOMPatch {
-    replaceNode(
-      state.target,
-      state.childrenSelected,
+    return replaceNode(
+      state,
       state.target.ownerDocument.createElementNS(namespaceURI, localName)
     )
-    return state
   }
   static replaceWithStashedNode(state: DOMPatch, address: number): DOMPatch {
     const node = state.stash[address]
     if (node == null) {
       throw Error(`Unable to find stashed node with address #${address}`)
     }
-    replaceNode(state.target, state.childrenSelected, node)
-    return state
+    return replaceNode(state, node)
   }
 
   static editTextData(
