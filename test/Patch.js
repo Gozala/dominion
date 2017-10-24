@@ -1443,3 +1443,54 @@ test("nested children", async test => {
     ]
   ])
 })
+
+test("indexed element ordering", async test => {
+  const tree = createHostMount()
+
+  const toHTML = items =>
+    `<ul>${items.map(item => `<li id="${item}"></li>`).join("")}</ul>`
+
+  const toDOM = items =>
+    items == null
+      ? DOMinion.createHost()
+      : DOMinion.createHost(
+          [],
+          [
+            DOMinion.createIndexedElement(
+              "ul",
+              [],
+              items.map(item => [
+                item,
+                DOMinion.createElement("li", [
+                  DOMinion.setAttribute("id", item)
+                ])
+              ])
+            )
+          ]
+        )
+
+  const assert = cases =>
+    cases.reduce((last, next) => {
+      test.equal(
+        applyDiff(tree, toDOM(last), toDOM(next)).innerHTML,
+        toHTML(next),
+        `${String(last)} -> ${String(next)}`
+      )
+      return next
+    }, null)
+
+  const combinations = (items: Array<string>) => {
+    return items.reduce((all, item) => {
+      const index = items.indexOf(item)
+      const rest = [...items.slice(0, index), ...items.slice(index + 1)]
+      let n = 0
+      while (n <= rest.length) {
+        all.push([...rest.slice(0, n), item, ...rest.slice(n)])
+        n++
+      }
+      return all
+    }, [])
+  }
+
+  assert(combinations(["a", "b", "c"]))
+})
