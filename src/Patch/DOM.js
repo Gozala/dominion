@@ -171,14 +171,17 @@ export default class DOMPatch {
     }
   }
   static removeNextSibling(state: DOMPatch): DOMPatch {
-    const next = state.childrenSelected
-      ? state.target.firstChild
-      : state.target.nextSibling
+    const { childrenSelected, target } = state
+    const [parent, next] = childrenSelected
+      ? [target, target.firstChild]
+      : [target.parentNode, target.nextSibling]
 
     if (next == null) {
       throw Error("Can not remove next sibling as it does not exist")
+    } else if (parent == null) {
+      throw Error("Can not remove next sibling as it has not parent")
     } else {
-      state.target.removeChild(next)
+      parent.removeChild(next)
       return state
     }
   }
