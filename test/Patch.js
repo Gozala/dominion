@@ -1236,3 +1236,210 @@ test("setStyleRule", async test => {
     [styled(), ""]
   ])
 })
+
+test("nested children", async test => {
+  const tree = createHostMount()
+  const html = (...chunks) => node => {
+    const html = chunks.join("")
+    test.deepEqual(node.innerHTML, html, html)
+  }
+
+  const assert = cases =>
+    cases.reduce((last, [next, test]) => {
+      test(applyDiff(tree, last, next))
+      return next
+    }, DOMinion.createHost())
+
+  assert([
+    [
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement(
+            "div",
+            [
+              DOMinion.setAttribute("id", "main"),
+              DOMinion.property("autofocus", true),
+              DOMinion.style({
+                backgroundColor: "blue",
+                color: "white"
+              })
+            ],
+            [
+              DOMinion.createTextNode("hi there"),
+              DOMinion.createComment("this is"),
+              DOMinion.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "circle",
+                [
+                  DOMinion.setAttribute("cx", "40"),
+                  DOMinion.setAttribute("cy", "50"),
+                  DOMinion.setAttribute("r", "26")
+                ],
+                [
+                  DOMinion.createElement(
+                    "span",
+                    [],
+                    [DOMinion.createTextNode("what's up ?")]
+                  )
+                ]
+              )
+            ]
+          )
+        ]
+      ),
+      html(
+        '<div id="main" style="background-color: blue; color: white;">',
+        "hi there",
+        "<!--this is-->",
+        '<circle cx="40" cy="50" r="26">',
+        "<span>",
+        "what's up ?",
+        "</span>",
+        "</circle>",
+        "</div>"
+      )
+    ],
+    [
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement(
+            "div",
+            [
+              DOMinion.setAttribute("id", "main"),
+              DOMinion.property("autofocus", true),
+              DOMinion.style({
+                backgroundColor: "blue",
+                color: "white"
+              })
+            ],
+            [
+              DOMinion.createTextNode("hi there"),
+              DOMinion.createComment("this is"),
+              DOMinion.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "circle",
+                [
+                  DOMinion.setAttribute("cx", "40"),
+                  DOMinion.setAttribute("cy", "50"),
+                  DOMinion.setAttribute("r", "26")
+                ],
+                [
+                  DOMinion.createElement(
+                    "span",
+                    [],
+                    [DOMinion.createTextNode("bye")]
+                  )
+                ]
+              )
+            ]
+          )
+        ]
+      ),
+      html(
+        '<div id="main" style="background-color: blue; color: white;">',
+        "hi there",
+        "<!--this is-->",
+        '<circle cx="40" cy="50" r="26">',
+        "<span>",
+        "bye",
+        "</span>",
+        "</circle>",
+        "</div>"
+      )
+    ],
+    [
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement(
+            "div",
+            [
+              DOMinion.setAttribute("id", "main"),
+              DOMinion.property("autofocus", true),
+              DOMinion.style({
+                backgroundColor: "blue",
+                color: "white"
+              })
+            ],
+            [DOMinion.createTextNode("hi there")]
+          )
+        ]
+      ),
+      html(
+        '<div id="main" style="background-color: blue; color: white;">',
+        "hi there",
+        "</div>"
+      )
+    ],
+    [
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement(
+            "div",
+            [
+              DOMinion.setAttribute("id", "main"),
+              DOMinion.property("autofocus", true),
+              DOMinion.style({
+                backgroundColor: "blue",
+                color: "white"
+              })
+            ],
+            [
+              DOMinion.createElement(
+                "h1",
+                [DOMinion.setAttribute("class", "title")],
+                [DOMinion.createTextNode("Example")]
+              ),
+              DOMinion.createElement("p")
+            ]
+          )
+        ]
+      ),
+      html(
+        '<div id="main" style="background-color: blue; color: white;">',
+        '<h1 class="title">',
+        "Example",
+        "</h1>",
+        "<p></p>",
+        "</div>"
+      )
+    ],
+    [
+      DOMinion.createHost(
+        [],
+        [
+          DOMinion.createElement(
+            "div",
+            [
+              DOMinion.setAttribute("id", "main"),
+              DOMinion.property("autofocus", false),
+              DOMinion.style({
+                backgroundColor: "blue",
+                color: "white"
+              })
+            ],
+            [
+              DOMinion.createElement(
+                "h1",
+                [],
+                [DOMinion.createTextNode("Example")]
+              ),
+              DOMinion.createElement("p", [], [DOMinion.createTextNode("Hi")])
+            ]
+          )
+        ]
+      ),
+      html(
+        '<div id="main" style="background-color: blue; color: white;">',
+        "<h1>",
+        "Example",
+        "</h1>",
+        "<p>Hi</p>",
+        "</div>"
+      )
+    ]
+  ])
+})
