@@ -6,7 +6,7 @@ import type { Encode, Encoder } from "../../Log"
 import * as FBS from "./DOMinion.fbs.ts.js"
 
 export type OpType = FBS.Op
-const opType = FBS.OpValue
+const opType = FBS.op
 export opaque type Op: Offset = Offset
 
 export class DecoderError {

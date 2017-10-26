@@ -1,3 +1,5 @@
+include "./Decoder.fbs";
+
 namespace DOMinion;
 
 table StashNextSibling {
@@ -116,6 +118,18 @@ table RemoveNextSibling {
 
 }
 
+table AddEventListener {
+  type:string;
+  capture:bool;
+  decoder:Decoder.Decoder;
+}
+
+table RemoveEventListener {
+  type:string;
+  capture:bool;
+  decoder:Decoder.Decoder;
+}
+
 union Op {
   SelectChildren,
   SelectSibling,
@@ -143,8 +157,12 @@ union Op {
   RemoveStyleRule,
   StashNextSibling,
   DiscardStashed,
-  ShiftSiblings
+  ShiftSiblings,
+
+  AddEventListener,
+  RemoveEventListener,
 }
+
 
 table Change {
   op:Op;

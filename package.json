@@ -2,14 +2,7 @@
   "version": "0.0.0",
   "name": "dominion",
   "description": "Library for describing & applying DOM changes",
-  "keywords": [
-    "dom",
-    "changelist",
-    "worker",
-    "html",
-    "typed",
-    "flow"
-  ],
+  "keywords": ["dom", "changelist", "worker", "html", "typed", "flow"],
   "main": "lib/DOMinion",
   "module": "src/DOMinion",
   "author": "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)",
@@ -39,18 +32,22 @@
     "build:types": "flow-copy-source --verbose src lib",
     "build:node": "babel --out-dir lib src",
     "build:api": "documentation readme --section=API src/dominion.js",
-    "build:docs": "documentation build --document-exported src/** -f html --o docs",
-    "build:schema": "flatc --ts --no-fb-import src/Format/FlatBuffer/DOMinion.fbs && mv DOMinion_generated.ts src/Format/FlatBuffer/DOMinion.fbs.ts",
+    "build:docs":
+      "documentation build --document-exported src/** -f html --o docs",
+    "build:schema":
+      "npm run build:schema:DOMinion && npm run build:schema:Decoder",
+    "build:schema:DOMinion":
+      "flatc --ts src/Format/FlatBuffer/DOMinion.fbs && mv DOMinion_generated.ts src/Format/FlatBuffer/DOMinion.fbs.ts",
+    "build:schema:Decoder":
+      "flatc --ts src/Format/FlatBuffer/Decoder.fbs && mv Decoder_generated.ts src/Format/FlatBuffer/Decoder.fbs.ts",
     "build": "npm run build:node && npm run build:types",
     "prepublish": "npm run build && npm test",
     "precommit": "lint-staged",
-    "start": "flow-copy-source --watch --verbose src lib & babel --watch --out-dir lib src"
+    "start":
+      "flow-copy-source --watch --verbose src lib & babel --watch --out-dir lib src"
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --parser flow --no-semi --write",
-      "git add"
-    ]
+    "*.js": ["prettier --parser flow --no-semi --write", "git add"]
   },
   "quokka": {
     "alias": {
@@ -61,10 +58,7 @@
     },
     "pro": true,
     "babel": true,
-    "plugins": [
-      "alias-quokka-plugin",
-      "jsdom-quokka-plugin"
-    ]
+    "plugins": ["alias-quokka-plugin", "jsdom-quokka-plugin"]
   },
   "dependencies": {
     "dictionary.flow": "^0.1.0",

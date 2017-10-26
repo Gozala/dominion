@@ -3,68 +3,41 @@
 // Transformed verison of DOMinion.fbs.ts
 
 import * as flatbuffers from "flatbuffers"
+import * as Decoder from "./Decoder.fbs.ts"
 
-export type OpType = {
-  NONE: 0,
-  SelectChildren: 1,
-  SelectSibling: 2,
-  SelectParent: 3,
-  InsertComment: 4,
-  InsertText: 5,
-  InsertElement: 6,
-  InsertStashedNode: 7,
-  ReplaceWithComment: 8,
-  ReplaceWithText: 9,
-  ReplaceWithElement: 10,
-  ReplaceWithStashedNode: 11,
-  RemoveNextSibling: 12,
-  SetTextData: 13,
-  EditTextData: 14,
-  SetAttribute: 15,
-  RemoveAttribute: 16,
-  AssignStringProperty: 17,
-  AssignBooleanProperty: 18,
-  AssignNumberProperty: 19,
-  AssignNullProperty: 20,
-  DeleteProperty: 21,
-  SetStyleRule: 22,
-  RemoveStyleRule: 23,
-  StashNextSibling: 24,
-  DiscardStashed: 25,
-  ShiftSiblings: 26
+export const op = {
+  NONE: (0: 0),
+  SelectChildren: (1: 1),
+  SelectSibling: (2: 2),
+  SelectParent: (3: 3),
+  InsertComment: (4: 4),
+  InsertText: (5: 5),
+  InsertElement: (6: 6),
+  InsertStashedNode: (7: 7),
+  ReplaceWithComment: (8: 8),
+  ReplaceWithText: (9: 9),
+  ReplaceWithElement: (10: 10),
+  ReplaceWithStashedNode: (11: 11),
+  RemoveNextSibling: (12: 12),
+  SetTextData: (13: 13),
+  EditTextData: (14: 14),
+  SetAttribute: (15: 15),
+  RemoveAttribute: (16: 16),
+  AssignStringProperty: (17: 17),
+  AssignBooleanProperty: (18: 18),
+  AssignNumberProperty: (19: 19),
+  AssignNullProperty: (20: 20),
+  DeleteProperty: (21: 21),
+  SetStyleRule: (22: 22),
+  RemoveStyleRule: (23: 23),
+  StashNextSibling: (24: 24),
+  DiscardStashed: (25: 25),
+  ShiftSiblings: (26: 26),
+  AddEventListener: (27: 27),
+  RemoveEventListener: (28: 28)
 }
 
-export const OpValue: OpType = {
-  NONE: 0,
-  SelectChildren: 1,
-  SelectSibling: 2,
-  SelectParent: 3,
-  InsertComment: 4,
-  InsertText: 5,
-  InsertElement: 6,
-  InsertStashedNode: 7,
-  ReplaceWithComment: 8,
-  ReplaceWithText: 9,
-  ReplaceWithElement: 10,
-  ReplaceWithStashedNode: 11,
-  RemoveNextSibling: 12,
-  SetTextData: 13,
-  EditTextData: 14,
-  SetAttribute: 15,
-  RemoveAttribute: 16,
-  AssignStringProperty: 17,
-  AssignBooleanProperty: 18,
-  AssignNumberProperty: 19,
-  AssignNullProperty: 20,
-  DeleteProperty: 21,
-  SetStyleRule: 22,
-  RemoveStyleRule: 23,
-  StashNextSibling: 24,
-  DiscardStashed: 25,
-  ShiftSiblings: 26
-}
-
-export type Op = $Values<OpType>
+export type Op = $Values<typeof op>
 
 /**
  * @constructor
@@ -2183,6 +2156,282 @@ export class RemoveNextSibling {
   }
 }
 /**
+* @constructor
+*/
+// export namespace DOMinion{
+export class AddEventListener {
+  /**
+  * @type {flatbuffers.ByteBuffer}
+  */
+  bb: flatbuffers.ByteBuffer
+
+  /**
+  * @type {number}
+  */
+  bb_pos: number = 0
+  /**
+* @param {number} i
+* @param {flatbuffers.ByteBuffer} bb
+* @returns {AddEventListener}
+*/
+  __init(i: number, bb: flatbuffers.ByteBuffer): AddEventListener {
+    this.bb_pos = i
+    this.bb = bb
+    return this
+  }
+
+  /**
+* @param {flatbuffers.ByteBuffer} bb
+* @param {AddEventListener=} obj
+* @returns {AddEventListener}
+*/
+  static getRootAsAddEventListener(
+    bb: flatbuffers.ByteBuffer,
+    obj?: AddEventListener
+  ): AddEventListener {
+    return (obj || new AddEventListener()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
+  }
+
+  /**
+* @param {flatbuffers.Encoding=} optionalEncoding
+* @returns {string|Uint8Array|null}
+*/
+  type(optionalEncoding?: any): string | null {
+    // type(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+    // type(optionalEncoding?:any):string|Uint8Array|null {
+    var offset = this.bb.__offset(this.bb_pos, 4)
+    return offset
+      ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
+      : null
+  }
+
+  /**
+* @returns {boolean}
+*/
+  capture(): boolean {
+    var offset = this.bb.__offset(this.bb_pos, 6)
+    return offset ? !!this.bb.readInt8(this.bb_pos + offset) : false
+  }
+
+  /**
+* @returns {Decoder.Decoder}
+*/
+  decoderType(): Decoder.Decoder {
+    var offset = this.bb.__offset(this.bb_pos, 8)
+    return offset
+      ? /** @type {Decoder.Decoder} */ (((this.bb.readUint8(
+          this.bb_pos + offset
+        ): any): Decoder.Decoder))
+      : Decoder.decoder.NONE
+  }
+
+  /**
+* @param {flatbuffers.Table} obj
+* @returns {?flatbuffers.Table}
+*/
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
+    var offset = this.bb.__offset(this.bb_pos, 10)
+    return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+*/
+  static startAddEventListener(builder: flatbuffers.Builder) {
+    builder.startObject(4)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @param {flatbuffers.Offset} typeOffset
+*/
+  static addType(builder: flatbuffers.Builder, typeOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(0, typeOffset, 0)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @param {boolean} capture
+*/
+  static addCapture(builder: flatbuffers.Builder, capture: boolean) {
+    builder.addFieldInt8(1, +capture, +false)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @param {Decoder.Decoder} decoderType
+*/
+  static addDecoderType(
+    builder: flatbuffers.Builder,
+    decoderType: Decoder.Decoder
+  ) {
+    builder.addFieldInt8(2, decoderType, Decoder.decoder.NONE)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @param {flatbuffers.Offset} decoderOffset
+*/
+  static addDecoder(
+    builder: flatbuffers.Builder,
+    decoderOffset: flatbuffers.Offset
+  ) {
+    builder.addFieldOffset(3, decoderOffset, 0)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @returns {flatbuffers.Offset}
+*/
+  static endAddEventListener(builder: flatbuffers.Builder): flatbuffers.Offset {
+    var offset = builder.endObject()
+    return offset
+  }
+}
+// }
+/**
+* @constructor
+*/
+// export namespace DOMinion{
+export class RemoveEventListener {
+  /**
+  * @type {flatbuffers.ByteBuffer}
+  */
+  bb: flatbuffers.ByteBuffer
+
+  /**
+  * @type {number}
+  */
+  bb_pos: number = 0
+  /**
+* @param {number} i
+* @param {flatbuffers.ByteBuffer} bb
+* @returns {RemoveEventListener}
+*/
+  __init(i: number, bb: flatbuffers.ByteBuffer): RemoveEventListener {
+    this.bb_pos = i
+    this.bb = bb
+    return this
+  }
+
+  /**
+* @param {flatbuffers.ByteBuffer} bb
+* @param {RemoveEventListener=} obj
+* @returns {RemoveEventListener}
+*/
+  static getRootAsRemoveEventListener(
+    bb: flatbuffers.ByteBuffer,
+    obj?: RemoveEventListener
+  ): RemoveEventListener {
+    return (obj || new RemoveEventListener()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
+  }
+
+  /**
+* @param {flatbuffers.Encoding=} optionalEncoding
+* @returns {string|Uint8Array|null}
+*/
+  type(optionalEncoding?: any): string | null {
+    // type(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+    // type(optionalEncoding?:any):string|Uint8Array|null {
+    var offset = this.bb.__offset(this.bb_pos, 4)
+    return offset
+      ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
+      : null
+  }
+
+  /**
+* @returns {boolean}
+*/
+  capture(): boolean {
+    var offset = this.bb.__offset(this.bb_pos, 6)
+    return offset ? !!this.bb.readInt8(this.bb_pos + offset) : false
+  }
+
+  /**
+* @returns {Decoder.Decoder}
+*/
+  decoderType(): Decoder.Decoder {
+    var offset = this.bb.__offset(this.bb_pos, 8)
+    return offset
+      ? /** @type {Decoder.Decoder} */ (((this.bb.readUint8(
+          this.bb_pos + offset
+        ): any): Decoder.Decoder))
+      : Decoder.decoder.NONE
+  }
+
+  /**
+* @param {flatbuffers.Table} obj
+* @returns {?flatbuffers.Table}
+*/
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
+    var offset = this.bb.__offset(this.bb_pos, 10)
+    return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+*/
+  static startRemoveEventListener(builder: flatbuffers.Builder) {
+    builder.startObject(4)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @param {flatbuffers.Offset} typeOffset
+*/
+  static addType(builder: flatbuffers.Builder, typeOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(0, typeOffset, 0)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @param {boolean} capture
+*/
+  static addCapture(builder: flatbuffers.Builder, capture: boolean) {
+    builder.addFieldInt8(1, +capture, +false)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @param {Decoder.Decoder} decoderType
+*/
+  static addDecoderType(
+    builder: flatbuffers.Builder,
+    decoderType: Decoder.Decoder
+  ) {
+    builder.addFieldInt8(2, decoderType, Decoder.decoder.NONE)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @param {flatbuffers.Offset} decoderOffset
+*/
+  static addDecoder(
+    builder: flatbuffers.Builder,
+    decoderOffset: flatbuffers.Offset
+  ) {
+    builder.addFieldOffset(3, decoderOffset, 0)
+  }
+
+  /**
+* @param {flatbuffers.Builder} builder
+* @returns {flatbuffers.Offset}
+*/
+  static endRemoveEventListener(
+    builder: flatbuffers.Builder
+  ): flatbuffers.Offset {
+    var offset = builder.endObject()
+    return offset
+  }
+}
+// }
+/**
    * @constructor
    */
 export class Change {
@@ -2223,9 +2472,7 @@ export class Change {
    */
   opType(): Op {
     var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset
-      ? (this.bb.readUint8(this.bb_pos + offset): any)
-      : OpValue.NONE
+    return offset ? (this.bb.readUint8(this.bb_pos + offset): any) : op.NONE
   }
 
   /**
@@ -2249,7 +2496,7 @@ export class Change {
    * @param {Op} opType
    */
   static addOpType(builder: flatbuffers.Builder, opType: Op) {
-    builder.addFieldInt8(0, opType, OpValue.NONE)
+    builder.addFieldInt8(0, opType, op.NONE)
   }
 
   /**
