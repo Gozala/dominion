@@ -23,8 +23,9 @@ export type ClassList = Set<string>
 export type StyleRules = Dict<string | null>
 
 export type Style = {
-  settingType: STYLE_SETTING
-} & StyleRules
+  settingType: STYLE_SETTING,
+  [string]: string | null
+}
 
 export interface Property {
   settingType: PROPERTY_SETTING,
