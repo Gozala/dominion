@@ -1,6 +1,8 @@
 /* @flow */
 
 import type { Dict } from "dictionary.flow"
+import type { Decoder } from "decoder.flow"
+
 export type TEXT_NODE = 3
 export type ELEMENT_NODE = 1
 export type COMMENT_NODE = 8
@@ -28,47 +30,51 @@ export type Style = {
 }
 
 export interface Property {
-  settingType: PROPERTY_SETTING,
-  name: string,
-  value: void | null | boolean | number | string
+  settingType: PROPERTY_SETTING;
+  name: string;
+  value: void | null | boolean | number | string;
 }
 
 export interface Attribute {
-  settingType: ATTRIBUTE_SETTING,
-  name: string,
-  value: string | null,
-  namespaceURI: string | null
+  settingType: ATTRIBUTE_SETTING;
+  name: string;
+  value: string | null;
+  namespaceURI: string | null;
 }
 
 export interface Listener<message> {
-  settingType: LISTENER_SETTING
+  settingType: LISTENER_SETTING;
+  type: string;
+  capture: boolean;
+  decoder: Decoder<message>;
 }
 
 export type Listeners<message> = Dict<Listener<message>>
 export type Setting<message> = Listener<message> | Attribute | Property | Style
+
 export type Settings<message> = Array<Setting<message>>
 
 export interface Text<message> {
-  nodeType: TEXT_NODE,
-  data: string,
-  toDebugString(): string
+  nodeType: TEXT_NODE;
+  data: string;
+  toDebugString(): string;
 }
 
 export interface Comment<message> {
-  nodeType: COMMENT_NODE,
-  data: string,
-  toDebugString(): string
+  nodeType: COMMENT_NODE;
+  data: string;
+  toDebugString(): string;
 }
 
 interface ElementNode<message> {
-  localName: string,
-  namespaceURI: null | string,
-  properties: Properties,
-  attributes: Attributes,
-  style: StyleRules,
-  classList: ClassList,
-  listeners: Listeners<message>,
-  toDebugString(): string
+  localName: string;
+  namespaceURI: null | string;
+  properties: Properties;
+  attributes: Attributes;
+  style: StyleRules;
+  classList: ClassList;
+  listeners: Listeners<message>;
+  toDebugString(): string;
 }
 
 export type Indexed<node> = [string, node]
@@ -77,13 +83,13 @@ export type UnindexedChildren<message> = Array<Node<message>>
 export type IndexedChildren<message> = Array<Indexed<Node<message>>>
 
 export interface UnindexedElement<message> extends ElementNode<message> {
-  nodeType: ELEMENT_NODE,
-  children: UnindexedChildren<message>
+  nodeType: ELEMENT_NODE;
+  children: UnindexedChildren<message>;
 }
 
 export interface IndexedElement<message> extends ElementNode<message> {
-  nodeType: INDEXED_ELEMENT_NODE,
-  children: IndexedChildren<message>
+  nodeType: INDEXED_ELEMENT_NODE;
+  children: IndexedChildren<message>;
 }
 
 export type Element<message> =
@@ -95,31 +101,31 @@ export type Fragment<message> =
   | UnindexedFragment<message>
 
 export interface UnindexedFragment<message> {
-  nodeType: UNINDEXED_FRAGMENT_NODE,
-  children: UnindexedChildren<message>,
-  toDebugString(): string
+  nodeType: UNINDEXED_FRAGMENT_NODE;
+  children: UnindexedChildren<message>;
+  toDebugString(): string;
 }
 
 export interface IndexedFragment<message> {
-  nodeType: INDEXED_FRAGMENT_NODE,
-  children: IndexedChildren<message>,
-  toDebugString(): string
+  nodeType: INDEXED_FRAGMENT_NODE;
+  children: IndexedChildren<message>;
+  toDebugString(): string;
 }
 
 export interface Thunk<message, params: Array<mixed> = *> {
-  nodeType: THUNK_NODE,
-  node: ?Node<message>,
-  args: params,
-  render: (...args: params) => Node<message>,
-  force(): Node<message>,
-  toDebugString(): string
+  nodeType: THUNK_NODE;
+  node: ?Node<message>;
+  args: params;
+  render: (...args: params) => Node<message>;
+  force(): Node<message>;
+  toDebugString(): string;
 }
 
 export interface Tagged<message, inner = *> {
-  nodeType: TAGGED_ELEMENT_NODE,
-  node: Node<inner>,
-  tag: inner => message,
-  toDebugString(): string
+  nodeType: TAGGED_ELEMENT_NODE;
+  node: Node<inner>;
+  tag: inner => message;
+  toDebugString(): string;
 }
 
 export const nodeType = {

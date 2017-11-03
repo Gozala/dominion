@@ -1,6 +1,13 @@
 /* @flow */
 
-import type { Encode, Encoder, ChangeList, DecoderError, Result } from "../Log"
+import type {
+  Encode,
+  Encoder,
+  ChangeList,
+  DecoderError,
+  Result,
+  EventDecoder
+} from "../Log"
 import { ok, error } from "result.flow"
 import { nodeType } from "../DOM/Node"
 import unreachable from "unreachable"
@@ -328,14 +335,30 @@ export default class DOMPatch {
     delete node[name]
     return state
   }
-  static setStyleRule(state: DOMPatch, name: string, value: string) {
+  static setStyleRule(state: DOMPatch, name: string, value: string): DOMPatch {
     const style = getTargetStyle(state.childrenSelected, state.target)
     style[name] = value
     return state
   }
-  static removeStyleRule(state: DOMPatch, name: string) {
+  static removeStyleRule(state: DOMPatch, name: string): DOMPatch {
     const style = getTargetStyle(state.childrenSelected, state.target)
     style[name] = ""
+    return state
+  }
+  static addEventDecoder(
+    state: DOMPatch,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): DOMPatch {
+    return state
+  }
+  static removeEventDecoder(
+    state: DOMPatch,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): DOMPatch {
     return state
   }
 

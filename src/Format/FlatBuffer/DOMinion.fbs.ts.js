@@ -3,7 +3,7 @@
 // Transformed verison of DOMinion.fbs.ts
 
 import * as flatbuffers from "flatbuffers"
-import * as Decoder from "./Decoder.fbs.ts"
+import * as Decoder from "./Decoder.fbs.ts.js"
 
 export const op = {
   NONE: (0: 0),

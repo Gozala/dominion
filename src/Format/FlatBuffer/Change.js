@@ -3,11 +3,11 @@
 import type { Builder, Offset } from "flatbuffers"
 import type { Encoder, Decode, Encode, Result } from "../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
+import { DecoderError } from "./Error"
 import { Change } from "./DOMinion.fbs.ts.js"
 import * as op from "./Op"
 
 import {
-  DecoderError,
   AssignBooleanProperty,
   AssignNullProperty,
   AssignNumberProperty,
@@ -33,7 +33,9 @@ import {
   SetStyleRule,
   SetTextData,
   StashNextSibling,
-  ShiftSiblings
+  ShiftSiblings,
+  AddEventListener,
+  RemoveEventListener
 } from "./Op"
 
 export opaque type change: Offset = Offset
@@ -91,7 +93,9 @@ export class Codec {
     [SetTextData.opType]: new SetTextData(),
     [DiscardStashed.opType]: new DiscardStashed(),
     [StashNextSibling.opType]: new StashNextSibling(),
-    [ShiftSiblings.opType]: new ShiftSiblings()
+    [ShiftSiblings.opType]: new ShiftSiblings(),
+    [AddEventListener.opType]: new AddEventListener(),
+    [RemoveEventListener.opType]: new RemoveEventListener()
   }
   decode<x>(
     change: Change,

@@ -7,7 +7,7 @@ import type { Builder, Offset } from "flatbuffers"
 import type { change } from "./Change"
 import { ChangeLog } from "./DOMinion.fbs.ts.js"
 import Change from "./Change"
-import { DecoderError } from "./Op"
+import { DecoderError } from "./Error"
 
 class IndexError extends DecoderError {
   kind: "IndexError" = "IndexError"

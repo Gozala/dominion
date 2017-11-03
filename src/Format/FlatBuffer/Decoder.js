@@ -6,11 +6,11 @@ import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
 import type { Builder, ByteBuffer } from "flatbuffers"
 import Changes from "./ChangeLog"
+import { DecoderError } from "./Error"
 
 import {
   type Op,
   type OpVariant,
-  DecoderError,
   AssignBooleanProperty,
   AssignNullProperty,
   AssignNumberProperty,

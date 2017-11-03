@@ -1,6 +1,13 @@
 /* @flow */
 
-import type { Encoder, Decode, Encode, ChangeList, Result } from "../Log"
+import type {
+  Encoder,
+  Decode,
+  Encode,
+  EventDecoder,
+  ChangeList,
+  Result
+} from "../Log"
 import { ok, error } from "result.flow"
 import unreachable from "unreachable"
 
@@ -28,6 +35,8 @@ type Update =
   | StashNextSibling
   | DiscardStashed
   | ShiftSiblings
+  | AddEventDecoder
+  | RemoveEventDecoder
 
 type Op = Update
 
@@ -131,6 +140,46 @@ class RemoveAttribute {
     } else {
       return changeLog.removeAttributeNS(buffer, namespaceURI, name)
     }
+  }
+}
+
+class AddEventDecoder {
+  kind: "AddEventDecoder" = "AddEventDecoder"
+  type: string
+  capture: boolean
+  decoder: EventDecoder
+  constructor(type: string, decoder: EventDecoder, capture: boolean) {
+    this.type = type
+    this.decoder = decoder
+    this.capture = capture
+  }
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
+    return changeLog.addEventDecoder(
+      buffer,
+      this.type,
+      this.decoder,
+      this.capture
+    )
+  }
+}
+
+class RemoveEventDecoder {
+  kind: "RemoveEventDecoder" = "RemoveEventDecoder"
+  type: string
+  capture: boolean
+  decoder: EventDecoder
+  constructor(type: string, decoder: EventDecoder, capture: boolean) {
+    this.type = type
+    this.decoder = decoder
+    this.capture = capture
+  }
+  decode<x>(changeLog: Encoder<x>, buffer: x): x {
+    return changeLog.removeEventDecoder(
+      buffer,
+      this.type,
+      this.decoder,
+      this.capture
+    )
   }
 }
 
@@ -403,6 +452,22 @@ export default class JSONEncoder {
     value: string | number | boolean | null
   ): Op[] {
     return push(new AssignProperty(name, value), log)
+  }
+  static addEventDecoder(
+    log: Op[],
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): Op[] {
+    return push(new AddEventDecoder(type, decoder, capture), log)
+  }
+  static removeEventDecoder(
+    log: Op[],
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): Op[] {
+    return push(new RemoveEventDecoder(type, decoder, capture), log)
   }
   static deleteProperty(log: Op[], name: string): Op[] {
     return push(new DeleteProperty(name), log)

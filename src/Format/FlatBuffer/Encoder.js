@@ -1,6 +1,13 @@
 /* @flow */
 
-import type { Encode, Decode, Encoder, ChangeList, Result } from "../../Log"
+import type {
+  Encode,
+  Decode,
+  Encoder,
+  ChangeList,
+  EventDecoder,
+  Result
+} from "../../Log"
 import type { Builder, ByteBuffer } from "flatbuffers"
 import type { OpType, Op } from "./Op"
 import unreachable from "unreachable"
@@ -9,13 +16,15 @@ import { type change } from "./Change"
 import { ok, error } from "result.flow"
 import Change from "./Change"
 import Changes from "./ChangeLog"
+import { DecoderError } from "./Error"
 
 import {
-  DecoderError,
   AssignBooleanProperty,
   AssignNullProperty,
   AssignNumberProperty,
   AssignStringProperty,
+  AddEventListener,
+  RemoveEventListener,
   DeleteProperty,
   DiscardStashed,
   EditTextData,
@@ -290,17 +299,43 @@ export default class FlatBufferEncoder {
       DeleteProperty.encode(state.builder, name)
     )
   }
-  static setStyleRule(state: FlatBufferEncoder, name: string, value: string) {
+  static setStyleRule(
+    state: FlatBufferEncoder,
+    name: string,
+    value: string
+  ): FlatBufferEncoder {
     return state.change(
       SetStyleRule.opType,
       SetStyleRule.encode(state.builder, name, value)
     )
   }
-  static removeStyleRule(state: FlatBufferEncoder, name: string) {
+  static removeStyleRule(
+    state: FlatBufferEncoder,
+    name: string
+  ): FlatBufferEncoder {
     return state.change(
       RemoveStyleRule.opType,
       RemoveStyleRule.encode(state.builder, name)
     )
+  }
+  static addEventDecoder(
+    state: FlatBufferEncoder,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): FlatBufferEncoder {
+    return state.change(
+      AddEventListener.opType,
+      AddEventListener.encode(state.builder, type, decoder, capture)
+    )
+  }
+  static removeEventDecoder(
+    state: FlatBufferEncoder,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): FlatBufferEncoder {
+    return state
   }
 
   static stashNextSibling(

@@ -1,6 +1,8 @@
 /* @flow */
 
-import * as result from "result.flow"
+import type { Decoder } from "decoder.flow"
+
+export type EventDecoder = Decoder<any>
 
 export interface Encoder<buffer> {
   selectParent(buffer): buffer;
@@ -47,6 +49,18 @@ export interface Encoder<buffer> {
   deleteProperty(buffer, name: string): buffer;
   setStyleRule(buffer, name: string, value: string): buffer;
   removeStyleRule(buffer, name: string): buffer;
+  addEventDecoder(
+    buffer,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): buffer;
+  removeEventDecoder(
+    buffer,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): buffer;
 
   stashNextSibling(buffer, address: number): buffer;
   discardStashedNode(buffer, address: number): buffer;

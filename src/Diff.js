@@ -17,7 +17,9 @@ import type {
   UnindexedChildren,
   Properties,
   Attributes,
-  StyleRules
+  StyleRules,
+  Listener,
+  Listeners
 } from "./DOM/Node"
 import type { Encoder, ChangeList, Result } from "./Log"
 import { nodeType } from "./DOM/Node"
@@ -732,7 +734,8 @@ const setSettings = <a, x>(node: Element<a>, log: Diff<x>): Diff<x> => {
   const v2 = diffProperties(blank, node.properties, v1)
   const v3 = diffAttributes(blank, node.attributes, v2)
   const v4 = diffStyle(blank, node.style, v3)
-  return v4
+  const v5 = diffListeners(blank, node.listeners, v4)
+  return v5
 }
 
 const diffSettings = <a, x>(
@@ -744,7 +747,8 @@ const diffSettings = <a, x>(
   const v2 = diffProperties(last.properties, next.properties, v1)
   const v3 = diffAttributes(last.attributes, next.attributes, v2)
   const v4 = diffStyle(last.style, next.style, v3)
-  return v4
+  const v5 = diffListeners(last.listeners, next.listeners, v4)
+  return v5
 }
 
 const diffProperties = <x>(
@@ -845,6 +849,59 @@ const diffStyle = <x>(
           log = Diff.setStyleRule(log, name, value)
         }
       }
+    }
+  }
+
+  return log
+}
+
+const isEqualListeners = <a>(last: Listener<a>, next: Listener<a>): boolean => {
+  return (
+    last.type === next.type &&
+    last.capture === next.capture &&
+    JSON.stringify(last.decoder) === JSON.stringify(next.decoder)
+  )
+}
+
+const diffListeners = <x, a>(
+  last: Listeners<a>,
+  next: Listeners<a>,
+  log: Diff<x>
+): Diff<x> => {
+  for (let name in last) {
+    if (!(name in next)) {
+      const listener = last[name]
+      if (listener) {
+        const { type, capture, decoder } = listener
+        log = Diff.removeEventDecoder(log, type, decoder, capture)
+      }
+    }
+  }
+
+  for (let name in next) {
+    const nextListener = next[name]
+    const lastListener = last[name]
+
+    const [remove, add] =
+      lastListener && !nextListener
+        ? [lastListener, null]
+        : !lastListener && nextListener
+          ? [null, nextListener]
+          : lastListener &&
+            nextListener &&
+            isEqualListeners(lastListener, nextListener)
+            ? [null, null]
+            : [lastListener, nextListener]
+
+    if (remove) {
+      console.log("remove listener")
+      const { type, capture, decoder } = remove
+      log = Diff.removeEventDecoder(log, type, decoder, capture)
+    }
+    if (add) {
+      console.log("add listener")
+      const { type, capture, decoder } = add
+      log = Diff.addEventDecoder(log, type, decoder, capture)
     }
   }
 

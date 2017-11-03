@@ -5,6 +5,7 @@ import type { Dict } from "dictionary.flow"
 import * as DOMinion from "dominion"
 import JSON from "./src/Format/JSON"
 import FlatBuffer from "./src/Format/FlatBuffer"
+import Log from "./src/Patch/Log"
 
 DOMinion //?
 
@@ -62,9 +63,9 @@ const tree2 = DOMinion.createHost(
   ]
 ) //?$.toDebugString()
 
-DOMinion.diff(tree0, tree1) // ?JSON.stringify($.encode())
-DOMinion.diff(tree1, tree1) //?$.encode()
-DOMinion.diff(tree1, tree2) //?$.encode()
+DOMinion.diff(tree0, tree1) // ?JSON.stringify($)
+DOMinion.diff(tree1, tree1) //?JSON.stringify($)
+DOMinion.diff(tree1, tree2) //?JSON.stringify($)
 
 const json1 = JSON.encode(DOMinion.diff(tree0, tree1)) //?
 const json2 = JSON.encode(DOMinion.diff(tree1, tree1)) //?
@@ -80,15 +81,36 @@ if (delta1.isError !== true) {
   body.innerHTML //?
 }
 
-const delta2 = FlatBuffer.encode(DOMinion.diff(tree1, tree1)) //?$.encode().length
+const delta2 = FlatBuffer.encode(DOMinion.diff(tree1, tree1)) //?$.length
 
 if (delta2.isError !== true) {
   DOMinion.patch(host, FlatBuffer.decode(delta2)) //?
   body.innerHTML //?
 }
 
-const delta3 = FlatBuffer.encode(DOMinion.diff(tree1, tree2)) //?$.encode().length
+const delta3 = FlatBuffer.encode(DOMinion.diff(tree1, tree2)) //?$.length
 if (delta3.isError !== true) {
   DOMinion.patch(host, FlatBuffer.decode(delta3)) //?
 }
 body.innerHTML //?
+
+import * as Decoder from "decoder.flow"
+
+const etree1 = DOMinion.createHost(
+  [],
+  [
+    DOMinion.createElement(
+      "button",
+      [DOMinion.on("click", Decoder.record({ type: Decoder.String }))],
+      []
+    )
+  ]
+)
+const edelta1 = FlatBuffer.encode(DOMinion.diff(tree0, etree1)) //?
+try {
+  if (edelta1.isError !== true) {
+    DOMinion.patch(Log.encode, FlatBuffer.decode(edelta1)) //?
+  }
+} catch (error) {
+  error //?
+}

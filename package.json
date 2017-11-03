@@ -69,7 +69,7 @@
     ]
   },
   "dependencies": {
-    "decoder.flow": "0.4.0",
+    "decoder.flow": "0.4.1",
     "dictionary.flow": "^0.1.0",
     "result.flow": "^0.2.0",
     "unreachable": "^0.2.0"

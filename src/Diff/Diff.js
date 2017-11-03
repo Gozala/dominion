@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Encoder } from "../Log"
+import type { Encoder, EventDecoder } from "../Log"
 type Nav = [-1 | 0 | 1, number]
 
 export default class Diff<x> {
@@ -264,6 +264,30 @@ export default class Diff<x> {
   static removeStyleRule(diff: Diff<x>, name: string): Diff<x> {
     const { changeLog, buffer } = Diff.navigate(diff)
     return Diff.update(diff, changeLog.removeStyleRule(buffer, name))
+  }
+  static addEventDecoder(
+    diff: Diff<x>,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(
+      diff,
+      changeLog.addEventDecoder(buffer, type, decoder, capture)
+    )
+  }
+  static removeEventDecoder(
+    diff: Diff<x>,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): Diff<x> {
+    const { changeLog, buffer } = Diff.navigate(diff)
+    return Diff.update(
+      diff,
+      changeLog.removeEventDecoder(buffer, type, decoder, capture)
+    )
   }
   static shiftSiblings(diff: Diff<x>, count: number): Diff<x> {
     const { changeLog, buffer } = Diff.navigate(diff)

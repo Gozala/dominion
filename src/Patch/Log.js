@@ -1,7 +1,7 @@
 /* @flow */
 
 import { error, ok } from "result.flow"
-import type { Encode, Encoder, ChangeList, Result } from "../Log"
+import type { Encode, Encoder, ChangeList, EventDecoder, Result } from "../Log"
 
 const push = <a>(x: a, xs: a[]): a[] => (xs.push(x), xs)
 
@@ -117,6 +117,32 @@ export default class LogEncoder {
   }
   static shiftSiblings(log: string[], count: number): string[] {
     return push(`shiftSiblings(${count})`, log)
+  }
+  static addEventDecoder(
+    log: string[],
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): string[] {
+    return push(
+      `addEventDecoder(${type}, ${JSON.stringify(decoder)}, ${String(
+        capture
+      )})`,
+      log
+    )
+  }
+  static removeEventDecoder(
+    log: string[],
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ): string[] {
+    return push(
+      `removeEventDecoder(${type}, ${JSON.stringify(decoder)}, ${String(
+        capture
+      )})`,
+      log
+    )
   }
 
   static encode(changeList: ChangeList): Result<string[]> {

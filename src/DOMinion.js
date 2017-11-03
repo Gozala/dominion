@@ -20,6 +20,7 @@ import type {
   Listener,
   Listeners
 } from "./DOM/Node"
+import type { Decoder } from "decoder.flow"
 import type { Dict } from "dictionary.flow"
 import { nodeType, settingType } from "./DOM/Node"
 import { diff } from "./Diff"
@@ -51,6 +52,18 @@ class PropertySetting implements Property {
   constructor(name: string, value: string | number | boolean | null | void) {
     this.name = name
     this.value = value
+  }
+}
+
+class ListenerSetting<message> implements Listener<message> {
+  settingType = settingType.listener
+  type: string
+  capture: boolean
+  decoder: Decoder<message>
+  constructor(type: string, capture: boolean, decoder: Decoder<message>) {
+    this.type = type
+    this.capture = capture
+    this.decoder = decoder
   }
 }
 
@@ -185,6 +198,9 @@ const setSetting = <message>(
       return element
     }
     case settingType.listener: {
+      const key = `${setting.type}${setting.capture ? "Capture" : ""}`
+      element.listeners = set(key, setting, element.listeners)
+
       return element
     }
     default: {
@@ -251,6 +267,12 @@ export const property = (
   name: string,
   value?: string | number | boolean | null
 ): Property => new PropertySetting(name, value)
+
+export const on = <message>(
+  type: string,
+  decoder: Decoder<message>,
+  capture: boolean = false
+): Listener<message> => new ListenerSetting(type, capture, decoder)
 
 export const style = (rules: StyleRules): Style => {
   const style: Style = (rules: Object)
