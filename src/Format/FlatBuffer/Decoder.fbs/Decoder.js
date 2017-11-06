@@ -15,6 +15,7 @@
 // Replace all `/** @type {JSON} */ (this.bb.readUint8(this.bb_pos + offset))` with `((this.bb.readUint8(this.bb_pos + offset):any):JSON)`
 
 import * as flatbuffers from "flatbuffers"
+import * as JSON from "../JSON.fbs/JSON"
 
 /**
  * @enum
@@ -24,7 +25,7 @@ export const decoder = {
   NONE: (0: 0),
   Error: (1: 1),
   Ok: (2: 2),
-  Primitive: (3: 3),
+  Boolean: (3: 3),
   Accessor: (4: 4),
   Either: (5: 5),
   Field: (6: 6),
@@ -36,789 +37,15 @@ export const decoder = {
   Collection: (12: 12),
   Dictionary: (13: 13),
   Record: (14: 14),
-  Form: (15: 15)
+  Form: (15: 15),
+  String: (16: 16),
+  Integer: (17: 17),
+  Float: (18: 18)
 }
 
 export type Decoder = $Values<typeof decoder>
 // };
 
-/**
- * @enum
- */
-// // export namespace Decoder{
-export const value = {
-  Null: (0: 0),
-  Boolean: (1: 1),
-  Integer: (2: 2),
-  Float: (3: 3),
-  String: (4: 4),
-  JSON: (5: 5)
-}
-
-export type Value = $Values<typeof value>
-//}
-
-/**
- * @enum
- */
-// // export namespace Decoder{
-export const json = {
-  NONE: (0: 0),
-  Boolean: (1: 1),
-  Integer: (2: 2),
-  Float: (3: 3),
-  String: (4: 4),
-  JSONArray: (5: 5),
-  JSONObject: (6: 6)
-}
-
-export type JSON = $Values<typeof json>
-// };
-
-/**
- * @constructor
- */
-// // export namespace Decoder{
-export class JSONArray {
-  /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-  bb: flatbuffers.ByteBuffer
-
-  /**
-     * @type {number}
-     */
-  bb_pos: number = 0
-  /**
-   * @param {number} i
-   * @param {flatbuffers.ByteBuffer} bb
-   * @returns {JSONArray}
-   */
-  __init(i: number, bb: flatbuffers.ByteBuffer): JSONArray {
-    this.bb_pos = i
-    this.bb = bb
-    return this
-  }
-
-  /**
-   * @param {flatbuffers.ByteBuffer} bb
-   * @param {JSONArray=} obj
-   * @returns {JSONArray}
-   */
-  static getRootAsJSONArray(
-    bb: flatbuffers.ByteBuffer,
-    obj?: JSONArray
-  ): JSONArray {
-    return (obj || new JSONArray()).__init(
-      bb.readInt32(bb.position()) + bb.position(),
-      bb
-    )
-  }
-
-  /**
-   * @param {number} index
-   * @param {JSONElement=} obj
-   * @returns {JSONElement}
-   */
-  elements(index: number, obj?: JSONElement): JSONElement | null {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset
-      ? (obj || new JSONElement()).__init(
-          this.bb.__indirect(
-            this.bb.__vector(this.bb_pos + offset) + index * 4
-          ),
-          this.bb
-        )
-      : null
-  }
-
-  /**
-   * @returns {number}
-   */
-  elementsLength(): number {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   */
-  static startJSONArray(builder: flatbuffers.Builder) {
-    builder.startObject(1)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} elementsOffset
-   */
-  static addElements(
-    builder: flatbuffers.Builder,
-    elementsOffset: flatbuffers.Offset
-  ) {
-    builder.addFieldOffset(0, elementsOffset, 0)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {Array.<flatbuffers.Offset>} data
-   * @returns {flatbuffers.Offset}
-   */
-  static createElementsVector(
-    builder: flatbuffers.Builder,
-    data: flatbuffers.Offset[]
-  ): flatbuffers.Offset | null {
-    if (!data) {
-      return null
-    }
-    builder.startVector(4, data.length, 4)
-    for (var i = data.length - 1; i >= 0; i--) {
-      builder.addOffset(data[i])
-    }
-    return builder.endVector()
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {number} numElems
-   */
-  static startElementsVector(builder: flatbuffers.Builder, numElems: number) {
-    builder.startVector(4, numElems, 4)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @returns {flatbuffers.Offset}
-   */
-  static endJSONArray(builder: flatbuffers.Builder): flatbuffers.Offset {
-    var offset = builder.endObject()
-    return offset
-  }
-}
-// }
-/**
-   * @constructor
-   */
-// // export namespace Decoder{
-export class JSONObject {
-  /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-  bb: flatbuffers.ByteBuffer
-
-  /**
-     * @type {number}
-     */
-  bb_pos: number = 0
-  /**
-   * @param {number} i
-   * @param {flatbuffers.ByteBuffer} bb
-   * @returns {JSONObject}
-   */
-  __init(i: number, bb: flatbuffers.ByteBuffer): JSONObject {
-    this.bb_pos = i
-    this.bb = bb
-    return this
-  }
-
-  /**
-   * @param {flatbuffers.ByteBuffer} bb
-   * @param {JSONObject=} obj
-   * @returns {JSONObject}
-   */
-  static getRootAsJSONObject(
-    bb: flatbuffers.ByteBuffer,
-    obj?: JSONObject
-  ): JSONObject {
-    return (obj || new JSONObject()).__init(
-      bb.readInt32(bb.position()) + bb.position(),
-      bb
-    )
-  }
-
-  /**
-   * @param {number} index
-   * @param {JSONProperty=} obj
-   * @returns {JSONProperty}
-   */
-  propreties(index: number, obj?: JSONProperty): JSONProperty | null {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset
-      ? (obj || new JSONProperty()).__init(
-          this.bb.__indirect(
-            this.bb.__vector(this.bb_pos + offset) + index * 4
-          ),
-          this.bb
-        )
-      : null
-  }
-
-  /**
-   * @returns {number}
-   */
-  propretiesLength(): number {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   */
-  static startJSONObject(builder: flatbuffers.Builder) {
-    builder.startObject(1)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} propretiesOffset
-   */
-  static addPropreties(
-    builder: flatbuffers.Builder,
-    propretiesOffset: flatbuffers.Offset
-  ) {
-    builder.addFieldOffset(0, propretiesOffset, 0)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {Array.<flatbuffers.Offset>} data
-   * @returns {flatbuffers.Offset}
-   */
-  static createPropretiesVector(
-    builder: flatbuffers.Builder,
-    data: flatbuffers.Offset[]
-  ): flatbuffers.Offset | null {
-    if (!data) {
-      return null
-    }
-    builder.startVector(4, data.length, 4)
-    for (var i = data.length - 1; i >= 0; i--) {
-      builder.addOffset(data[i])
-    }
-    return builder.endVector()
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {number} numElems
-   */
-  static startPropretiesVector(builder: flatbuffers.Builder, numElems: number) {
-    builder.startVector(4, numElems, 4)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @returns {flatbuffers.Offset}
-   */
-  static endJSONObject(builder: flatbuffers.Builder): flatbuffers.Offset {
-    var offset = builder.endObject()
-    return offset
-  }
-}
-// }
-/**
-   * @constructor
-   */
-// // export namespace Decoder{
-export class JSONProperty {
-  /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-  bb: flatbuffers.ByteBuffer
-
-  /**
-     * @type {number}
-     */
-  bb_pos: number = 0
-  /**
-   * @param {number} i
-   * @param {flatbuffers.ByteBuffer} bb
-   * @returns {JSONProperty}
-   */
-  __init(i: number, bb: flatbuffers.ByteBuffer): JSONProperty {
-    this.bb_pos = i
-    this.bb = bb
-    return this
-  }
-
-  /**
-   * @param {flatbuffers.ByteBuffer} bb
-   * @param {JSONProperty=} obj
-   * @returns {JSONProperty}
-   */
-  static getRootAsJSONProperty(
-    bb: flatbuffers.ByteBuffer,
-    obj?: JSONProperty
-  ): JSONProperty {
-    return (obj || new JSONProperty()).__init(
-      bb.readInt32(bb.position()) + bb.position(),
-      bb
-    )
-  }
-
-  /**
-   * @param {flatbuffers.Encoding=} optionalEncoding
-   * @returns {string|Uint8Array|null}
-   */
-  name(optionalEncoding?: any): string | null {
-    // //name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-    // //name(optionalEncoding?:any):string|Uint8Array|null {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset
-      ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
-      : null
-  }
-
-  /**
-   * @returns {JSON}
-   */
-  valueType(): JSON {
-    var offset = this.bb.__offset(this.bb_pos, 6)
-    return offset
-      ? /** @type {JSON} */ ((this.bb.readUint8(this.bb_pos + offset): any))
-      : json.NONE
-  }
-
-  /**
-   * @param {flatbuffers.Table} obj
-   * @returns {?flatbuffers.Table}
-   */
-  value<T: flatbuffers.Table>(obj: T): T | null {
-    var offset = this.bb.__offset(this.bb_pos, 8)
-    return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   */
-  static startJSONProperty(builder: flatbuffers.Builder) {
-    builder.startObject(3)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} nameOffset
-   */
-  static addName(builder: flatbuffers.Builder, nameOffset: flatbuffers.Offset) {
-    builder.addFieldOffset(0, nameOffset, 0)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {JSON} valueType
-   */
-  static addValueType(builder: flatbuffers.Builder, valueType: JSON) {
-    builder.addFieldInt8(1, valueType, json.NONE)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} valueOffset
-   */
-  static addValue(
-    builder: flatbuffers.Builder,
-    valueOffset: flatbuffers.Offset
-  ) {
-    builder.addFieldOffset(2, valueOffset, 0)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @returns {flatbuffers.Offset}
-   */
-  static endJSONProperty(builder: flatbuffers.Builder): flatbuffers.Offset {
-    var offset = builder.endObject()
-    return offset
-  }
-}
-// }
-/**
-   * @constructor
-   */
-// // export namespace Decoder{
-export class JSONElement {
-  /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-  bb: flatbuffers.ByteBuffer
-
-  /**
-     * @type {number}
-     */
-  bb_pos: number = 0
-  /**
-   * @param {number} i
-   * @param {flatbuffers.ByteBuffer} bb
-   * @returns {JSONElement}
-   */
-  __init(i: number, bb: flatbuffers.ByteBuffer): JSONElement {
-    this.bb_pos = i
-    this.bb = bb
-    return this
-  }
-
-  /**
-   * @param {flatbuffers.ByteBuffer} bb
-   * @param {JSONElement=} obj
-   * @returns {JSONElement}
-   */
-  static getRootAsJSONElement(
-    bb: flatbuffers.ByteBuffer,
-    obj?: JSONElement
-  ): JSONElement {
-    return (obj || new JSONElement()).__init(
-      bb.readInt32(bb.position()) + bb.position(),
-      bb
-    )
-  }
-
-  /**
-   * @returns {JSON}
-   */
-  valueType(): JSON {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset
-      ? /** @type {JSON} */ ((this.bb.readUint8(this.bb_pos + offset): any))
-      : json.NONE
-  }
-
-  /**
-   * @param {flatbuffers.Table} obj
-   * @returns {?flatbuffers.Table}
-   */
-  value<T: flatbuffers.Table>(obj: T): T | null {
-    var offset = this.bb.__offset(this.bb_pos, 6)
-    return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   */
-  static startJSONElement(builder: flatbuffers.Builder) {
-    builder.startObject(2)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {JSON} valueType
-   */
-  static addValueType(builder: flatbuffers.Builder, valueType: JSON) {
-    builder.addFieldInt8(0, valueType, json.NONE)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} valueOffset
-   */
-  static addValue(
-    builder: flatbuffers.Builder,
-    valueOffset: flatbuffers.Offset
-  ) {
-    builder.addFieldOffset(1, valueOffset, 0)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @returns {flatbuffers.Offset}
-   */
-  static endJSONElement(builder: flatbuffers.Builder): flatbuffers.Offset {
-    var offset = builder.endObject()
-    return offset
-  }
-}
-// }
-
-/**
- * @constructor
- */
-// export namespace Decoder{
-export class Boolean {
-  /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-  bb: flatbuffers.ByteBuffer
-
-  /**
-     * @type {number}
-     */
-  bb_pos: number = 0
-  /**
-   * @param {number} i
-   * @param {flatbuffers.ByteBuffer} bb
-   * @returns {Boolean}
-   */
-  __init(i: number, bb: flatbuffers.ByteBuffer): Boolean {
-    this.bb_pos = i
-    this.bb = bb
-    return this
-  }
-
-  /**
-   * @param {flatbuffers.ByteBuffer} bb
-   * @param {Boolean=} obj
-   * @returns {Boolean}
-   */
-  static getRootAsBoolean(bb: flatbuffers.ByteBuffer, obj?: Boolean): Boolean {
-    return (obj || new Boolean()).__init(
-      bb.readInt32(bb.position()) + bb.position(),
-      bb
-    )
-  }
-
-  /**
-   * @returns {boolean}
-   */
-  value(): boolean {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset ? !!this.bb.readInt8(this.bb_pos + offset) : false
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   */
-  static startBoolean(builder: flatbuffers.Builder) {
-    builder.startObject(1)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {boolean} value
-   */
-  static addValue(builder: flatbuffers.Builder, value: boolean) {
-    builder.addFieldInt8(0, +value, +false)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @returns {flatbuffers.Offset}
-   */
-  static endBoolean(builder: flatbuffers.Builder): flatbuffers.Offset {
-    var offset = builder.endObject()
-    return offset
-  }
-
-  //}
-}
-/**
-   * @constructor
-   */
-// export namespace Decoder{
-export class Integer {
-  /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-  bb: flatbuffers.ByteBuffer
-
-  /**
-     * @type {number}
-     */
-  bb_pos: number = 0
-  /**
-   * @param {number} i
-   * @param {flatbuffers.ByteBuffer} bb
-   * @returns {Integer}
-   */
-  __init(i: number, bb: flatbuffers.ByteBuffer): Integer {
-    this.bb_pos = i
-    this.bb = bb
-    return this
-  }
-
-  /**
-   * @param {flatbuffers.ByteBuffer} bb
-   * @param {Integer=} obj
-   * @returns {Integer}
-   */
-  static getRootAsInteger(bb: flatbuffers.ByteBuffer, obj?: Integer): Integer {
-    return (obj || new Integer()).__init(
-      bb.readInt32(bb.position()) + bb.position(),
-      bb
-    )
-  }
-
-  /**
-   * @returns {number}
-   */
-  value(): number {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset ? this.bb.readInt32(this.bb_pos + offset) : 0
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   */
-  static startInteger(builder: flatbuffers.Builder) {
-    builder.startObject(1)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {number} value
-   */
-  static addValue(builder: flatbuffers.Builder, value: number) {
-    builder.addFieldInt32(0, value, 0)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @returns {flatbuffers.Offset}
-   */
-  static endInteger(builder: flatbuffers.Builder): flatbuffers.Offset {
-    var offset = builder.endObject()
-    return offset
-  }
-
-  //}
-}
-/**
-   * @constructor
-   */
-// export namespace Decoder{
-export class String {
-  /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-  bb: flatbuffers.ByteBuffer
-
-  /**
-     * @type {number}
-     */
-  bb_pos: number = 0
-  /**
-   * @param {number} i
-   * @param {flatbuffers.ByteBuffer} bb
-   * @returns {String}
-   */
-  __init(i: number, bb: flatbuffers.ByteBuffer): String {
-    this.bb_pos = i
-    this.bb = bb
-    return this
-  }
-
-  /**
-   * @param {flatbuffers.ByteBuffer} bb
-   * @param {String=} obj
-   * @returns {String}
-   */
-  static getRootAsString(bb: flatbuffers.ByteBuffer, obj?: String): String {
-    return (obj || new String()).__init(
-      bb.readInt32(bb.position()) + bb.position(),
-      bb
-    )
-  }
-
-  /**
-   * @param {flatbuffers.Encoding=} optionalEncoding
-   * @returns {string|Uint8Array|null}
-   */
-  value(optionalEncoding?: any): string | null {
-    //value(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-    //value(optionalEncoding?:any):string|Uint8Array|null {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset
-      ? this.bb.__string(this.bb_pos + offset, optionalEncoding)
-      : null
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   */
-  static startString(builder: flatbuffers.Builder) {
-    builder.startObject(1)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} valueOffset
-   */
-  static addValue(
-    builder: flatbuffers.Builder,
-    valueOffset: flatbuffers.Offset
-  ) {
-    builder.addFieldOffset(0, valueOffset, 0)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @returns {flatbuffers.Offset}
-   */
-  static endString(builder: flatbuffers.Builder): flatbuffers.Offset {
-    var offset = builder.endObject()
-    return offset
-  }
-
-  //}
-}
-/**
-   * @constructor
-   */
-// export namespace Decoder{
-export class Float {
-  /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-  bb: flatbuffers.ByteBuffer
-
-  /**
-     * @type {number}
-     */
-  bb_pos: number = 0
-  /**
-   * @param {number} i
-   * @param {flatbuffers.ByteBuffer} bb
-   * @returns {Float}
-   */
-  __init(i: number, bb: flatbuffers.ByteBuffer): Float {
-    this.bb_pos = i
-    this.bb = bb
-    return this
-  }
-
-  /**
-   * @param {flatbuffers.ByteBuffer} bb
-   * @param {Float=} obj
-   * @returns {Float}
-   */
-  static getRootAsFloat(bb: flatbuffers.ByteBuffer, obj?: Float): Float {
-    return (obj || new Float()).__init(
-      bb.readInt32(bb.position()) + bb.position(),
-      bb
-    )
-  }
-
-  /**
-   * @returns {number}
-   */
-  value(): number {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   */
-  static startFloat(builder: flatbuffers.Builder) {
-    builder.startObject(1)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {number} value
-   */
-  static addValue(builder: flatbuffers.Builder, value: number) {
-    builder.addFieldFloat32(0, value, 0.0)
-  }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @returns {flatbuffers.Offset}
-   */
-  static endFloat(builder: flatbuffers.Builder): flatbuffers.Offset {
-    var offset = builder.endObject()
-    return offset
-  }
-
-  //}
-}
 /**
    * @constructor
    */
@@ -875,7 +102,7 @@ export class Accessor {
   /**
    * @returns {Decoder}
    */
-  accessorType(): Decoder {
+  decoderType(): Decoder {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? ((this.bb.readUint8(this.bb_pos + offset): any): Decoder)
@@ -886,7 +113,7 @@ export class Accessor {
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  accessor<T: flatbuffers.Table>(obj: T): T | null {
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 8)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -910,7 +137,7 @@ export class Accessor {
    * @param {flatbuffers.Builder} builder
    * @param {Decoder} accessorType
    */
-  static addAccessorType(builder: flatbuffers.Builder, accessorType: Decoder) {
+  static addDecoderType(builder: flatbuffers.Builder, accessorType: Decoder) {
     builder.addFieldInt8(1, accessorType, decoder.NONE)
   }
 
@@ -918,7 +145,7 @@ export class Accessor {
    * @param {flatbuffers.Builder} builder
    * @param {flatbuffers.Offset} accessorOffset
    */
-  static addAccessor(
+  static addDecoder(
     builder: flatbuffers.Builder,
     accessorOffset: flatbuffers.Offset
   ) {
@@ -979,7 +206,7 @@ export class Collection {
   /**
    * @returns {Decoder}
    */
-  itemType(): Decoder {
+  decoderType(): Decoder {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? ((this.bb.readUint8(this.bb_pos + offset): any): Decoder)
@@ -990,7 +217,7 @@ export class Collection {
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  item<T: flatbuffers.Table>(obj: T): T | null {
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -1004,18 +231,21 @@ export class Collection {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {Decoder} itemType
+   * @param {Decoder} decoderType
    */
-  static addItemType(builder: flatbuffers.Builder, itemType: Decoder) {
-    builder.addFieldInt8(0, itemType, decoder.NONE)
+  static addDecoderType(builder: flatbuffers.Builder, decoderType: Decoder) {
+    builder.addFieldInt8(0, decoderType, decoder.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} itemOffset
+   * @param {flatbuffers.Offset} decoderOffset
    */
-  static addItem(builder: flatbuffers.Builder, itemOffset: flatbuffers.Offset) {
-    builder.addFieldOffset(1, itemOffset, 0)
+  static addDecoder(
+    builder: flatbuffers.Builder,
+    decoderOffset: flatbuffers.Offset
+  ) {
+    builder.addFieldOffset(1, decoderOffset, 0)
   }
 
   /**
@@ -1033,7 +263,7 @@ export class Collection {
    * @constructor
    */
 // export namespace Decoder{
-export class Primitive {
+export class Boolean {
   /**
      * @type {flatbuffers.ByteBuffer}
      */
@@ -1046,9 +276,9 @@ export class Primitive {
   /**
    * @param {number} i
    * @param {flatbuffers.ByteBuffer} bb
-   * @returns {Primitive}
+   * @returns {Boolean}
    */
-  __init(i: number, bb: flatbuffers.ByteBuffer): Primitive {
+  __init(i: number, bb: flatbuffers.ByteBuffer): Boolean {
     this.bb_pos = i
     this.bb = bb
     return this
@@ -1056,49 +286,30 @@ export class Primitive {
 
   /**
    * @param {flatbuffers.ByteBuffer} bb
-   * @param {Primitive=} obj
-   * @returns {Primitive}
+   * @param {Boolean=} obj
+   * @returns {Boolean}
    */
   static getRootAsPrimitive(
     bb: flatbuffers.ByteBuffer,
-    obj?: Primitive
-  ): Primitive {
-    return (obj || new Primitive()).__init(
+    obj?: Boolean
+  ): Boolean {
+    return (obj || new Boolean()).__init(
       bb.readInt32(bb.position()) + bb.position(),
       bb
     )
   }
 
   /**
-   * @returns {Value}
-   */
-  type(): Value {
-    var offset = this.bb.__offset(this.bb_pos, 4)
-    return offset
-      ? ((this.bb.readInt8(this.bb_pos + offset): any): Value)
-      : value.Null
-  }
-
-  /**
    * @param {flatbuffers.Builder} builder
    */
-  static startPrimitive(builder: flatbuffers.Builder) {
-    builder.startObject(1)
+  static startBoolean(builder: flatbuffers.Builder) {
+    builder.startObject(0)
   }
-
-  /**
-   * @param {flatbuffers.Builder} builder
-   * @param {Value} type
-   */
-  static addType(builder: flatbuffers.Builder, type: Value) {
-    builder.addFieldInt8(0, type, value.Null)
-  }
-
   /**
    * @param {flatbuffers.Builder} builder
    * @returns {flatbuffers.Offset}
    */
-  static endPrimitive(builder: flatbuffers.Builder): flatbuffers.Offset {
+  static endBoolean(builder: flatbuffers.Builder): flatbuffers.Offset {
     var offset = builder.endObject()
     return offset
   }
@@ -1148,7 +359,7 @@ export class Dictionary {
   /**
    * @returns {Decoder}
    */
-  dictionaryType(): Decoder {
+  decoderType(): Decoder {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? ((this.bb.readUint8(this.bb_pos + offset): any): Decoder)
@@ -1159,7 +370,7 @@ export class Dictionary {
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  dictionary<T: flatbuffers.Table>(obj: T): T | null {
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -1173,24 +384,21 @@ export class Dictionary {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {Decoder} dictionaryType
+   * @param {Decoder} decoderType
    */
-  static addDictionaryType(
-    builder: flatbuffers.Builder,
-    dictionaryType: Decoder
-  ) {
-    builder.addFieldInt8(0, dictionaryType, decoder.NONE)
+  static addDecoderType(builder: flatbuffers.Builder, decoderType: Decoder) {
+    builder.addFieldInt8(0, decoderType, decoder.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} dictionaryOffset
+   * @param {flatbuffers.Offset} decoderOffset
    */
-  static addDictionary(
+  static addDecoder(
     builder: flatbuffers.Builder,
-    dictionaryOffset: flatbuffers.Offset
+    decoderOffset: flatbuffers.Offset
   ) {
-    builder.addFieldOffset(1, dictionaryOffset, 0)
+    builder.addFieldOffset(1, decoderOffset, 0)
   }
 
   /**
@@ -1292,10 +500,7 @@ export class Either {
   static createVariantsVector(
     builder: flatbuffers.Builder,
     data: flatbuffers.Offset[]
-  ): flatbuffers.Offset | null {
-    if (!data) {
-      return null
-    }
+  ): flatbuffers.Offset {
     builder.startVector(4, data.length, 4)
     for (var i = data.length - 1; i >= 0; i--) {
       builder.addOffset(data[i])
@@ -1362,7 +567,7 @@ export class Variant {
   /**
    * @returns {Decoder}
    */
-  variantType(): Decoder {
+  decoderType(): Decoder {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? ((this.bb.readUint8(this.bb_pos + offset): any): Decoder)
@@ -1373,7 +578,7 @@ export class Variant {
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  variant<T: flatbuffers.Table>(obj: T): T | null {
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -1387,21 +592,21 @@ export class Variant {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {Decoder} variantType
+   * @param {Decoder} decoderType
    */
-  static addVariantType(builder: flatbuffers.Builder, variantType: Decoder) {
-    builder.addFieldInt8(0, variantType, decoder.NONE)
+  static addDecoderType(builder: flatbuffers.Builder, decoderType: Decoder) {
+    builder.addFieldInt8(0, decoderType, decoder.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} variantOffset
+   * @param {flatbuffers.Offset} decoderOffset
    */
-  static addVariant(
+  static addDecoder(
     builder: flatbuffers.Builder,
-    variantOffset: flatbuffers.Offset
+    decoderOffset: flatbuffers.Offset
   ) {
-    builder.addFieldOffset(1, variantOffset, 0)
+    builder.addFieldOffset(1, decoderOffset, 0)
   }
 
   /**
@@ -1532,20 +737,20 @@ export class Ok {
   }
 
   /**
-   * @returns {JSON}
+   * @returns {JSON.JSONType}
    */
-  okType(): JSON {
+  valueType(): JSON.JSONType {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
-      ? ((this.bb.readUint8(this.bb_pos + offset): any): JSON)
-      : json.NONE
+      ? ((this.bb.readUint8(this.bb_pos + offset): any): JSON.JSONType)
+      : JSON.JSONVariant.NONE
   }
 
   /**
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  ok<T: flatbuffers.Table>(obj: T): T | null {
+  value<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -1559,18 +764,21 @@ export class Ok {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {JSON} okType
+   * @param {JSON.JSONType} JSONType
    */
-  static addOkType(builder: flatbuffers.Builder, okType: JSON) {
-    builder.addFieldInt8(0, okType, json.NONE)
+  static addValueType(builder: flatbuffers.Builder, valueType: JSON.JSONType) {
+    builder.addFieldInt8(0, valueType, JSON.JSONVariant.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} okOffset
+   * @param {flatbuffers.Offset} valueOffset
    */
-  static addOk(builder: flatbuffers.Builder, okOffset: flatbuffers.Offset) {
-    builder.addFieldOffset(1, okOffset, 0)
+  static addValue(
+    builder: flatbuffers.Builder,
+    valueOffset: flatbuffers.Offset
+  ) {
+    builder.addFieldOffset(1, valueOffset, 0)
   }
 
   /**
@@ -1637,7 +845,7 @@ export class Field {
   /**
    * @returns {Decoder}
    */
-  fieldType(): Decoder {
+  decoderType(): Decoder {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? ((this.bb.readUint8(this.bb_pos + offset): any): Decoder)
@@ -1648,7 +856,7 @@ export class Field {
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  field<T: flatbuffers.Table>(obj: T): T | null {
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 8)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -1670,21 +878,21 @@ export class Field {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {Decoder} fieldType
+   * @param {Decoder} decoderType
    */
-  static addFieldType(builder: flatbuffers.Builder, fieldType: Decoder) {
-    builder.addFieldInt8(1, fieldType, decoder.NONE)
+  static addDecoderType(builder: flatbuffers.Builder, decoderType: Decoder) {
+    builder.addFieldInt8(1, decoderType, decoder.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
    * @param {flatbuffers.Offset} fieldOffset
    */
-  static addField(
+  static addDecoder(
     builder: flatbuffers.Builder,
-    fieldOffset: flatbuffers.Offset
+    decoderOffset: flatbuffers.Offset
   ) {
-    builder.addFieldOffset(2, fieldOffset, 0)
+    builder.addFieldOffset(2, decoderOffset, 0)
   }
 
   /**
@@ -1746,7 +954,7 @@ export class Index {
   /**
    * @returns {Decoder}
    */
-  memberType(): Decoder {
+  decoderType(): Decoder {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset
       ? ((this.bb.readUint8(this.bb_pos + offset): any): Decoder)
@@ -1757,7 +965,7 @@ export class Index {
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  member<T: flatbuffers.Table>(obj: T): T | null {
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 8)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -1781,19 +989,19 @@ export class Index {
    * @param {flatbuffers.Builder} builder
    * @param {Decoder} memberType
    */
-  static addMemberType(builder: flatbuffers.Builder, memberType: Decoder) {
-    builder.addFieldInt8(1, memberType, decoder.NONE)
+  static addDecoderType(builder: flatbuffers.Builder, decoderType: Decoder) {
+    builder.addFieldInt8(1, decoderType, decoder.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
    * @param {flatbuffers.Offset} memberOffset
    */
-  static addMember(
+  static addDecoder(
     builder: flatbuffers.Builder,
-    memberOffset: flatbuffers.Offset
+    decoderOffset: flatbuffers.Offset
   ) {
-    builder.addFieldOffset(2, memberOffset, 0)
+    builder.addFieldOffset(2, decoderOffset, 0)
   }
 
   /**
@@ -1849,7 +1057,7 @@ export class Form {
    * @param {Field=} obj
    * @returns {Field}
    */
-  form(index: number, obj?: Field): Field | null {
+  fields(index: number, obj?: Field): Field | null {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? (obj || new Field()).__init(
@@ -1864,7 +1072,7 @@ export class Form {
   /**
    * @returns {number}
    */
-  formLength(): number {
+  fieldsLength(): number {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0
   }
@@ -1878,10 +1086,13 @@ export class Form {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} formOffset
+   * @param {flatbuffers.Offset} fieldsOffset
    */
-  static addForm(builder: flatbuffers.Builder, formOffset: flatbuffers.Offset) {
-    builder.addFieldOffset(0, formOffset, 0)
+  static addFields(
+    builder: flatbuffers.Builder,
+    fieldsOffset: flatbuffers.Offset
+  ) {
+    builder.addFieldOffset(0, fieldsOffset, 0)
   }
 
   /**
@@ -1892,10 +1103,7 @@ export class Form {
   static createFormVector(
     builder: flatbuffers.Builder,
     data: flatbuffers.Offset[]
-  ): flatbuffers.Offset | null {
-    if (!data) {
-      return null
-    }
+  ): flatbuffers.Offset {
     builder.startVector(4, data.length, 4)
     for (var i = data.length - 1; i >= 0; i--) {
       builder.addOffset(data[i])
@@ -1907,7 +1115,7 @@ export class Form {
    * @param {flatbuffers.Builder} builder
    * @param {number} numElems
    */
-  static startFormVector(builder: flatbuffers.Builder, numElems: number) {
+  static startFieldsVector(builder: flatbuffers.Builder, numElems: number) {
     builder.startVector(4, numElems, 4)
   }
 
@@ -2010,10 +1218,7 @@ export class Record {
   static createFieldsVector(
     builder: flatbuffers.Builder,
     data: flatbuffers.Offset[]
-  ): flatbuffers.Offset | null {
-    if (!data) {
-      return null
-    }
+  ): flatbuffers.Offset {
     builder.startVector(4, data.length, 4)
     for (var i = data.length - 1; i >= 0; i--) {
       builder.addOffset(data[i])
@@ -2080,7 +1285,7 @@ export class Maybe {
   /**
    * @returns {Decoder}
    */
-  maybeType(): Decoder {
+  decoderType(): Decoder {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? ((this.bb.readUint8(this.bb_pos + offset): any): Decoder)
@@ -2091,7 +1296,7 @@ export class Maybe {
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  maybe<T: flatbuffers.Table>(obj: T): T | null {
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -2105,21 +1310,21 @@ export class Maybe {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {Decoder} maybeType
+   * @param {Decoder} decoderType
    */
-  static addMaybeType(builder: flatbuffers.Builder, maybeType: Decoder) {
-    builder.addFieldInt8(0, maybeType, decoder.NONE)
+  static addDecoderType(builder: flatbuffers.Builder, decoderType: Decoder) {
+    builder.addFieldInt8(0, decoderType, decoder.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
    * @param {flatbuffers.Offset} maybeOffset
    */
-  static addMaybe(
+  static addDecoder(
     builder: flatbuffers.Builder,
-    maybeOffset: flatbuffers.Offset
+    decoderOffset: flatbuffers.Offset
   ) {
-    builder.addFieldOffset(1, maybeOffset, 0)
+    builder.addFieldOffset(1, decoderOffset, 0)
   }
 
   /**
@@ -2173,18 +1378,18 @@ export class Null {
   /**
    * @returns {JSON}
    */
-  NullType(): JSON {
+  valueType(): JSON.JSONType {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
-      ? ((this.bb.readUint8(this.bb_pos + offset): any): JSON)
-      : json.NONE
+      ? ((this.bb.readUint8(this.bb_pos + offset): any): JSON.JSONType)
+      : JSON.JSONVariant.NONE
   }
 
   /**
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  Null<T: flatbuffers.Table>(obj: T): T | null {
+  value<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -2198,18 +1403,21 @@ export class Null {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {JSON} NullType
+   * @param {JSON} valueType
    */
-  static addNullType(builder: flatbuffers.Builder, NullType: JSON) {
-    builder.addFieldInt8(0, NullType, json.NONE)
+  static addValueType(builder: flatbuffers.Builder, valueType: JSON.JSONType) {
+    builder.addFieldInt8(0, valueType, JSON.JSONVariant.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} NullOffset
+   * @param {flatbuffers.Offset} valueOffset
    */
-  static addNull(builder: flatbuffers.Builder, NullOffset: flatbuffers.Offset) {
-    builder.addFieldOffset(1, NullOffset, 0)
+  static addValue(
+    builder: flatbuffers.Builder,
+    valueOffset: flatbuffers.Offset
+  ) {
+    builder.addFieldOffset(1, valueOffset, 0)
   }
 
   /**
@@ -2266,18 +1474,18 @@ export class Undefined {
   /**
    * @returns {JSON}
    */
-  UndefinedType(): JSON {
+  valueType(): JSON.JSONType {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
-      ? ((this.bb.readUint8(this.bb_pos + offset): any): JSON)
-      : json.NONE
+      ? ((this.bb.readUint8(this.bb_pos + offset): any): JSON.JSONType)
+      : JSON.JSONVariant.NONE
   }
 
   /**
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  Undefined<T: flatbuffers.Table>(obj: T): T | null {
+  value<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -2291,21 +1499,21 @@ export class Undefined {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {JSON} UndefinedType
+   * @param {JSON} valueType
    */
-  static addUndefinedType(builder: flatbuffers.Builder, UndefinedType: JSON) {
-    builder.addFieldInt8(0, UndefinedType, json.NONE)
+  static addValueType(builder: flatbuffers.Builder, valueType: JSON.JSONType) {
+    builder.addFieldInt8(0, valueType, JSON.JSONVariant.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {flatbuffers.Offset} UndefinedOffset
+   * @param {flatbuffers.Offset} valueOffset
    */
-  static addUndefined(
+  static addValue(
     builder: flatbuffers.Builder,
-    UndefinedOffset: flatbuffers.Offset
+    valueOffset: flatbuffers.Offset
   ) {
-    builder.addFieldOffset(1, UndefinedOffset, 0)
+    builder.addFieldOffset(1, valueOffset, 0)
   }
 
   /**
@@ -2362,7 +1570,7 @@ export class Optional {
   /**
    * @returns {Decoder}
    */
-  optionalType(): Decoder {
+  decoderType(): Decoder {
     var offset = this.bb.__offset(this.bb_pos, 4)
     return offset
       ? ((this.bb.readUint8(this.bb_pos + offset): any): Decoder)
@@ -2373,7 +1581,7 @@ export class Optional {
    * @param {flatbuffers.Table} obj
    * @returns {?flatbuffers.Table}
    */
-  optional<T: flatbuffers.Table>(obj: T): T | null {
+  decoder<T: flatbuffers.Table>(obj: T): T | null {
     var offset = this.bb.__offset(this.bb_pos, 6)
     return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
   }
@@ -2387,21 +1595,21 @@ export class Optional {
 
   /**
    * @param {flatbuffers.Builder} builder
-   * @param {Decoder} optionalType
+   * @param {Decoder} decoderType
    */
-  static addOptionalType(builder: flatbuffers.Builder, optionalType: Decoder) {
-    builder.addFieldInt8(0, optionalType, decoder.NONE)
+  static addDecoderType(builder: flatbuffers.Builder, decoderType: Decoder) {
+    builder.addFieldInt8(0, decoderType, decoder.NONE)
   }
 
   /**
    * @param {flatbuffers.Builder} builder
    * @param {flatbuffers.Offset} optionalOffset
    */
-  static addOptional(
+  static addDecoder(
     builder: flatbuffers.Builder,
-    optionalOffset: flatbuffers.Offset
+    decoderOffset: flatbuffers.Offset
   ) {
-    builder.addFieldOffset(1, optionalOffset, 0)
+    builder.addFieldOffset(1, decoderOffset, 0)
   }
 
   /**
@@ -2409,6 +1617,169 @@ export class Optional {
    * @returns {flatbuffers.Offset}
    */
   static endOptional(builder: flatbuffers.Builder): flatbuffers.Offset {
+    var offset = builder.endObject()
+    return offset
+  }
+}
+// }
+
+/**
+ * @constructor
+ */
+// export namespace Decoder{
+export class Integer {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  bb: flatbuffers.ByteBuffer
+
+  /**
+   * @type {number}
+   */
+  bb_pos: number = 0
+  /**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {Integer}
+ */
+  __init(i: number, bb: flatbuffers.ByteBuffer): Integer {
+    this.bb_pos = i
+    this.bb = bb
+    return this
+  }
+
+  /**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {Integer=} obj
+ * @returns {Integer}
+ */
+  static getRootAsInteger(bb: flatbuffers.ByteBuffer, obj?: Integer): Integer {
+    return (obj || new Integer()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
+  }
+
+  /**
+ * @param {flatbuffers.Builder} builder
+ */
+  static startInteger(builder: flatbuffers.Builder) {
+    builder.startObject(0)
+  }
+
+  /**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+  static endInteger(builder: flatbuffers.Builder): flatbuffers.Offset {
+    var offset = builder.endObject()
+    return offset
+  }
+}
+// }
+/**
+ * @constructor
+ */
+// export namespace Decoder{
+export class Float {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  bb: flatbuffers.ByteBuffer
+
+  /**
+   * @type {number}
+   */
+  bb_pos: number = 0
+  /**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {Float}
+ */
+  __init(i: number, bb: flatbuffers.ByteBuffer): Float {
+    this.bb_pos = i
+    this.bb = bb
+    return this
+  }
+
+  /**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {Float=} obj
+ * @returns {Float}
+ */
+  static getRootAsFloat(bb: flatbuffers.ByteBuffer, obj?: Float): Float {
+    return (obj || new Float()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
+  }
+
+  /**
+ * @param {flatbuffers.Builder} builder
+ */
+  static startFloat(builder: flatbuffers.Builder) {
+    builder.startObject(0)
+  }
+
+  /**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+  static endFloat(builder: flatbuffers.Builder): flatbuffers.Offset {
+    var offset = builder.endObject()
+    return offset
+  }
+}
+// }
+/**
+ * @constructor
+ */
+// export namespace Decoder{
+export class String {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  bb: flatbuffers.ByteBuffer
+
+  /**
+   * @type {number}
+   */
+  bb_pos: number = 0
+  /**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {String}
+ */
+  __init(i: number, bb: flatbuffers.ByteBuffer): String {
+    this.bb_pos = i
+    this.bb = bb
+    return this
+  }
+
+  /**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {String=} obj
+ * @returns {String}
+ */
+  static getRootAsString(bb: flatbuffers.ByteBuffer, obj?: String): String {
+    return (obj || new String()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
+  }
+
+  /**
+ * @param {flatbuffers.Builder} builder
+ */
+  static startString(builder: flatbuffers.Builder) {
+    builder.startObject(0)
+  }
+
+  /**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+  static endString(builder: flatbuffers.Builder): flatbuffers.Offset {
     var offset = builder.endObject()
     return offset
   }

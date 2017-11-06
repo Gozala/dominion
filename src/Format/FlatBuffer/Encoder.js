@@ -9,13 +9,13 @@ import type {
   Result
 } from "../../Log"
 import type { Builder, ByteBuffer } from "flatbuffers"
-import type { OpType, Op } from "./Op"
+import type { OpType, Op } from "./ChangeLog.fbs/Op"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
-import { type change } from "./Change"
+import type { EncodedChange } from "./ChangeLog.fbs/Change"
 import { ok, error } from "result.flow"
-import Change from "./Change"
-import Changes from "./ChangeLog"
+import Change from "./ChangeLog.fbs/Change"
+import Changes from "./ChangeLog.fbs"
 import { DecoderError } from "./Error"
 
 import {
@@ -47,17 +47,17 @@ import {
   SetTextData,
   StashNextSibling,
   ShiftSiblings
-} from "./Op"
+} from "./ChangeLog.fbs/Op"
 
 const push = <a>(item: a, items: a[]): a[] => (items.push(item), items)
 
 export default class FlatBufferEncoder {
   builder: Builder
-  log: change[]
-  constructor(builder: Builder, log: change[]) {
+  log: EncodedChange[]
+  constructor(builder: Builder, log: EncodedChange[]) {
     this.reset(builder, log)
   }
-  reset(builder: Builder, log: change[]): FlatBufferEncoder {
+  reset(builder: Builder, log: EncodedChange[]): FlatBufferEncoder {
     this.builder = builder
     this.log = log
 
@@ -335,7 +335,10 @@ export default class FlatBufferEncoder {
     decoder: EventDecoder,
     capture: boolean
   ): FlatBufferEncoder {
-    return state
+    return state.change(
+      RemoveEventListener.opType,
+      RemoveEventListener.encode(state.builder, type, decoder, capture)
+    )
   }
 
   static stashNextSibling(

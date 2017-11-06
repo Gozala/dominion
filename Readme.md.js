@@ -5,6 +5,7 @@ import type { Dict } from "dictionary.flow"
 import * as DOMinion from "dominion"
 import JSON from "./src/Format/JSON"
 import FlatBuffer from "./src/Format/FlatBuffer"
+
 import Log from "./src/Patch/Log"
 
 DOMinion //?
@@ -101,15 +102,45 @@ const etree1 = DOMinion.createHost(
   [
     DOMinion.createElement(
       "button",
-      [DOMinion.on("click", Decoder.record({ type: Decoder.String }))],
+      [
+        DOMinion.on(
+          "click",
+          Decoder.record({ type: Decoder.String, button: Decoder.Integer })
+        )
+      ],
       []
     )
   ]
-)
+) //?$.children[0].listeners
 const edelta1 = FlatBuffer.encode(DOMinion.diff(tree0, etree1)) //?
 try {
   if (edelta1.isError !== true) {
     DOMinion.patch(Log.encode, FlatBuffer.decode(edelta1)) //?
+  }
+} catch (error) {
+  error //?
+}
+
+const etree2 = DOMinion.createHost(
+  [],
+  [
+    DOMinion.createElement(
+      "button",
+      [
+        DOMinion.on(
+          "mouseover",
+          Decoder.record({ type: Decoder.String, button: Decoder.Integer })
+        )
+      ],
+      []
+    )
+  ]
+) //?$.children[0].listeners
+
+const edelta2 = FlatBuffer.encode(DOMinion.diff(etree1, etree2)) //?
+try {
+  if (edelta2.isError !== true) {
+    DOMinion.patch(Log.encode, FlatBuffer.decode(edelta2)) //?
   }
 } catch (error) {
   error //?

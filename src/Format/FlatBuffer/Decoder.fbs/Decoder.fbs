@@ -1,0 +1,99 @@
+include "../JSON.fbs/JSON.fbs";
+
+namespace Decoder;
+
+union Decoder {
+  Error,
+  Ok,
+  Boolean,
+  Accessor,
+  Either,
+  Field,
+  Index,
+  Null,
+  Undefined,
+  Optional,
+  Maybe,
+  Collection,
+  Dictionary,
+  Record,
+  Form,
+  String,
+  Integer,
+  Float
+}
+
+table Accessor {
+  name:string;
+  decoder:Decoder;
+}
+
+table Collection {
+  decoder:Decoder;
+}
+
+table Boolean {
+}
+
+table Dictionary {
+  decoder:Decoder;
+}
+
+table Either {
+ variants:[Variant];
+}
+
+table Variant {
+  decoder:Decoder;
+}
+
+table Error {
+  message:string;
+}
+
+table Ok {
+  value:JSON.JSON;
+}
+
+table Field {
+  name:string;
+  decoder:Decoder;
+}
+
+table Index {
+  index:int;
+  decoder:Decoder;
+}
+
+table Form {
+  fields:[Field];
+}
+
+table Record {
+  fields:[Field];
+}
+
+table Maybe {
+  decoder:Decoder;
+}
+
+table Null {
+  value:JSON.JSON;
+}
+
+table Undefined {
+  value:JSON.JSON;
+}
+
+table Optional {
+  decoder:Decoder;
+}
+
+table Integer {
+}
+
+table Float {
+}
+
+table String {
+}

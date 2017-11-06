@@ -1,0 +1,43 @@
+namespace JSON;
+
+union JSON {
+  Boolean,
+  Integer,
+  Float,
+  String,
+  JSONArray,
+  JSONObject
+}
+
+table JSONArray {
+  elements:[Element];
+}
+
+table JSONObject {
+  properties:[Property];
+}
+
+table Property {
+  name:string;
+  value:JSON;
+}
+
+table Element {
+  value:JSON;
+}
+
+table Boolean {
+  value:bool;
+}
+
+table Integer {
+  value:int;
+}
+
+table String {
+  value:string;
+}
+
+table Float {
+  value:float;
+}

@@ -2,10 +2,10 @@
 
 import { flatbuffers } from "flatbuffers"
 import type { Builder, Offset } from "flatbuffers"
-import type { Encode, Encoder, EventDecoder } from "../../Log"
-import * as FBS from "./DOMinion.fbs.ts.js"
-import Decoder from "./EventDecoder"
-import { DecoderError, FieldError } from "./Error"
+import type { Encode, Encoder, EventDecoder } from "../../../Log"
+import * as FBS from "./ChangeLog.js"
+import Decoder from "../Decoder.fbs.js"
+import { DecoderError, FieldError } from "../Error"
 
 export type OpType = FBS.Op
 const opType = FBS.op
@@ -136,14 +136,11 @@ export class AddEventListener extends FBS.AddEventListener {
     if (type == null) {
       return new FieldError("type", AddEventListener)
     }
-    const decoderType = this.decoderType()
-    const variant = Decoder.variant(decoderType)
-    const encodedDecoder = variant && this.decoder(variant)
-    const decoder = encodedDecoder && Decoder.decode(encodedDecoder)
-    if (decoder && !(decoder instanceof DecoderError)) {
-      return changeLog.addEventDecoder(buffer, type, decoder, capture)
-    } else {
+    const decoder = Decoder.decode(this)
+    if (decoder instanceof DecoderError) {
       return new FieldError("decoder", AddEventListener)
+    } else {
+      return changeLog.addEventDecoder(buffer, type, decoder, capture)
     }
   }
 }
@@ -175,15 +172,12 @@ export class RemoveEventListener extends FBS.RemoveEventListener {
       return new FieldError("type", RemoveEventListener)
     }
 
-    const decoderType = this.decoderType()
-    const variant = Decoder.variant(decoderType)
-    const encodedDecoder = variant && this.decoder(variant)
-    const decoder = encodedDecoder && Decoder.decode(encodedDecoder)
-    if (!decoder || decoder instanceof DecoderError) {
+    const decoder = Decoder.decode(this)
+    if (decoder instanceof DecoderError) {
       return new FieldError("decoder", RemoveEventListener)
+    } else {
+      return changeLog.removeEventDecoder(buffer, type, decoder, capture)
     }
-
-    return changeLog.removeEventDecoder(buffer, type, decoder, capture)
   }
 }
 

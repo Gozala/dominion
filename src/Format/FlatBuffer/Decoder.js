@@ -5,7 +5,7 @@ import * as Log from "../../Log"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"
 import type { Builder, ByteBuffer } from "flatbuffers"
-import Changes from "./ChangeLog"
+import ChangeLog from "./ChangeLog.fbs"
 import { DecoderError } from "./Error"
 
 import {
@@ -36,7 +36,7 @@ import {
   SetStyleRule,
   SetTextData,
   StashNextSibling
-} from "./Op"
+} from "./ChangeLog.fbs/Op"
 
 export default class FlatBufferDecoder implements ChangeList {
   data: Uint8Array
@@ -45,9 +45,9 @@ export default class FlatBufferDecoder implements ChangeList {
   }
   encode<buffer>(encoder: Encoder<buffer>, init: buffer): Result<buffer> {
     const byteBuffer = new flatbuffers.ByteBuffer(this.data)
-    const table = new Changes.Table()
-    Changes.Table.getRootAsChangeLog(byteBuffer, table)
-    return Changes.decode(table, encoder, init)
+    const chageLog = new ChangeLog()
+    ChangeLog.getRootAsChangeLog(byteBuffer, chageLog)
+    return ChangeLog.decode(chageLog, encoder, init)
   }
 
   static decode(data: Uint8Array): ChangeList {

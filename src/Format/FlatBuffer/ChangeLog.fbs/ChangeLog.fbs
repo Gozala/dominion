@@ -1,6 +1,6 @@
-include "./Decoder.fbs";
+include "../Decoder.fbs/Decoder.fbs";
 
-namespace DOMinion;
+namespace ChangeLog;
 
 table StashNextSibling {
   address:int;

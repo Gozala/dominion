@@ -3,7 +3,7 @@
 // Transformed verison of DOMinion.fbs.ts
 
 import * as flatbuffers from "flatbuffers"
-import * as Decoder from "./Decoder.fbs.ts.js"
+import * as Decoder from "../Decoder.fbs/Decoder"
 
 export const op = {
   NONE: (0: 0),
@@ -2603,10 +2603,7 @@ export class ChangeLog {
   static createLogVector(
     builder: flatbuffers.Builder,
     data: flatbuffers.Offset[]
-  ): flatbuffers.Offset | null {
-    if (!data) {
-      return null
-    }
+  ): flatbuffers.Offset {
     builder.startVector(4, data.length, 4)
     for (var i = data.length - 1; i >= 0; i--) {
       builder.addOffset(data[i])

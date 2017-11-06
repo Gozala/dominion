@@ -4,7 +4,7 @@ import { flatbuffers } from "./flatbuffers"
 /**
  * @enum
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export enum Op{
   NONE= 0,
   SelectChildren= 1,
@@ -40,7 +40,7 @@ export enum Op{
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class StashNextSibling {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -108,7 +108,7 @@ static endStashNextSibling(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class ShiftSiblings {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -176,7 +176,7 @@ static endShiftSiblings(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class DiscardStashed {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -244,7 +244,7 @@ static endDiscardStashed(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class AssignStringProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -334,7 +334,7 @@ static endAssignStringProperty(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class AssignBooleanProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -421,7 +421,7 @@ static endAssignBooleanProperty(builder:flatbuffers.Builder):flatbuffers.Offset 
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class AssignNumberProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -508,7 +508,7 @@ static endAssignNumberProperty(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class AssignNullProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -579,7 +579,7 @@ static endAssignNullProperty(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class DeleteProperty {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -650,7 +650,7 @@ static endDeleteProperty(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class SetStyleRule {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -740,7 +740,7 @@ static endSetStyleRule(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class RemoveStyleRule {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -811,7 +811,7 @@ static endRemoveStyleRule(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class SetAttribute {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -920,7 +920,7 @@ static endSetAttribute(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class RemoveAttribute {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1010,7 +1010,7 @@ static endRemoveAttribute(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class InsertText {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1081,7 +1081,7 @@ static endInsertText(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class InsertComment {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1152,7 +1152,7 @@ static endInsertComment(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class InsertElement {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1242,7 +1242,7 @@ static endInsertElement(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class InsertStashedNode {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1310,7 +1310,7 @@ static endInsertStashedNode(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class ReplaceWithText {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1381,7 +1381,7 @@ static endReplaceWithText(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class ReplaceWithComment {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1452,7 +1452,7 @@ static endReplaceWithComment(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class ReplaceWithElement {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1542,7 +1542,7 @@ static endReplaceWithElement(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class ReplaceWithStashedNode {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1610,7 +1610,7 @@ static endReplaceWithStashedNode(builder:flatbuffers.Builder):flatbuffers.Offset
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class SetTextData {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1681,7 +1681,7 @@ static endSetTextData(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class EditTextData {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1803,7 +1803,7 @@ static endEditTextData(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class SelectChildren {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1855,7 +1855,7 @@ static endSelectChildren(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class SelectSibling {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1923,7 +1923,7 @@ static endSelectSibling(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class SelectParent {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -1975,7 +1975,7 @@ static endSelectParent(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class RemoveNextSibling {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -2027,7 +2027,7 @@ static endRemoveNextSibling(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class AddEventListener {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -2080,9 +2080,9 @@ capture():boolean {
 /**
  * @returns {Decoder.Decoder}
  */
-decoderType():NS17203419818377876140.Decoder.Decoder {
+decoderType():NS12653012536621855626.Decoder.Decoder {
   var offset = this.bb.__offset(this.bb_pos, 8);
-  return offset ? /** @type {Decoder.Decoder} */ (this.bb.readUint8(this.bb_pos + offset)) : NS17203419818377876140.Decoder.Decoder.NONE;
+  return offset ? /** @type {Decoder.Decoder} */ (this.bb.readUint8(this.bb_pos + offset)) : NS12653012536621855626.Decoder.Decoder.NONE;
 };
 
 /**
@@ -2121,15 +2121,15 @@ static addCapture(builder:flatbuffers.Builder, capture:boolean) {
  * @param {flatbuffers.Builder} builder
  * @param {Decoder.Decoder} decoderType
  */
-static addDecoderType(builder:flatbuffers.Builder, decoderType:NS17203419818377876140.Decoder.Decoder) {
-  builder.addFieldInt8(2, decoderType, NS17203419818377876140.Decoder.Decoder.NONE);
+static addDecoderType(builder:flatbuffers.Builder, decoderType:NS12653012536621855626.Decoder.Decoder) {
+  builder.addFieldInt8(2, decoderType, NS12653012536621855626.Decoder.Decoder.NONE);
 };
 
 /**
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} decoderOffset
  */
-static addDecoder(builder:flatbuffers.Builder, decoderOffset:NS17203419818377876140.flatbuffers.Offset) {
+static addDecoder(builder:flatbuffers.Builder, decoderOffset:NS12653012536621855626.flatbuffers.Offset) {
   builder.addFieldOffset(3, decoderOffset, 0);
 };
 
@@ -2147,7 +2147,7 @@ static endAddEventListener(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class RemoveEventListener {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -2200,9 +2200,9 @@ capture():boolean {
 /**
  * @returns {Decoder.Decoder}
  */
-decoderType():NS17203419818377876140.Decoder.Decoder {
+decoderType():NS12653012536621855626.Decoder.Decoder {
   var offset = this.bb.__offset(this.bb_pos, 8);
-  return offset ? /** @type {Decoder.Decoder} */ (this.bb.readUint8(this.bb_pos + offset)) : NS17203419818377876140.Decoder.Decoder.NONE;
+  return offset ? /** @type {Decoder.Decoder} */ (this.bb.readUint8(this.bb_pos + offset)) : NS12653012536621855626.Decoder.Decoder.NONE;
 };
 
 /**
@@ -2241,15 +2241,15 @@ static addCapture(builder:flatbuffers.Builder, capture:boolean) {
  * @param {flatbuffers.Builder} builder
  * @param {Decoder.Decoder} decoderType
  */
-static addDecoderType(builder:flatbuffers.Builder, decoderType:NS17203419818377876140.Decoder.Decoder) {
-  builder.addFieldInt8(2, decoderType, NS17203419818377876140.Decoder.Decoder.NONE);
+static addDecoderType(builder:flatbuffers.Builder, decoderType:NS12653012536621855626.Decoder.Decoder) {
+  builder.addFieldInt8(2, decoderType, NS12653012536621855626.Decoder.Decoder.NONE);
 };
 
 /**
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} decoderOffset
  */
-static addDecoder(builder:flatbuffers.Builder, decoderOffset:NS17203419818377876140.flatbuffers.Offset) {
+static addDecoder(builder:flatbuffers.Builder, decoderOffset:NS12653012536621855626.flatbuffers.Offset) {
   builder.addFieldOffset(3, decoderOffset, 0);
 };
 
@@ -2267,7 +2267,7 @@ static endRemoveEventListener(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class Change {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -2299,11 +2299,11 @@ static getRootAsChange(bb:flatbuffers.ByteBuffer, obj?:Change):Change {
 };
 
 /**
- * @returns {DOMinion.Op}
+ * @returns {ChangeLog.Op}
  */
-opType():DOMinion.Op {
+opType():ChangeLog.Op {
   var offset = this.bb.__offset(this.bb_pos, 4);
-  return offset ? /** @type {DOMinion.Op} */ (this.bb.readUint8(this.bb_pos + offset)) : DOMinion.Op.NONE;
+  return offset ? /** @type {ChangeLog.Op} */ (this.bb.readUint8(this.bb_pos + offset)) : ChangeLog.Op.NONE;
 };
 
 /**
@@ -2324,10 +2324,10 @@ static startChange(builder:flatbuffers.Builder) {
 
 /**
  * @param {flatbuffers.Builder} builder
- * @param {DOMinion.Op} opType
+ * @param {ChangeLog.Op} opType
  */
-static addOpType(builder:flatbuffers.Builder, opType:DOMinion.Op) {
-  builder.addFieldInt8(0, opType, DOMinion.Op.NONE);
+static addOpType(builder:flatbuffers.Builder, opType:ChangeLog.Op) {
+  builder.addFieldInt8(0, opType, ChangeLog.Op.NONE);
 };
 
 /**
@@ -2352,7 +2352,7 @@ static endChange(builder:flatbuffers.Builder):flatbuffers.Offset {
 /**
  * @constructor
  */
-export namespace DOMinion{
+export namespace ChangeLog{
 export class ChangeLog {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -2385,12 +2385,12 @@ static getRootAsChangeLog(bb:flatbuffers.ByteBuffer, obj?:ChangeLog):ChangeLog {
 
 /**
  * @param {number} index
- * @param {DOMinion.Change=} obj
- * @returns {DOMinion.Change}
+ * @param {ChangeLog.Change=} obj
+ * @returns {ChangeLog.Change}
  */
-log(index: number, obj?:DOMinion.Change):DOMinion.Change|null {
+log(index: number, obj?:ChangeLog.Change):ChangeLog.Change|null {
   var offset = this.bb.__offset(this.bb_pos, 4);
-  return offset ? (obj || new DOMinion.Change).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
+  return offset ? (obj || new ChangeLog.Change).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
 };
 
 /**
@@ -2421,10 +2421,7 @@ static addLog(builder:flatbuffers.Builder, logOffset:flatbuffers.Offset) {
  * @param {Array.<flatbuffers.Offset>} data
  * @returns {flatbuffers.Offset}
  */
-static createLogVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset|null {
-if(!data){
-  return null;
-}
+static createLogVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
   builder.startVector(4, data.length, 4);
   for (var i = data.length - 1; i >= 0; i--) {
     builder.addOffset(data[i]);

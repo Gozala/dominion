@@ -1,10 +1,10 @@
 /* @flow */
 
 import type { Builder, Offset } from "flatbuffers"
-import type { Encoder, Decode, Encode, Result } from "../../Log"
+import type { Encoder, Decode, Encode, Result } from "../../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
-import { DecoderError } from "./Error"
-import { Change } from "./DOMinion.fbs.ts.js"
+import { DecoderError } from "../Error"
+import * as ChangeLogTable from "./ChangeLog"
 import * as op from "./Op"
 
 import {
@@ -38,7 +38,8 @@ import {
   RemoveEventListener
 } from "./Op"
 
-export opaque type change: Offset = Offset
+export opaque type Encoded<type>: Offset = Offset
+export type EncodedChange = Encoded<Change>
 
 class UnknownOpType extends DecoderError {
   opType: OpType
@@ -65,9 +66,9 @@ class OpError extends DecoderError {
   }
 }
 
-export class Codec {
-  Table = Change
-  pool: { [OpType]: OpVariant } = {
+export default class Change extends ChangeLogTable.Change {
+  static Table = ChangeLogTable.Change
+  static pool: { [OpType]: OpVariant } = {
     [AssignStringProperty.opType]: new AssignStringProperty(),
     [RemoveNextSibling.opType]: new RemoveNextSibling(),
     [InsertText.opType]: new InsertText(),
@@ -97,13 +98,13 @@ export class Codec {
     [AddEventListener.opType]: new AddEventListener(),
     [RemoveEventListener.opType]: new RemoveEventListener()
   }
-  decode<x>(
+  static decode<x>(
     change: Change,
     changeLog: Encoder<x>,
     buffer: x
   ): x | DecoderError {
     const type = change.opType()
-    const variant = this.pool[type]
+    const variant = Change.pool[type]
     if (variant == null) {
       return new UnknownOpType(type)
     } else {
@@ -114,12 +115,14 @@ export class Codec {
       return op.decode(changeLog, buffer)
     }
   }
-  encode(builder: Builder, opType: OpType, opOffset: Op): change {
+  static encode(
+    builder: Builder,
+    opType: OpType,
+    opOffset: Op
+  ): Encoded<Change> {
     Change.startChange(builder)
     Change.addOp(builder, opOffset)
     Change.addOpType(builder, opType)
     return Change.endChange(builder)
   }
 }
-
-export default new Codec()
