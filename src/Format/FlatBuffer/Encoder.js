@@ -1,13 +1,6 @@
 /* @flow */
 
-import type {
-  Encode,
-  Decode,
-  Encoder,
-  ChangeList,
-  EventDecoder,
-  Result
-} from "../../Log"
+import type { ChangeList, EventDecoder, Result } from "../../Log"
 import type { Builder, ByteBuffer } from "flatbuffers"
 import type { OpType, Op } from "./ChangeLog.fbs/Op"
 import unreachable from "unreachable"

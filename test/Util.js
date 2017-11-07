@@ -13,7 +13,7 @@ export const diff = <a>(
   if (delta.isError === true) {
     return delta
   } else {
-    return DOMinon.patch(Log.encode, FlatBuffer.decode(delta))
+    return DOMinon.patch(Log.archive(), FlatBuffer.decode(delta))
   }
 }
 
@@ -22,10 +22,10 @@ export const createHost = (localName: string = "x-host"): HTMLElement =>
 
 export const createHostMount = (
   host: HTMLElement = createHost()
-): DOMinon.Encode<HTMLElement> => DOMinon.mount(host)
+): DOMinon.Archive<HTMLElement> => DOMinon.mount(host)
 
 export const applyDiff = <a>(
-  host: DOMinon.Encode<HTMLElement>,
+  host: DOMinon.Archive<HTMLElement>,
   left: DOMinon.Node<a>,
   right: DOMinon.Node<a>
 ): HTMLElement => {

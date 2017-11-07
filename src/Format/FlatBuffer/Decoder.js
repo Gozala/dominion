@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Encoder, Encode, Decode, Result, ChangeList } from "../../Log"
+import type { Encoder, Decode, Result, ChangeList } from "../../Log"
 import * as Log from "../../Log"
 import unreachable from "unreachable"
 import { flatbuffers } from "flatbuffers"

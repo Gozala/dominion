@@ -1,13 +1,6 @@
 /* @flow */
 
-import type {
-  Encoder,
-  Decode,
-  Encode,
-  EventDecoder,
-  ChangeList,
-  Result
-} from "../Log"
+import type { Encoder, Decode, EventDecoder, ChangeList, Result } from "../Log"
 import { ok, error } from "result.flow"
 import unreachable from "unreachable"
 

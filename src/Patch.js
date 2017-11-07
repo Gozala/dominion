@@ -2,14 +2,14 @@
 
 import type {
   Decode,
-  Encode,
+  Archive,
   Encoder,
   DecoderError,
   ChangeList,
   Result
 } from "./Log"
 
-export const patch = <target>(
-  host: Encode<target>,
+export const patch = <a>(
+  archive: Archive<a>,
   changeList: ChangeList
-): Result<target> => host(changeList)
+): Result<a> => archive.patch(changeList)

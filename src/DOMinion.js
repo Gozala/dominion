@@ -28,7 +28,7 @@ import { patch } from "./Patch"
 import DOMPatch from "./Patch/DOM"
 import * as Dictionary from "dictionary.flow"
 import unreachable from "unreachable"
-export type { Encoder, Decode, Encode, ChangeList, DecoderError } from "./Log"
+export type { Encoder, Decode, Archive, ChangeList, DecoderError } from "./Log"
 
 const empty: Array<any> = Object.freeze([])
 const blank: Dict<any> = Dictionary.empty()
@@ -342,7 +342,7 @@ export const createHost = <message>(
   children: Node<message>[] = empty
 ): Element<message> => createElement("x-host", settings, children)
 
-export const mount = DOMPatch.encoder
+export const mount = DOMPatch.archive
 export { diff, patch }
 
 export type {

@@ -1,8 +1,8 @@
 /* @flow */
 
 import type {
-  Encode,
   Encoder,
+  Archive,
   ChangeList,
   DecoderError,
   Result,
@@ -11,6 +11,7 @@ import type {
 import { ok, error } from "result.flow"
 import { nodeType } from "../DOM/Node"
 import unreachable from "unreachable"
+import * as Decoder from "decoder.flow"
 
 const empty = Object.freeze([])
 
@@ -124,10 +125,17 @@ export default class DOMPatch {
   target: Node
   childrenSelected: boolean
   stash: Stash
-  constructor(target: Node, childrenSelected: boolean, stash: Stash) {
+  mailbox: { send: Object => void }
+  reset(
+    target: Node,
+    childrenSelected: boolean,
+    stash: Stash,
+    mailbox: { send: Object => void }
+  ) {
     this.target = target
     this.childrenSelected = childrenSelected
     this.stash = stash
+    this.mailbox = mailbox
   }
 
   static selectChildren(state: DOMPatch): DOMPatch {
@@ -351,6 +359,12 @@ export default class DOMPatch {
     decoder: EventDecoder,
     capture: boolean
   ): DOMPatch {
+    const node: Object = getUpdateTargetElement(
+      state.childrenSelected,
+      state.target
+    )
+    const host = node.DOMinion || (node.DOMinion = new DOMinion(state.mailbox))
+    host.addEventDecoder(node, type, decoder, capture)
     return state
   }
   static removeEventDecoder(
@@ -359,6 +373,12 @@ export default class DOMPatch {
     decoder: EventDecoder,
     capture: boolean
   ): DOMPatch {
+    const node: Object = getUpdateTargetElement(
+      state.childrenSelected,
+      state.target
+    )
+    const host = node.DOMinion || (node.DOMinion = new DOMinion(state.mailbox))
+    host.removeEventDecoder(node, type, decoder, capture)
     return state
   }
 
@@ -401,20 +421,72 @@ export default class DOMPatch {
     return state
   }
 
-  static encode<node: Node>(
-    target: node,
-    changeList: ChangeList
-  ): Result<node> {
-    const result = changeList.encode(DOMPatch, new DOMPatch(target, false, {}))
+  static archive<node: Node>(target: node): Archive<node> {
+    return new DOMArchive(target)
+  }
+}
+
+const CAPTURING_PHASE = 1
+
+class DOMinion {
+  decoders: { string: EventDecoder }
+  mailbox: { send: Object => void }
+  constructor(mailbox: { send: Object => void }) {
+    this.mailbox = mailbox
+  }
+  static handleEvent(event: Event) {
+    const { currentTarget, type, eventPhase } = event
+    const node: Object = currentTarget
+    const host = node.DOMinion
+    const capture = event.eventPhase === CAPTURING_PHASE
+    if (host) {
+      const hash = `${event.type}${capture ? "!" : "^"}`
+      const decoder = host.decoders[hash]
+      if (decoder) {
+        const result = Decoder.decode(decoder, event)
+        host.mailbox.send(result)
+        return null
+      }
+    }
+    currentTarget.removeEventListener(type, DOMinion.handleEvent, capture)
+  }
+  addEventDecoder(
+    target: Node,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ) {
+    const hash = `${type}${capture ? "!" : "^"}`
+    this.decoders[hash] = decoder
+    target.addEventListener(type, DOMinion.handleEvent, capture)
+  }
+  removeEventDecoder(
+    target: Node,
+    type: string,
+    decoder: EventDecoder,
+    capture: boolean
+  ) {
+    const hash = `${type}${capture ? "!" : "^"}`
+    delete this.decoders[hash]
+  }
+}
+
+class DOMArchive<node: Node> {
+  static receive = message => {}
+  target: node
+  mailbox: { send: Object => void }
+  cursor: DOMPatch = new DOMPatch()
+  constructor(target: node, receive: Object => void = DOMArchive.receive) {
+    this.target = target
+    this.mailbox = { send: receive }
+  }
+  patch(changeList: ChangeList): Result<node> {
+    this.cursor.reset(this.target, false, {}, this.mailbox)
+    const result = changeList.encode(DOMPatch, this.cursor)
     if (result instanceof DOMPatch) {
-      return target
+      return this.target
     } else {
       return result
     }
-  }
-
-  static encoder<node: Node>(target: node): Encode<node> {
-    return (changeList: ChangeList): Result<node> =>
-      DOMPatch.encode(target, changeList)
   }
 }

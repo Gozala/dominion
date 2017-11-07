@@ -1,7 +1,7 @@
 /* @flow */
 
 import type { Builder, Offset } from "flatbuffers"
-import type { Encoder, Decode, Encode, Result } from "../../../Log"
+import type { Encoder, Decode, Result } from "../../../Log"
 import type { Op, OpType, OpVariant } from "./Op"
 import { DecoderError } from "../Error"
 import * as ChangeLogTable from "./ChangeLog"

@@ -2,7 +2,7 @@
 
 import { flatbuffers } from "flatbuffers"
 import type { Builder, Offset } from "flatbuffers"
-import type { Encode, Encoder, EventDecoder } from "../../../Log"
+import type { Encoder, EventDecoder } from "../../../Log"
 import * as FBS from "./ChangeLog.js"
 import Decoder from "../Decoder.fbs.js"
 import { DecoderError, FieldError } from "../Error"

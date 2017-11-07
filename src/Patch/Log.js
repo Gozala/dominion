@@ -1,7 +1,7 @@
 /* @flow */
 
 import { error, ok } from "result.flow"
-import type { Encode, Encoder, ChangeList, EventDecoder, Result } from "../Log"
+import type { Encoder, ChangeList, EventDecoder, Result, Archive } from "../Log"
 
 const push = <a>(x: a, xs: a[]): a[] => (xs.push(x), xs)
 
@@ -145,7 +145,11 @@ export default class LogEncoder {
     )
   }
 
-  static encode(changeList: ChangeList): Result<string[]> {
-    return changeList.encode(LogEncoder, [])
+  static archive(log: string[] = []): Archive<string[]> {
+    return {
+      patch(changeList: ChangeList) {
+        return changeList.encode(LogEncoder, log)
+      }
+    }
   }
 }

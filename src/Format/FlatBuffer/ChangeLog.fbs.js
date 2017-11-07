@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Decode, Encode, Encoder, ChangeList } from "../../Log"
+import type { Encoder } from "../../Log"
 import * as Log from "../../Log"
 import type { Op, OpType, OpVariant } from "./ChangeLog.fbs/Op"
 import type { Builder, Offset } from "flatbuffers"

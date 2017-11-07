@@ -78,7 +78,7 @@ const body = document.createElement("div") //?$.innerHTML
 const host = DOMinion.mount(body)
 
 if (delta1.isError !== true) {
-  DOMinion.patch(host, FlatBuffer.decode(delta1)) //?
+  host.patch(FlatBuffer.decode(delta1)) //?
   body.innerHTML //?
 }
 
@@ -115,7 +115,7 @@ const etree1 = DOMinion.createHost(
 const edelta1 = FlatBuffer.encode(DOMinion.diff(tree0, etree1)) //?
 try {
   if (edelta1.isError !== true) {
-    DOMinion.patch(Log.encode, FlatBuffer.decode(edelta1)) //?
+    DOMinion.patch(Log.archive(), FlatBuffer.decode(edelta1)) //?
   }
 } catch (error) {
   error //?
@@ -140,7 +140,7 @@ const etree2 = DOMinion.createHost(
 const edelta2 = FlatBuffer.encode(DOMinion.diff(etree1, etree2)) //?
 try {
   if (edelta2.isError !== true) {
-    DOMinion.patch(Log.encode, FlatBuffer.decode(edelta2)) //?
+    DOMinion.patch(Log.archive(), FlatBuffer.decode(edelta2)) //?
   }
 } catch (error) {
   error //?

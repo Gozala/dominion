@@ -78,10 +78,14 @@ export interface ChangeList {
   encode<buffer>(Encoder<buffer>, buffer): Result<buffer>;
 }
 
-export interface Encode<buffer> {
-  (ChangeList): Result<buffer>;
-}
+// export interface Encode<buffer> {
+//   (ChangeList): Result<buffer>;
+// }
 
 export interface Decode<buffer> {
   (buffer): ChangeList;
+}
+
+export interface Archive<node> {
+  patch(ChangeList): Result<node>;
 }
