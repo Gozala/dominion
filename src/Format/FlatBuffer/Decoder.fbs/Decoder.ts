@@ -24,7 +24,9 @@ export enum Decoder{
   Form= 15,
   String= 16,
   Integer= 17,
-  Float= 18
+  Float= 18,
+  And= 19,
+  Match= 20
 }};
 
 /**
@@ -1586,6 +1588,209 @@ static startString(builder:flatbuffers.Builder) {
  * @returns {flatbuffers.Offset}
  */
 static endString(builder:flatbuffers.Builder):flatbuffers.Offset {
+  var offset = builder.endObject();
+  return offset;
+};
+
+}
+}
+/**
+ * @constructor
+ */
+export namespace Decoder{
+export class And {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  bb: flatbuffers.ByteBuffer;
+
+  /**
+   * @type {number}
+   */
+  bb_pos:number = 0;
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {And}
+ */
+__init(i:number, bb:flatbuffers.ByteBuffer):And {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {And=} obj
+ * @returns {And}
+ */
+static getRootAsAnd(bb:flatbuffers.ByteBuffer, obj?:And):And {
+  return (obj || new And).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {Decoder.Decoder}
+ */
+leftType():Decoder.Decoder {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? /** @type {Decoder.Decoder} */ (this.bb.readUint8(this.bb_pos + offset)) : Decoder.Decoder.NONE;
+};
+
+/**
+ * @param {flatbuffers.Table} obj
+ * @returns {?flatbuffers.Table}
+ */
+left<T extends flatbuffers.Table>(obj:T):T|null {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? this.bb.__union(obj, this.bb_pos + offset) : null;
+};
+
+/**
+ * @returns {Decoder.Decoder}
+ */
+rightType():Decoder.Decoder {
+  var offset = this.bb.__offset(this.bb_pos, 8);
+  return offset ? /** @type {Decoder.Decoder} */ (this.bb.readUint8(this.bb_pos + offset)) : Decoder.Decoder.NONE;
+};
+
+/**
+ * @param {flatbuffers.Table} obj
+ * @returns {?flatbuffers.Table}
+ */
+right<T extends flatbuffers.Table>(obj:T):T|null {
+  var offset = this.bb.__offset(this.bb_pos, 10);
+  return offset ? this.bb.__union(obj, this.bb_pos + offset) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+static startAnd(builder:flatbuffers.Builder) {
+  builder.startObject(4);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {Decoder.Decoder} leftType
+ */
+static addLeftType(builder:flatbuffers.Builder, leftType:Decoder.Decoder) {
+  builder.addFieldInt8(0, leftType, Decoder.Decoder.NONE);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} leftOffset
+ */
+static addLeft(builder:flatbuffers.Builder, leftOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(1, leftOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {Decoder.Decoder} rightType
+ */
+static addRightType(builder:flatbuffers.Builder, rightType:Decoder.Decoder) {
+  builder.addFieldInt8(2, rightType, Decoder.Decoder.NONE);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} rightOffset
+ */
+static addRight(builder:flatbuffers.Builder, rightOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(3, rightOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+static endAnd(builder:flatbuffers.Builder):flatbuffers.Offset {
+  var offset = builder.endObject();
+  return offset;
+};
+
+}
+}
+/**
+ * @constructor
+ */
+export namespace Decoder{
+export class Match {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  bb: flatbuffers.ByteBuffer;
+
+  /**
+   * @type {number}
+   */
+  bb_pos:number = 0;
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {Match}
+ */
+__init(i:number, bb:flatbuffers.ByteBuffer):Match {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {Match=} obj
+ * @returns {Match}
+ */
+static getRootAsMatch(bb:flatbuffers.ByteBuffer, obj?:Match):Match {
+  return (obj || new Match).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {JSON.JSON}
+ */
+valueType():NS2244006937882397563.JSON.JSON {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? /** @type {JSON.JSON} */ (this.bb.readUint8(this.bb_pos + offset)) : NS2244006937882397563.JSON.JSON.NONE;
+};
+
+/**
+ * @param {flatbuffers.Table} obj
+ * @returns {?flatbuffers.Table}
+ */
+value<T extends flatbuffers.Table>(obj:T):T|null {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? this.bb.__union(obj, this.bb_pos + offset) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+static startMatch(builder:flatbuffers.Builder) {
+  builder.startObject(2);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {JSON.JSON} valueType
+ */
+static addValueType(builder:flatbuffers.Builder, valueType:NS2244006937882397563.JSON.JSON) {
+  builder.addFieldInt8(0, valueType, NS2244006937882397563.JSON.JSON.NONE);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} valueOffset
+ */
+static addValue(builder:flatbuffers.Builder, valueOffset:NS2244006937882397563.flatbuffers.Offset) {
+  builder.addFieldOffset(1, valueOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+static endMatch(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   return offset;
 };

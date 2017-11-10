@@ -34,6 +34,8 @@ type VariantType =
   | Integer
   | Float
   | String
+  | Match
+  | And
 
 type EncodedDecoder =
   | Encoded<Accessor>
@@ -54,6 +56,8 @@ type EncodedDecoder =
   | Encoded<String>
   | Encoded<Float>
   | Encoded<Integer>
+  | Encoded<Match>
+  | Encoded<And>
 
 class Accessor extends DecoderTable.Accessor {
   static encode<a>(
@@ -419,6 +423,94 @@ class Ok extends DecoderTable.Ok {
   }
 }
 
+class Match extends DecoderTable.Match {
+  static encode(builder: Builder, value: Value): Encoded<Match> {
+    const encodedValue = JSON.encode(builder, value)
+    Match.startMatch(builder)
+    Match.addValueType(builder, JSON.typeOf(value))
+    if (encodedValue) {
+      Match.addValue(builder, encodedValue)
+    }
+    return Match.endMatch(builder)
+  }
+  static decode(value: Value): Decoder.Decoder<Value> {
+    return Decoder.match(value)
+  }
+  decode(): Decoder.Decoder<Value> | DecoderError {
+    const value = JSON.decode(this)
+    if (value instanceof DecoderError) {
+      return value
+    } else {
+      return Match.decode(value)
+    }
+  }
+}
+
+class Left {
+  source: And
+  reset(source: And): Left {
+    this.source = source
+    return this
+  }
+  decoderType(): DecoderType {
+    return this.source.leftType()
+  }
+  decoder<t: Table>(table: t): ?t {
+    return this.source.left(table)
+  }
+}
+
+class Right {
+  source: And
+  reset(source: And): Right {
+    this.source = source
+    return this
+  }
+  decoderType(): DecoderType {
+    return this.source.rightType()
+  }
+  decoder<t: Table>(table: t): ?t {
+    return this.source.right(table)
+  }
+}
+
+class And extends DecoderTable.And {
+  static left = new Left()
+  static right = new Right()
+  static encode<a, b>(
+    builder: Builder,
+    left: Decoder.Decoder<a>,
+    right: Decoder.Decoder<b>
+  ): Encoded<And> {
+    const encodedLeft = Variant.encode(builder, left)
+    const encodedRight = Variant.encode(builder, right)
+
+    And.startAnd(builder)
+    And.addLeftType(builder, Variant.typeOf(left))
+    And.addLeft(builder, encodedLeft)
+    And.addRightType(builder, Variant.typeOf(right))
+    And.addRight(builder, encodedRight)
+    return And.endAnd(builder)
+  }
+  static decode<a, b>(
+    left: Decoder.Decoder<a>,
+    right: Decoder.Decoder<b>
+  ): Decoder.Decoder<b> {
+    return Decoder.and(left, right)
+  }
+  decode<a, b>(): Decoder.Decoder<b> | DecoderError {
+    const left = Variant.decode(And.left.reset(this))
+    if (left instanceof DecoderError) {
+      return left
+    }
+    const right = Variant.decode(And.right.reset(this))
+    if (right instanceof DecoderError) {
+      return right
+    }
+    return And.decode(left, right)
+  }
+}
+
 class Error extends DecoderTable.Error {
   static encode(builder: Builder, message: string): Encoded<Error> {
     const encodedMessage = builder.createString(message)
@@ -554,7 +646,9 @@ export default class Variant {
     [decoderType.Boolean]: new Boolean(),
     [decoderType.Float]: new Float(),
     [decoderType.Integer]: new Integer(),
-    [decoderType.String]: new String()
+    [decoderType.String]: new String(),
+    [decoderType.Match]: new Match(),
+    [decoderType.And]: new And()
   }
   static typeOf<a>(decoder: Decoder.Decoder<a>): DecoderType {
     const { type } = decoder
@@ -624,16 +718,25 @@ export default class Variant {
       case "Form": {
         return Form.encode(builder, decoder.form)
       }
+      case "And": {
+        return And.encode(builder, decoder.left, decoder.right)
+      }
+      case "Match": {
+        return Match.encode(builder, JSON.from(decoder.match))
+      }
       default:
         return unreachable(decoder)
     }
+  }
+  static cursor<a>(type: DecoderType): ?VariantType {
+    return Variant.pool[type]
   }
   static decode<a>(table: {
     decoderType(): DecoderType,
     decoder<t: Table>(t): ?t
   }): Decoder.Decoder<a> | DecoderError {
     const type = table.decoderType()
-    const cursor = Variant.pool[type]
+    const cursor = Variant.cursor(type)
     const variant = cursor && table.decoder(cursor)
     const decoder = variant && variant.decode()
     if (decoder == null) {

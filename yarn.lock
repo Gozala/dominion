@@ -1357,9 +1357,9 @@ decamelize@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
 
-decoder.flow@0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/decoder.flow/-/decoder.flow-0.4.1.tgz#3d32af343f1b2d921c8bb160ce872c4e97cf749e"
+decoder.flow@0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/decoder.flow/-/decoder.flow-0.5.0.tgz#d96d67d7b1f6082a8dd13debda7cb61718f12702"
   dependencies:
     float.flow "^0.1.1"
     integer.flow "^0.1.0"

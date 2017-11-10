@@ -40,7 +40,9 @@ export const decoder = {
   Form: (15: 15),
   String: (16: 16),
   Integer: (17: 17),
-  Float: (18: 18)
+  Float: (18: 18),
+  And: (19: 19),
+  Match: (20: 20)
 }
 
 export type Decoder = $Values<typeof decoder>
@@ -1780,6 +1782,227 @@ export class String {
  * @returns {flatbuffers.Offset}
  */
   static endString(builder: flatbuffers.Builder): flatbuffers.Offset {
+    var offset = builder.endObject()
+    return offset
+  }
+}
+// }
+/**
+ * @constructor
+ */
+// export namespace Decoder{
+export class And {
+  /**
+     * @type {flatbuffers.ByteBuffer}
+     */
+  bb: flatbuffers.ByteBuffer
+
+  /**
+     * @type {number}
+     */
+  bb_pos: number = 0
+  /**
+   * @param {number} i
+   * @param {flatbuffers.ByteBuffer} bb
+   * @returns {And}
+   */
+  __init(i: number, bb: flatbuffers.ByteBuffer): And {
+    this.bb_pos = i
+    this.bb = bb
+    return this
+  }
+
+  /**
+   * @param {flatbuffers.ByteBuffer} bb
+   * @param {And=} obj
+   * @returns {And}
+   */
+  static getRootAsAnd(bb: flatbuffers.ByteBuffer, obj?: And): And {
+    return (obj || new And()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
+  }
+
+  /**
+   * @returns {Decoder}
+   */
+  leftType(): Decoder {
+    var offset = this.bb.__offset(this.bb_pos, 4)
+    return offset
+      ? /** @type {Decoder} */ ((this.bb.readUint8(this.bb_pos + offset): any))
+      : decoder.NONE
+  }
+
+  /**
+   * @param {flatbuffers.Table} obj
+   * @returns {?flatbuffers.Table}
+   */
+  left<T: flatbuffers.Table>(obj: T): T | null {
+    var offset = this.bb.__offset(this.bb_pos, 6)
+    return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
+  }
+
+  /**
+   * @returns {Decoder}
+   */
+  rightType(): Decoder {
+    var offset = this.bb.__offset(this.bb_pos, 8)
+    return offset
+      ? /** @type {Decoder} */ ((this.bb.readUint8(this.bb_pos + offset): any))
+      : decoder.NONE
+  }
+
+  /**
+   * @param {flatbuffers.Table} obj
+   * @returns {?flatbuffers.Table}
+   */
+  right<T: flatbuffers.Table>(obj: T): T | null {
+    var offset = this.bb.__offset(this.bb_pos, 10)
+    return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   */
+  static startAnd(builder: flatbuffers.Builder) {
+    builder.startObject(4)
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   * @param {Decoder} leftType
+   */
+  static addLeftType(builder: flatbuffers.Builder, leftType: Decoder) {
+    builder.addFieldInt8(0, leftType, decoder.NONE)
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   * @param {flatbuffers.Offset} leftOffset
+   */
+  static addLeft(builder: flatbuffers.Builder, leftOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(1, leftOffset, 0)
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   * @param {Decoder} rightType
+   */
+  static addRightType(builder: flatbuffers.Builder, rightType: Decoder) {
+    builder.addFieldInt8(2, rightType, decoder.NONE)
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   * @param {flatbuffers.Offset} rightOffset
+   */
+  static addRight(
+    builder: flatbuffers.Builder,
+    rightOffset: flatbuffers.Offset
+  ) {
+    builder.addFieldOffset(3, rightOffset, 0)
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   * @returns {flatbuffers.Offset}
+   */
+  static endAnd(builder: flatbuffers.Builder): flatbuffers.Offset {
+    var offset = builder.endObject()
+    return offset
+  }
+}
+// }
+/**
+   * @constructor
+   */
+// export namespace Decoder{
+export class Match {
+  /**
+     * @type {flatbuffers.ByteBuffer}
+     */
+  bb: flatbuffers.ByteBuffer
+
+  /**
+     * @type {number}
+     */
+  bb_pos: number = 0
+  /**
+   * @param {number} i
+   * @param {flatbuffers.ByteBuffer} bb
+   * @returns {Match}
+   */
+  __init(i: number, bb: flatbuffers.ByteBuffer): Match {
+    this.bb_pos = i
+    this.bb = bb
+    return this
+  }
+
+  /**
+   * @param {flatbuffers.ByteBuffer} bb
+   * @param {Match=} obj
+   * @returns {Match}
+   */
+  static getRootAsMatch(bb: flatbuffers.ByteBuffer, obj?: Match): Match {
+    return (obj || new Match()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb
+    )
+  }
+
+  /**
+   * @returns {JSON.JSON}
+   */
+  valueType(): JSON.JSONType {
+    var offset = this.bb.__offset(this.bb_pos, 4)
+    return offset
+      ? /** @type {JSON.JSON} */ ((this.bb.readUint8(
+          this.bb_pos + offset
+        ): any))
+      : JSON.JSONVariant.NONE
+  }
+
+  /**
+   * @param {flatbuffers.Table} obj
+   * @returns {?flatbuffers.Table}
+   */
+  value<T: flatbuffers.Table>(obj: T): T | null {
+    var offset = this.bb.__offset(this.bb_pos, 6)
+    return offset ? this.bb.__union(obj, this.bb_pos + offset) : null
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   */
+  static startMatch(builder: flatbuffers.Builder) {
+    builder.startObject(2)
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   * @param {JSON.JSON} valueType
+   */
+  static addValueType(builder: flatbuffers.Builder, valueType: JSON.JSONType) {
+    builder.addFieldInt8(0, valueType, JSON.JSONVariant.NONE)
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   * @param {flatbuffers.Offset} valueOffset
+   */
+  static addValue(
+    builder: flatbuffers.Builder,
+    valueOffset: flatbuffers.Offset
+  ) {
+    builder.addFieldOffset(1, valueOffset, 0)
+  }
+
+  /**
+   * @param {flatbuffers.Builder} builder
+   * @returns {flatbuffers.Offset}
+   */
+  static endMatch(builder: flatbuffers.Builder): flatbuffers.Offset {
     var offset = builder.endObject()
     return offset
   }
