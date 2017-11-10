@@ -336,7 +336,7 @@ export default class FlatBufferEncoder {
 
   static stashNextSibling(
     state: FlatBufferEncoder,
-    address
+    address: number
   ): FlatBufferEncoder {
     return state.change(
       StashNextSibling.opType,

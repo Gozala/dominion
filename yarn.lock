@@ -1757,9 +1757,9 @@ float.flow@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/float.flow/-/float.flow-0.1.1.tgz#f2a5addd59fbc12203761f2b25890d1e92f67538"
 
-flow-bin@0.58.0:
-  version "0.58.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.58.0.tgz#62d5a776589419e5656800a0e5230a5e585ca65e"
+flow-bin@0.59.0:
+  version "0.59.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.59.0.tgz#8c151ee7f09f1deed9bf0b9d1f2e8ab9d470f1bb"
 
 flow-copy-source@^1.2.1:
   version "1.2.1"
