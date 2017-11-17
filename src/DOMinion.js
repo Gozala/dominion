@@ -59,8 +59,8 @@ class ListenerSetting<message> implements Listener<message> {
   settingType = settingType.listener
   type: string
   capture: boolean
-  decoder: Decoder<message>
-  constructor(type: string, capture: boolean, decoder: Decoder<message>) {
+  decoder: Decoder<?message>
+  constructor(type: string, capture: boolean, decoder: Decoder<?message>) {
     this.type = type
     this.capture = capture
     this.decoder = decoder
@@ -270,7 +270,7 @@ export const property = (
 
 export const on = <message>(
   type: string,
-  decoder: Decoder<message>,
+  decoder: Decoder<?message>,
   capture: boolean = false
 ): Listener<message> => new ListenerSetting(type, capture, decoder)
 

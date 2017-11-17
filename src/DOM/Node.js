@@ -46,7 +46,7 @@ export interface Listener<message> {
   settingType: LISTENER_SETTING;
   type: string;
   capture: boolean;
-  decoder: Decoder<message>;
+  decoder: Decoder<?message>;
 }
 
 export type Listeners<message> = Dict<Listener<message>>
