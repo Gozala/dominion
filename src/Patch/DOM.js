@@ -421,8 +421,11 @@ export default class DOMPatch {
     return state
   }
 
-  static archive<node: Node>(target: node): Archive<node> {
-    return new DOMArchive(target)
+  static archive<node: Node>(
+    target: node,
+    receive?: Object => void = DOMArchive.receive
+  ): Archive<node> {
+    return new DOMArchive(target, receive)
   }
 }
 
