@@ -58,12 +58,14 @@ export interface Text<message> {
   nodeType: TEXT_NODE;
   data: string;
   toDebugString(): string;
+  map<tagged>((message) => tagged): Node<tagged>;
 }
 
 export interface Comment<message> {
   nodeType: COMMENT_NODE;
   data: string;
   toDebugString(): string;
+  map<tagged>((message) => tagged): Node<tagged>;
 }
 
 interface ElementNode<message> {
@@ -75,6 +77,7 @@ interface ElementNode<message> {
   classList: ClassList;
   listeners: Listeners<message>;
   toDebugString(): string;
+  map<tagged>((message) => tagged): Node<tagged>;
 }
 
 export type Indexed<node> = [string, node]
@@ -104,12 +107,14 @@ export interface UnindexedFragment<message> {
   nodeType: UNINDEXED_FRAGMENT_NODE;
   children: UnindexedChildren<message>;
   toDebugString(): string;
+  map<tagged>((message) => tagged): Node<tagged>;
 }
 
 export interface IndexedFragment<message> {
   nodeType: INDEXED_FRAGMENT_NODE;
   children: IndexedChildren<message>;
   toDebugString(): string;
+  map<tagged>((message) => tagged): Node<tagged>;
 }
 
 export interface Thunk<message, params: Array<mixed> = *> {
@@ -119,6 +124,7 @@ export interface Thunk<message, params: Array<mixed> = *> {
   render: (...args: params) => Node<message>;
   force(): Node<message>;
   toDebugString(): string;
+  map<tagged>((message) => tagged): Node<tagged>;
 }
 
 export interface Tagged<message, inner = *> {
@@ -126,6 +132,7 @@ export interface Tagged<message, inner = *> {
   node: Node<inner>;
   tag: inner => message;
   toDebugString(): string;
+  map<tagged>((message) => tagged): Node<tagged>;
 }
 
 export const nodeType = {

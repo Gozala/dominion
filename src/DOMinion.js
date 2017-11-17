@@ -7,6 +7,7 @@ import type {
   IndexedElement,
   Indexed,
   Thunk,
+  Tagged,
   Comment,
   Node,
   Style,
@@ -76,6 +77,9 @@ class TextNode<message> implements Text<message> {
   toDebugString(): string {
     return `#${this.data}`
   }
+  map<tagged>(tag: message => tagged): Text<tagged> {
+    return (this: Text<any>)
+  }
 }
 
 class CommentNode<message> implements Comment<message> {
@@ -86,6 +90,25 @@ class CommentNode<message> implements Comment<message> {
   }
   toDebugString(): string {
     return `<!-- ${this.data} -->`
+  }
+  map<tagged>(tag: message => tagged): Comment<tagged> {
+    return (this: Comment<any>)
+  }
+}
+
+class TaggedNode<outer, inner> implements Tagged<outer, inner> {
+  nodeType = nodeType.TAGGED_ELEMENT_NODE
+  node: Node<inner>
+  tag: inner => outer
+  constructor(node: Node<inner>, tag: inner => outer) {
+    this.node = node
+    this.tag = tag
+  }
+  toDebugString(): string {
+    return `<tagged tag=${this.tag.toString()}>${this.node.toDebugString()}</tagged>`
+  }
+  map<tagged>(tag: outer => tagged): Node<tagged> {
+    return new TaggedNode(this, tag)
   }
 }
 
@@ -142,7 +165,9 @@ class ElementNode<message> {
     const settings = [...attributes, ...properties].join(" ")
     const details = settings === "" ? style : ` ${settings}${style}`
 
-    return `<${localName}${details}>${this.toDebugChildrenString()}</${localName}>`
+    return `<${localName}${details}>${this.toDebugChildrenString()}</${
+      localName
+    }>`
   }
 }
 
@@ -216,6 +241,9 @@ class UnindexedElementNode<message> extends ElementNode<message>
   toDebugChildrenString(): string {
     return this.children.map(child => child.toDebugString()).join("")
   }
+  map<tagged>(tag: message => tagged): Node<tagged> {
+    return new TaggedNode(this, tag)
+  }
 }
 
 class IndexedElementNode<message> extends ElementNode<message>
@@ -228,6 +256,9 @@ class IndexedElementNode<message> extends ElementNode<message>
   }
   toDebugChildrenString(): string {
     return this.children.map(this.toDebugChildString).join("")
+  }
+  map<tagged>(tag: message => tagged): Node<tagged> {
+    return new TaggedNode(this, tag)
   }
 }
 
@@ -250,6 +281,9 @@ class ThunkNode<message, params: Array<mixed>>
   }
   toDebugString(): string {
     return this.force().toDebugString()
+  }
+  map<tagged>(tag: message => tagged): Node<tagged> {
+    return new TaggedNode(this, tag)
   }
 }
 
