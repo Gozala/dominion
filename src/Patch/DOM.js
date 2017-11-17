@@ -436,6 +436,7 @@ class DOMinion {
   mailbox: { send: Object => void }
   constructor(mailbox: { send: Object => void }) {
     this.mailbox = mailbox
+    this.decoders = (Object.create(null): Object)
   }
   static handleEvent(event: Event) {
     const { currentTarget, type, eventPhase } = event
