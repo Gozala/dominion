@@ -894,12 +894,10 @@ const diffListeners = <x, a>(
             : [lastListener, nextListener]
 
     if (remove) {
-      console.log("remove listener")
       const { type, capture, decoder } = remove
       log = Diff.removeEventDecoder(log, type, decoder, capture)
     }
     if (add) {
-      console.log("add listener")
       const { type, capture, decoder } = add
       log = Diff.addEventDecoder(log, type, decoder, capture)
     }
