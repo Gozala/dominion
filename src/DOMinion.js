@@ -377,7 +377,7 @@ export const createHost = <message>(
 ): Element<message> => createElement("x-host", settings, children)
 
 export const mount = DOMPatch.archive
-export { diff, patch }
+export { diff, patch, nodeType }
 
 export type {
   Text,
