@@ -81,13 +81,8 @@ export class Boolean extends JSONTable.Boolean {
     Boolean.addValue(builder, value)
     return Boolean.endBoolean(builder)
   }
-  static decode(table: Boolean): boolean | FieldError<Boolean> {
-    const value = table.value()
-    if (value) {
-      return value
-    } else {
-      return new FieldError("value", Boolean)
-    }
+  static decode(table: Boolean): boolean {
+    return table.value()
   }
   decode() {
     return Boolean.decode(this)
