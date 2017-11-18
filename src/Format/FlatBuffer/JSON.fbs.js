@@ -226,7 +226,7 @@ export default class JSON {
     [JSONTable.JSONVariant.Float]: new Float(),
     [JSONTable.JSONVariant.Integer]: new Integer(),
     [JSONTable.JSONVariant.JSONArray]: new JSONArray(),
-    [JSONTable.JSONVariant.JSONObject]: new Object()
+    [JSONTable.JSONVariant.JSONObject]: new JSONObject()
   }
   static from<a>(value: mixed): Value {
     return (value: any)
