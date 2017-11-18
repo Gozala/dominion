@@ -125,12 +125,12 @@ export default class DOMPatch {
   target: Node
   childrenSelected: boolean
   stash: Stash
-  mailbox: { send: Object => void }
+  mailbox: { send: (Object, event: Event) => void }
   reset(
     target: Node,
     childrenSelected: boolean,
     stash: Stash,
-    mailbox: { send: Object => void }
+    mailbox: { send: (Object, event: Event) => void }
   ) {
     this.target = target
     this.childrenSelected = childrenSelected
@@ -433,8 +433,8 @@ const CAPTURING_PHASE = 1
 
 class DOMinion {
   decoders: { string: EventDecoder }
-  mailbox: { send: Object => void }
-  constructor(mailbox: { send: Object => void }) {
+  mailbox: { send: (Object, Event) => void }
+  constructor(mailbox: { send: (Object, Event) => void }) {
     this.mailbox = mailbox
     this.decoders = (Object.create(null): Object)
   }
@@ -447,8 +447,8 @@ class DOMinion {
       const hash = `${event.type}${capture ? "!" : "^"}`
       const decoder = host.decoders[hash]
       if (decoder) {
-        const result = Decoder.decode(decoder, event)
-        host.mailbox.send(result)
+        const detail = Decoder.decode(decoder, event)
+        host.mailbox.send(detail, event)
         return null
       }
     }
@@ -476,11 +476,14 @@ class DOMinion {
 }
 
 class DOMArchive<node: Node> {
-  static receive = message => {}
+  static receive = (message, event) => {}
   target: node
-  mailbox: { send: Object => void }
+  mailbox: { send: (Object, Event) => void }
   cursor: DOMPatch = new DOMPatch()
-  constructor(target: node, receive: Object => void = DOMArchive.receive) {
+  constructor(
+    target: node,
+    receive: (Object, Event) => void = DOMArchive.receive
+  ) {
     this.target = target
     this.mailbox = { send: receive }
   }
