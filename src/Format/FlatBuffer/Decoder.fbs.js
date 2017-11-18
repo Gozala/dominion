@@ -198,8 +198,13 @@ class Either extends DecoderTable.Either {
     decoders: Decoder.Decoder<a>[]
   ): Encoded<Either> {
     const variants = []
-    for (const variant of decoders) {
-      variants.push(Variant.encode(builder, variant))
+    for (const decoder of decoders) {
+      const encodedDecoder = Variant.encode(builder, decoder)
+      Variant.startVariant(builder)
+      Variant.addDecoderType(builder, Variant.typeOf(decoder))
+      Variant.addDecoder(builder, encodedDecoder)
+      const encodedVariant = Variant.endVariant(builder)
+      variants.push(encodedVariant)
     }
 
     const encodedVariants = Either.createVariantsVector(builder, variants)
@@ -627,7 +632,7 @@ class Record extends DecoderTable.Record {
   }
 }
 
-export default class Variant {
+export default class Variant extends DecoderTable.Variant {
   static pool: { [DecoderType]: VariantType } = {
     [decoderType.Accessor]: new Accessor(),
     [decoderType.Collection]: new Collection(),
@@ -739,6 +744,7 @@ export default class Variant {
     const cursor = Variant.cursor(type)
     const variant = cursor && table.decoder(cursor)
     const decoder = variant && variant.decode()
+
     if (decoder == null) {
       return new VariantError(Variant, decoderType, type)
     } else if (decoder instanceof DecoderError) {
